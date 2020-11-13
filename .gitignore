@@ -2,3 +2,8 @@
 *.jl.cov
 *.jl.mem
 /docs/build/
+
+Manifest.toml
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+

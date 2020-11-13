@@ -11,8 +11,12 @@ makedocs(;
         canonical="https://hkim89.github.io/flxQTL.jl",
         assets=String[],
     ),
+#     doctest=false,
     pages=[
         "Home" => "index.md",
+        "Guide" => "guide/tutorial.md",
+                   "guide/analysis.md",
+        "Types and Functions" => "functions.md"
     ],
 )
 
