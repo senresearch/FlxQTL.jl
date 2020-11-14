@@ -85,22 +85,24 @@ end
 
 
 Implement 2d-genome scan with/without LOCO (Leave One Chromosome Out). Note that the second `gene2Scan()` is based on conventional MLMM: 
-``vec(Y)~ MVN((Z \\otimes X)vec(B) (or XBZ') , K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2)``, where `K` is a genetic kinship, 
-``\\Sigma_1, \\Sigma_2`` are covariance matrices for 
-random and error terms,respectively.  `Z` can be replaced with an identity matrix.
+```math
+vec(Y) \\sim MVN((Z \\otimes X)vec(B) (or XBZ') , K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2),
+```
+ where `K` is a genetic kinship, ``\\Sigma_1, \\Sigma_2`` are covariance matrices for 
+random and error terms, respectively.  `Z` can be replaced with an identity matrix.
 
 # Arguments
 
 - `cross` : An integer indicating the number of alleles or genotypes. Ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
-- `Tg` : A n x n matrix of eigenvectors from [`GRM`](@ref Main.flxQTL.GRM) (Genetic Relatedness Matrix, kinship). 
+- `Tg` : A n x n matrix of eigenvectors from [`GRM`](@ref flxQTL.GRM) (Genetic Relatedness Matrix, kinship). 
        Returns 3d-array of eigenvectors as many as Chromosomes if `LOCO` is true.
 - `Tc` : A m x m matrix of eigenvectors from climatic relatedness matrix. 
 - `Λg` : A n x 1 vector of eigenvalues from kinship. Returns a matrix of eigenvalues if `LOCO` is true.
 - `λc` : A m x 1 vector of eigenvalues from climatic relatedness matrix. Use `ones(m)` for no climatic information added.
 - `Y0` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
-        i.e. Y0[1,:] (a vector) -> Y[[1],:] (a matrix) .
-- `XX` : A type of `Markers`. See [`Markers`](@ref).
+        i.e. `Y0[1,:]` (a vector) -> `Y[[1],:]` (a matrix) .
+- `XX` : A type of [`Markers`](@ref flxQTL.Util.Markers).
 - `Z0` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.). 
       If nothing to insert in `Z0`, just insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates. 
 - `LOCO` : Boolean. Default is `false` (no LOCO). Runs genome scan using LOCO (Leave One Chromosome Out).
@@ -114,14 +116,15 @@ random and error terms,respectively.  `Z` can be replaced with an identity matri
 - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is 0.001.  
 
 !!! Note
-   - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not, 
+
+- When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not, 
     can reduce both `tol0` and `tol` to `1e-4` or further.
   
 
 # Output
 
-- `LODs` : LOD scores. Can change to ``- log[10]{P}`` using [`lod2logP`](@ref Main.flxQTL.lod2logP).
-- `est0` : A type of [`Approx`](@ref ) including parameter estimates under H0: no QTL. 
+- `LODs` : LOD scores. Can change to ``- \\log_{10}{P}`` using [`lod2logP`](@ref flxQTL.Util.lod2logP).
+- `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL. 
 
 """
 function gene2Scan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},

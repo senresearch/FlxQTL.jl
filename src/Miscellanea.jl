@@ -31,11 +31,10 @@ Assigns different numbers of seeds to workers (or processes).
 
 # Examples
 
-```@example
-using .Util
-using Random
-addprocs(10)
-setSeed(1,20)
+```julia
+julia> using Random, flxQTL
+julia> addprocs(10)
+julia> flxQTL.setSeed(1,20)
 
 ```
 
@@ -242,7 +241,7 @@ end
 
     lod2logP(LODs::Union{Array{Float64,1},Array{Any,1}},v::Int64)
 
-Caculates ``-log[10]{P}`` from LOD scores.
+Caculates ``-\\log_{10}{P}`` from LOD scores.
 
 # Arguments
     

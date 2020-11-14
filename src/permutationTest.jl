@@ -132,8 +132,10 @@ end
       permTest(nperm,cross,Kg,Y0,XX::Markers;pval=[0.05 0.01],Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
 
 Implement permutation test to get thresholds at the levels of type 1 error, `α`.  Note that the second `permTest()` is for the conventional MLMM: 
-``vec(Y)~ MVN((I \\otimes X)vec(B) (or BX), K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2)``, where `K` is a genetic kinship, 
-``\\Sigma_1, \\Sigma_2`` are covariance matrices for random and error terms,respectively.
+```math
+vec(Y)\\sim MVN((I \\otimes X)vec(B) (or BX), K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2),
+``` 
+where `K` is a genetic kinship, ``\\Sigma_1, \\Sigma_2`` are covariance matrices for random and error terms, respectively.
 
 # Arguments
 
@@ -143,14 +145,14 @@ Implement permutation test to get thresholds at the levels of type 1 error, `α`
 - `Kg` : A n x n genetic kinship matrix. Should be symmetric positive definite.
 - `Kc` : A m x m climatic relatedness matrix. Should be symmetric positive definite.
 - `Y0` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
-        i.e. Y0[1,:] (a vector) -> Y[[1],:] (a matrix) .
-- `XX` : A type of `Markers`. See [`Markers`](@ref).
+        i.e. `Y0[1,:]`  (a vector) -> `Y[[1],:]`  (a matrix) .
+- `XX` : A type of [`Markers`](@ref Util.Markers).
 - `Z0` : An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.). 
       If nothing to insert in `Z0`, just insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates. 
 
 ## Keyword Arguments 
 
-- `pval` : A vector of p-values to get their quantiles. Default is [0.05 0.01] (without comma).
+- `pval` : A vector of p-values to get their quantiles. Default is `[0.05  0.01]` (without comma).
 - `Xnul` : A matrix of covariates. Default is intercepts (1's).  Unless plugging in particular covariates, just leave as it is.
 - `itol` : A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` : A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
@@ -160,7 +162,7 @@ Implement permutation test to get thresholds at the levels of type 1 error, `α`
 # Output
 
 - `maxLODs` : A nperm x 1 vector of maximal LOD scores by permutation. 
-- `H1par_perm` : A type of [`Approx`](@ref ) including parameter estimates under H0: no QTL by permutation. 
+- `H1par_perm` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL by permutation. 
 - `cutoff` : A vector of thresholds corresponding to `pval`.
 
 

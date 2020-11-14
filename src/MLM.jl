@@ -5,7 +5,8 @@
 A module for fitting general Multivariate Linear Models motivated by functional data analysis via mle or reml.
 The default fitting method is mle. ( i.e. reml=false)
 
-The model: ``Y=XBZ'+E``, where ``E(Y)=XBZ' ``  (or ``E(vec(Y))= (Z \\otimes X)vec(B)`` ), var(vec(E))=\\Sigma \\otimes I.``
+The model: 
+``Y=XBZ'+E``, where ``E(Y)=XBZ'`` (or ``E(vec(Y))= (Z \\otimes X)vec(B)`` ),  ``var(vec(E))=\\Sigma \\otimes I.``
 size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
 
 """

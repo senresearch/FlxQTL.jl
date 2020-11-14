@@ -2,7 +2,8 @@
 
     EcmNestrv
 
-A module for baseline algorithm to fit a flexible multivariate linear mixed model (flxMLMM).
+A module for baseline algorithm using ECM (Expectation-Conditional Maxization) with Speed restarting Nesterov's accelerated gradient method 
+to fit a flexible multivariate linear mixed model (flxMLMM).
 
 """
 module EcmNestrv

@@ -23,7 +23,7 @@ Creates a struct of arrays for plotting LOD scores, (main, interaction) effects
 - `pos` : A vector of marker positions
 - `lod` : A matrix of LOD scores obtained from 1d- or 2d-genome scan.  Can be a matrix of effects (main, or interaction).
 
-See [`Markers`](@ref Main.flxQTL.Markers).
+See [`Markers`](@ref flxQTL.Util.Markers).
 
 """
 struct layers
