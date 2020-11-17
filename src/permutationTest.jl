@@ -140,15 +140,15 @@ where `K` is a genetic kinship, ``\\Sigma_1, \\Sigma_2`` are covariance matrices
 # Arguments
 
 - `nperm` : An integer indicating the number of permutation to be implemented.
-- `cross` : An integer indicating the number of alleles or genotypes. Ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+- `cross` : An integer indicating the number of alleles or genotypes. Ex. `2` for RIF, `4` for four-way cross, `8` for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
 - `Kg` : A n x n genetic kinship matrix. Should be symmetric positive definite.
 - `Kc` : A m x m climatic relatedness matrix. Should be symmetric positive definite.
 - `Y0` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y0[1,:]`  (a vector) -> `Y[[1],:]`  (a matrix) .
-- `XX` : A type of [`Markers`](@ref Util.Markers).
+- `XX` : A type of [`Markers`](@ref).
 - `Z0` : An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.). 
-      If nothing to insert in `Z0`, just insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates. 
+      If nothing to insert in `Z0`, just insert an identity matrix, `Matrix(1.0I,m,m)`.  `m` traits x `q` phenotypic covariates. 
 
 ## Keyword Arguments 
 
@@ -157,12 +157,13 @@ where `K` is a genetic kinship, ``\\Sigma_1, \\Sigma_2`` are covariance matrices
 - `itol` : A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` : A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
-- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is 0.001.  
+- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.  
 
 # Output
 
 - `maxLODs` : A nperm x 1 vector of maximal LOD scores by permutation. 
-- `H1par_perm` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL by permutation. 
+- `H1par_perm` : A type of struct, `EcmNestrv.Approx(B,τ2,Σ,loglik)` including parameter estimates  or `EcmNestrv.Result(B,Vc,Σ,loglik)` 
+                for a conventional MLMM under H0: no QTL by permutation. 
 - `cutoff` : A vector of thresholds corresponding to `pval`.
 
 

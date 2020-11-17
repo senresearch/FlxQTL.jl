@@ -105,7 +105,7 @@ end
         Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
 
-Implement 1d-genome scan with/without LOCO (Leave One Chromosome Out).  Note that the third `geneScan()` is based on conventional MLMM: 
+Implement 1d-genome scan with/without LOCO (Leave One Chromosome Out).  Note that the third `geneScan()` is based on a conventional MLMM: 
 ```math 
 vec(Y) \\sim MVN((Z \\otimes X)vec(B) (or XBZ'),  K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2),
 ```
@@ -117,14 +117,14 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 - `cross` : An integer indicating the number of alleles or genotypes. Ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
-- `Tg` : A n x n matrix of eigenvectors from [`GRM`](@ref GRM) (Genetic Relatedness Matrix, kinship). 
+- `Tg` : A n x n matrix of eigenvectors from [`K2eig`](@ref), or [`K2Eig`](@ref). 
        Returns 3d-array of eigenvectors as many as Chromosomes if `LOCO` is true.
 - `Tc` : A m x m matrix of eigenvectors from climatic relatedness matrix. 
 - `Λg` : A n x 1 vector of eigenvalues from kinship. Returns a matrix of eigenvalues if `LOCO` is true.
 - `λc` : A m x 1 vector of eigenvalues from climatic relatedness matrix. Use `ones(m)` for no climatic information added.
 - `Y0` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y0[1,:]` (a vector) ->`Y[[1],:]` (a matrix) .
-- `XX` : A type of [`Markers`](@ref flxQTL.Util.Markers).
+- `XX` : A type of [`Markers`](@ref).
 - `Z0` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.). 
       If nothing to insert in `Z0`, just exclude it or insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates. 
 - `LOCO` : Boolean. Default is `false` (no LOCO). Runs genome scan using LOCO (Leave One Chromosome Out).
@@ -135,7 +135,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
-- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is 0.001.  
+- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.  
 
 !!! Note
 
@@ -145,10 +145,10 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 # Output
 
-- `LODs` : LOD scores. Can change to ``- \\log_{10}{P}`` using [`lod2logP`](@ref flxQTL.Util.lod2logP).
+- `LODs` : LOD scores. Can change to ``- \\log_{10}{P}`` in [`lod2logP`](@ref).
 - `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL. 
 - `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL. 
-- `X1,Y1,(Z1)` : transformed `XX.X, Y0, Z0` by `Tg, Tc` to use permutation test.
+- `X1,Y1,(or Z1)` : transformed `XX.X, Y0, (or Z0)` by `Tg, Tc` to use permutation test.
 
 """
 function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},

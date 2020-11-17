@@ -15,6 +15,8 @@ module MLM
 
 using LinearAlgebra
 
+# export  EstI, EstZ, Estimat
+
 struct EstZ
      pX::Array{Float64,2}
      Σ::Array{Float64,2}
@@ -78,8 +80,8 @@ end
 
 """
 
-  mGLM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},reml::Bool=false)
-  mGLM(Y::Array{Float64,2},X::Array{Float64,2},reml::Bool=false)
+      mGLM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},reml::Bool=false)
+      mGLM(Y::Array{Float64,2},X::Array{Float64,2},reml::Bool=false)
 
 Fitting multivariate General Linear Models via MLE (or REML) and returns a type of a struct `Estimat`.  
 
@@ -107,7 +109,7 @@ function mGLM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},reml::
     #number of secondary (e.g. environment factors, grouping, etc.) variables in Z: rank(Z)=q
     q=size(Z,2)
     
-    estInd=mGLMInd(Y,X,Z,reml)
+    estInd=mGLMind(Y,X,Z,reml)
 #     Σ_0=estInd.Σ
 #     pX=estInd.pX
     
@@ -151,7 +153,7 @@ end
 
 
 
-
+#Z=I
 function mGLM(Y::Array{Float64,2},X::Array{Float64,2},reml::Bool=false)
 
     #number of individuals; number of covariates
@@ -165,7 +167,8 @@ function mGLM(Y::Array{Float64,2},X::Array{Float64,2},reml::Bool=false)
     pX= Xquad\X'  #  inv(R'R)*X'
    
     B=BLAS.gemm('N','N',pX,Y)
-    
+#     println("This is mGLM. $(B)")
+
     # mle for B and Σ=I 
     Ŷ=BLAS.gemm('N','N',X,B)  # Yhat= XB
     ESS=Symmetric(BLAS.syrk('U','T',1.0,(Y-Ŷ)))
@@ -180,7 +183,7 @@ end
         loglik += 0.5*p*m*log(2π)
     end
     
-    return Estimat(Σ,B,loglik)
+    return Estimat(B,Σ,loglik)
 end
 
 """
@@ -203,7 +206,7 @@ end
 
 
 
-# export mGLMind, EstI, EstZ, mGLM, Estimate
+
 
 
 

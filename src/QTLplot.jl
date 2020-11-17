@@ -15,15 +15,13 @@ using PyPlot
   
     layers(chr::Array{Any,1},pos::Array{Float64,1},lod::Array{Float64,2})
 
-Creates a struct of arrays for plotting LOD scores, (main, interaction) effects
+Creates a struct of arrays for plotting LOD scores, (or main, interaction) effects
 
 # Argument
 
 - `chr` : A vector of strings or numbers indicating Chromosome names, ex. 1,2,3,... or 1K,1N,2K,2N,...
 - `pos` : A vector of marker positions
 - `lod` : A matrix of LOD scores obtained from 1d- or 2d-genome scan.  Can be a matrix of effects (main, or interaction).
-
-See [`Markers`](@ref flxQTL.Util.Markers).
 
 """
 struct layers

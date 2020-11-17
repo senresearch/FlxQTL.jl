@@ -2,7 +2,7 @@
 
     EcmNestrv
 
-A module for baseline algorithm using ECM (Expectation-Conditional Maxization) with Speed restarting Nesterov's accelerated gradient method 
+A module for base algorithms using ECM (Expectation-Conditional Maxization) with Speed restarting Nesterov's accelerated gradient method 
 to fit a flexible multivariate linear mixed model (flxMLMM).
 
 """
@@ -12,9 +12,9 @@ using LinearAlgebra
 import Statistics: mean
 import Distributions: MvNormal, loglikelihood
 
-export Approx, Result
 
-#export functions
+
+
 # export fixX,fixZ,fixVar,fixVar!,eStep!,cmStep,cmStep!,ecmLMM,Loglik
 
 # export ecmNestrvAG, updatNestrvAG!, fullECM, NestrvAG
@@ -402,7 +402,6 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B_cur,τ2_cur::Float64,Σ_cur
 
     return B_new, τ2_new, Σ_new,loglik1
 end
-
 
 
 

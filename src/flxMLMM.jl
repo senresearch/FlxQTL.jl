@@ -22,9 +22,9 @@ import Statistics: mean, var
 
 using ..MLM
 
-using ..EcmNestrv
+using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result
 
-using ..Util: mat2array,array2mat, Markers, newMarkers
+using ..Util: mat2array,array2mat, Markers, newMarkers,lod2logP
 
 include("QTLfunctions.jl")
 # include("Miscellanea.jl")

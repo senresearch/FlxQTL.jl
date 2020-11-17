@@ -1,7 +1,7 @@
 
 """
 
-   Util
+     Util
 
 A module for utility functions.
 
@@ -32,9 +32,10 @@ Assigns different numbers of seeds to workers (or processes).
 # Examples
 
 ```julia
-julia> using Random, flxQTL
+julia> using Distributed
 julia> addprocs(10)
-julia> flxQTL.setSeed(1,20)
+julia> @everywhere using flxQTL
+julia> setSeed(1,20)
 
 ```
 
@@ -42,8 +43,10 @@ julia> flxQTL.setSeed(1,20)
 function setSeed(lw::Int64,up::Int64,replace::Bool=false)
 np=nprocs();pid=procs()
 seed=sample(lw:up,np,replace=replace)
+
 for i=1:np
 remotecall_fetch(()->Random.seed!(seed[i]),pid[i])
+#         println(pid[i])
 end
 end
 
@@ -97,7 +100,7 @@ end
 ## stacking a matrix to a vector (vectorizing a matrix)
 """
 
-   mat2vec(mat)
+     mat2vec(mat)
 
 Stacks a matrix to a vector, i.e. vectorizing a matrix.
 
@@ -115,7 +118,7 @@ end
 
 """
 
-    mat2array(cross::Int64,X0)
+     mat2array(cross::Int64,X0)
 
 Returns a matrix of genotype probabilities to 3-d array. size(X0)=(p1,n) --> (p,cross,n), where `p1` = ` cross*p` for `p` markers, 
 `cross` alleles or genotypes, and `n` individuals.
@@ -140,7 +143,7 @@ end
 
 """
 
-    array2mat(cross::Int64,X0::Array{Float64,3})
+     array2mat(cross::Int64,X0::Array{Float64,3})
 
 Returns a 3-d array to a matrix of genotype probabilities. size(X0)=(p,cross,n) --> (p1,n), where `p1` = ` cross*p` for `p` markers, 
 `cross` alleles or genotypes, and `n` individuals.
@@ -207,7 +210,7 @@ Attains genotype indices to drop correlated or bad markers.
 
 # Arguments
 - `GenoData` : A matrix of genotype data. size(GenoData)= (p,n) for `p` markers and `n` individuals.
-- `maf` : A scalar for dropping criteron of markers. Default is `0,025` i.e. markers of MAF < 0.025 are dropped.
+- `maf` : A scalar for dropping criterion of markers. Default is `0,025` i.e. markers of MAF < 0.025 are dropped.
 
 """
 function getGenoidx(GenoData::Array{Any,2},maf::Float64=0.025)
@@ -267,7 +270,7 @@ for 2-d genome scan to avoid singularity.
 # Arguments
 
 - `Chr` : A type of Any indicating a particular chromosome to sort markers out.
-- `XX` : A type of `Markers`. See [`Markers`](@ref).
+- `XX` : A type of [`Markers`](@ref).
 - `cross` : An integer indicating the number of alleles or genotypes. Ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
 - `cM` : An integer of dropping criterion of markers. Default is 2, i.e. keeping only markers in every 2 cM, or dropping markers within 2cM between 2 markers.
     
@@ -347,7 +350,7 @@ end
     Y_huber(Y::Array{Float64,2})
     
 Rescale Y (phenotype or trait data) to be less sensitive to outliers using by Huber loss function and MAD (median absolute deviation). 
-size(Y)=(m,n) for m trait and n individuals.
+size(Y)=(m,n) for `m` trait and `n` individuals.
     
 """       
 function Y_huber(Y::Array{Float64,2})
