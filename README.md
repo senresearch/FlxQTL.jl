@@ -10,7 +10,7 @@
 
 *flxQTL.jl* is a a package for a multivariate linear mixed model based QTL analysis tool that supports 1D-, 2D-genome scans, 
 [matplotlib]((http://matplotlib.org/)) based visualization using [PyPlot.jl](https://github.com/JuliaPy/PyPlot.jl) for 1D genome scan and effects plots, 
-a heat map for 2D scan, computation of kinship matrices, and auxillary functions for standardization of trait data using the Huber loss, transformation of LOD scores to $\log_{10}P$, 
+a heat map for 2D scan, computation of kinship matrices, and auxillary functions for standardization of trait data using the Huber loss, transformation of LOD scores to ``\\log_{10}P``, 
 reording genotype data, etc.  
 
 ## Installation
@@ -28,7 +28,7 @@ Or, equivalently,
 ```julia
 julia> using Pkg; Pkg.add("flxQTL")
 ```
-Currently Julia `1.5` supports for the package.
+Currently Julia `1.0.5`, `1.5` support for the package.
 
 
 To remove the package from the Julia REPL,

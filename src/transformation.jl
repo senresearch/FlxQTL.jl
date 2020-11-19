@@ -198,7 +198,7 @@ end
 function initial(Xnul,Y0,incl_τ2::Bool=true)
      m=size(Y0,1);
     init_val=MLM.mGLM(convert(Array{Float64,2},Y0'),convert(Array{Float64,2},Xnul'))
-
+ 
       if (incl_τ2)
         lmul!(sqrt(1/m),init_val.Σ)
         τ2 =mean(Diagonal(init_val.Σ))
