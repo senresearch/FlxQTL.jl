@@ -9,7 +9,7 @@ run by Nesterov's Accelerated Gradient  with restarting scheme incorporated with
 
 The model:
 
-``Y=XBZ'+R+E``, where ``E(vec(Y))= (Z \\otimes X)vec(B)``,  ``var(vec(Y))= \\tau^2 K_G \\otimes I_n \\otimes \\Sigma``
+``Y=XBZ'+R+E``, where ``E(vec(Y))= (Z \\otimes X)vec(B)``,  ``var(vec(Y))= \\tau^2 K_G \\otimes K_C + I_n \\otimes \\Sigma``
 
 """
 module flxMLMM
@@ -22,9 +22,9 @@ import Statistics: mean, var
 
 using ..MLM
 
-using ..EcmNestrv
+using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result
 
-using ..Util: mat2array,array2mat, Markers, newMarkers
+using ..Util: mat2array,array2mat, Markers, newMarkers,lod2logP
 
 include("QTLfunctions.jl")
 # include("Miscellanea.jl")

@@ -1,6 +1,6 @@
 """
 
-   GRM
+     GRM
 
 A module for computing Genetic Relatedness Matrix (or kinship).
 
@@ -13,6 +13,7 @@ module GRM
 using Statistics
 using Distributed
 using LinearAlgebra
+import StatsBase: sample
 
 # include("Miscellanea.jl")
 import ..Util: Markers
@@ -28,7 +29,7 @@ This function is not for 4-way cross genotype data.  See [`kinship4way`](@ref).
 
 # Argument
 
-- genematrix : A matrix of genotypes (0,1,2). size(genematrix)= (p,n) for `p` genetic markers x `n` individuals(or lines).
+- `genematrix` : A matrix of genotypes, i.e. 0,1,2.  size(genematrix)= (p,n) for `p` genetic markers x `n` individuals(or lines).
                
 
 # Output
@@ -61,15 +62,15 @@ end
 
 """
   
-    kinship4way(genmat::Array{Float64,2})
+     kinship4way(genmat::Array{Float64,2})
 
-Computes a kinship for four-way cross data counting different alleles between two markers: ex. AB-AB=0; AB-AC=1; AB-CD=2,...
-Note: In [R/qtl](https://cran.r-project.org/web/packages/qtl/qtl.pdf), genotypes are labeled as 1=AC;2=BC;3=AD;4=BD by the function, `read.cross`.
+Computes a kinship for four-way cross data counting different alleles between two markers: ex. AB-AB=0; AB-AC=1; AB-CD=2,``\\dots``
+Note: In [R/qtl](https://cran.r-project.org/web/packages/qtl/qtl.pdf), genotypes are labeled as 1=AC; 2=BC; 3=AD; 4=BD by the function, `read.cross`.
 
 
 # Argument
 
-- genmat : A matrix of genotypes for `four-way cross` (1,2,...). 
+- `genmat` : A matrix of genotypes for `four-way cross` ``(1,2, \\dots)``. 
            size(genematrix)= (p,n), for `p` genetic markers x `n` individuals(or lines).
 
 # Output 
@@ -114,9 +115,9 @@ Computes a kinship matrix using the Gaussian Kernel.
 
 # Arguments
 
-- climate : A matrix of genotype, or climate information data. size(climate)=(r,m), such that `r` genotype markers (or days/years of climate factors, 
+- `climate` : A matrix of genotype, or climate information data. size(climate)=(r,m), such that `r` genotype markers (or days/years of climate factors, 
             i.e. precipitations, temperatures, etc.), and `m` individuals (or environments/sites)
-- ρ : A free parameter determining the width of the kernel. Could be attained empirically.  
+- `ρ` : A free parameter determining the width of the kernel. Could be attained empirically.  
 
 # Output
 
@@ -139,15 +140,15 @@ end
 
 """
 
-   kinshipLin(mat,cross)
+    kinshipLin(mat,cross)
 
 Calculates a kinship (or climatic relatedness, [`kinshipGs`](@ref)) matrix by linear kernel. 
 
 # Arguments
 
-- mat : A matrix of genotype (or allele) probabilities usually extracted from [R/qtl](https://rqtl.org/tutorials/rqtltour.pdf), 
-        , [R/qtl2](https://kbroman.org/qtl2/assets/vignettes/user_guide.html), or the counterpart packages. size(mat)= (p,n) for p genetic markers x n individuals. 
-- cross : A scalar indicating the number of alleles or genotypes. ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+- `mat` : A matrix of genotype (or allele) probabilities usually extracted from [R/qtl](https://rqtl.org/tutorials/rqtltour.pdf), 
+        [R/qtl2](https://kbroman.org/qtl2/assets/vignettes/user_guide.html), or the counterpart packages. size(mat)= (p,n) for p genetic markers x n individuals. 
+- `cross` : A scalar indicating the number of alleles or genotypes. ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
 
 # Output
@@ -171,13 +172,13 @@ end
 
 """
 
-   kinshipCtr(genmat::Array{Float64,2})
+     kinshipCtr(genmat::Array{Float64,2})
 
 Calculates a kinship by a centered genotype matrix (linear kernel), i.e. genotypes subtracted by marker mean.
 
 # Argument
 
-- genmat : A matrix of genotype data (0,1,2). size(genmat)=(p,n) for `p` markers x `n` individuals
+- `genmat` : A matrix of genotype data (0,1,2). size(genmat)=(p,n) for `p` markers x `n` individuals
 
 # Output
 
@@ -198,14 +199,15 @@ end
 
 """
 
-   kinshipStd(genmat::Array{Float64,2})
+     kinshipStd(genmat::Array{Float64,2})
+
 
 Calculates a kinship by a standardized (or normalized) genotype matrix (linear kernel), i.e. genotypes subtracted by marker mean and divided by marker standard deviation.  
 Can also do with climatic information data. See [`kinshipGs`](@ref).
 
 # Argument
 
-- genmat : A matrix of genotype data (0,1,2). size(genmat)=(p,n) for `p` markers x `n` individuals
+- `genmat` : A matrix of genotype data (0,1,2). size(genmat)=(p,n) for `p` markers x `n` individuals
 
 # Output
 
@@ -233,9 +235,17 @@ This function runs faster by CPU parallelization.  Add workers/processes using `
 
 # Arguments
 
-- f : A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
-- nb : An integer indicating the number of bootstrap. It does not have to be a large number. Ex. K = shinkage(kinshipMan,20,myGeno)
-- geno : A matrix of genotypes
+- `f `: A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
+- `nb` : An integer indicating the number of bootstrap. It does not have to be a large number.  
+- `geno` : A matrix of genotypes
+
+# Example
+
+```julia
+julia> using flxQTL
+julia> addprocs(8) 
+julia> K = shinkage(kinshipMan,20,myGeno)
+```
 
 # Output
 
@@ -313,9 +323,9 @@ Generates 3-d array of full-rank positive definite kinship matrices by shrinkage
 
 # Argument
 
-- kin :  A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref)
-- nb : An integer indicating the number of bootstrap.
-- g : A struct of arrays, type `Markers`. [`Markers`](@ref).
+- `kin` :  A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref)
+- `nb` : An integer indicating the number of bootstrap.
+- `g` : A struct of arrays, type [`Markers`](@ref).
    
 
 # Output
@@ -354,8 +364,8 @@ For a non-positive definite kinship, a tweak like a weighted average of kinship 
 
 # Arguments
 
-- kin :  A function of computing a kinship. Can only use with [`kinshipCtr`](@ref), [`kinshipStd`](@ref)
-- g : A struct of arrays, type `Markers`. [`Markers`](@ref).
+- `kin` :  A function of computing a kinship. Can only use with [`kinshipCtr`](@ref), [`kinshipStd`](@ref)
+- `g` : A struct of arrays, type  [`Markers`](@ref).
 
 # Output
 
