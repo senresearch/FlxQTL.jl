@@ -51,4 +51,4 @@ For its installation, consult with [MKL.jl](https://github.com/JuliaComputing/MK
 
 ## Documentation
 
-The documentation is published in here.  To learn more about Julia functionality, the [Julia documentation](https://julialang.org) can be found.
+The documentation is published in [flxQTL manual](https://hkim89.github.io/flxQTL.jl/stable).  To learn more about Julia functionality, the [Julia documentation](https://julialang.org) can be found.

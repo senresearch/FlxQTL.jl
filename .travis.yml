@@ -4,7 +4,6 @@ codecov: true
 notifications:
   email: false
 julia:
-  - 1.0.5
   - 1.5
   - nightly
 os:
