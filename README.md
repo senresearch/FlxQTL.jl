@@ -1,7 +1,7 @@
 # flxQTL
 ## *flex*ible Multivariate Linear Mixed Model based *QTL* Analysis for Structured Multiple Traits 
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://hkim89.github.io/flxQTL.jl/stable)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://hkim89.github.io/flxQTL.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://hkim89.github.io/flxQTL.jl/dev)
 [![Build Status](https://travis-ci.com/hkim89/flxQTL.jl.svg?branch=master)](https://travis-ci.org/github/hkim89/flxQTL.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/hkim89/flxQTL.jl?svg=true)](https://ci.appveyor.com/project/hkim89/flxQTL-jl)
@@ -28,7 +28,7 @@ Or, equivalently,
 ```julia
 julia> using Pkg; Pkg.add("flxQTL")
 ```
-Currently Julia `1.0.5`, `1.5` support for the package.
+Currently Julia `1.5` supports for the package.
 
 
 To remove the package from the Julia REPL,

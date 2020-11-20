@@ -8,7 +8,7 @@ makedocs(;
     sitename="flxQTL.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://hkim89.github.io/flxQTL.jl/",
+        canonical="https://hkim89.github.io/flxQTL.jl/stable/",
         assets=String[],
     ),
 #     doctest=false,
