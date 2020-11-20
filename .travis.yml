@@ -13,12 +13,10 @@ arch:
 addons:
   apt:
     packages:
-      - python3-matplotlib
+      - python3.7-matplotlib
 env:
   matrix:
     - PYTHON=python3.7 
-notifications:
-    email: false
 cache:
   directories:
     - ~/.julia/artifacts
