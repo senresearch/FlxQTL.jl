@@ -4,7 +4,7 @@ using Documenter
 makedocs(;
     modules=[flxQTL],
     authors="Hyeonju Kim <hyeonjukm01@gmail.com>",
-    repo="https://github.com/hkim89/flxQTL.jl/blob/{commit}{path}#L{line}",
+#     repo="https://github.com/hkim89/flxQTL.jl/blob/{commit}{path}#L{line}",
     sitename="flxQTL Documentation",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
