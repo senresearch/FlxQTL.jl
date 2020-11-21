@@ -1,9 +1,4 @@
 # Documentation: http://docs.travis-ci.com/user/languages/julia
-os: linux
-before_install: 
-- python -m pip install -U pip
-- python -m pip install -U matplotlib
-
 language: julia
 notifications:
   email: false
@@ -23,6 +18,13 @@ jobs:
   allow_failures:
     - julia: nightly
   include:  
+    - stage: test
+      os: linux
+      before_install: 
+        - sudo apt-get install python3-matplotlib
+#          - python -m pip install -U pip
+#          - python -m pip install -U matplotlib
+
     - stage: Documentation
       julia: 1.5
       script: |
