@@ -1,4 +1,9 @@
 # Documentation: http://docs.travis-ci.com/user/languages/julia
+os: linux
+before_install: 
+- python -m pip install -U pip
+- python -m pip install -U matplotlib
+
 language: julia
 notifications:
   email: false
@@ -10,13 +15,6 @@ os:
   - osx
 arch:
   - x64 
-addons:
-  apt:
-    packages:
-      - python3.7-matplotlib
-env:
-  matrix:
-    - PYTHON=python3.7 
 cache:
   directories:
     - ~/.julia/artifacts
@@ -24,7 +22,7 @@ jobs:
   fast_finish: true
   allow_failures:
     - julia: nightly
-  include:
+  include:  
     - stage: Documentation
       julia: 1.5
       script: |
