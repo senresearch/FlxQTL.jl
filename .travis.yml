@@ -42,3 +42,5 @@ after_success:
       Pkg.add("Coverage")
       using Coverage
       Codecov.submit(process_folder())'
+before_install:
+  - julia -e 'ENV["PYTHON"]=""; Pkg.add("Conda"); using Conda;  Conda.add("python==3.9.0"); Conda.add("matplotlib==3.3.2"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'
