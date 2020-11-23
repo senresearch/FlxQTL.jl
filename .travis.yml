@@ -13,16 +13,18 @@ arch:
 cache:
   directories:
     - ~/.julia/artifacts
+matrix:
+  include:
+    - os : linux
+      before_install: 
+#         - sudo apt-get install python3-matplotlib
+         - pip3 -m install -U pip
+         - pip3 -m install -U matplotlib
 jobs:
   fast_finish: true
   allow_failures:
     - julia: nightly
   include:  
-      before_install: 
-        - sudo apt-get install python3-matplotlib
-#          - python -m pip install -U pip
-#          - python -m pip install -U matplotlib
-
     - stage: Documentation
       julia: 1.5
       script: |
