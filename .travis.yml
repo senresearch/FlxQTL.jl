@@ -24,20 +24,24 @@ jobs:
         - 1.5
         - nightly
       os: linux 
+      dist: focal     
       before_install: 
 #          - pip3 -m install -U matplotlib
         - sudo apt-get install python3-matplotlib 
     - stage: Documentation
       julia: 1.5
-      script: |
-          julia --project=docs -e '
-          using Pkg
-          Pkg.develop(PackageSpec(path=pwd()))
-          Pkg.instantiate()
-          using Documenter: doctest
-          using flxQTL
-          doctest(flxQTL)
-          include("docs/make.jl")'
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        - julia --project=docs/ docs/make.jl           
+#       script: |
+#           julia --project=docs -e '
+#           using Pkg
+#           Pkg.develop(PackageSpec(path=pwd()))
+#           Pkg.instantiate()
+#           using Documenter: doctest
+#           using flxQTL
+#           doctest(flxQTL)
+#           include("docs/make.jl")'
       after_success: skip
 after_success:
   - |
