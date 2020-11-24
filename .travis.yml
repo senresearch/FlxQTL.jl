@@ -8,7 +8,6 @@ julia:
 os:
   - linux
   - osx
-dist: focal  
 arch:
   - x64 
 cache:
@@ -21,13 +20,13 @@ jobs:
     - julia: nightly
   include:  
      - os : linux
+       dist: focal
        before_install: 
-         - pip3 -m install -U pip
          - pip3 -m install -U matplotlib
-    - stage: Documentation
-      julia: 1.5
-      script: |
-        julia --project=docs -e '
+     - stage: Documentation
+       julia: 1.5
+       script: |
+          julia --project=docs -e '
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
           Pkg.instantiate()
