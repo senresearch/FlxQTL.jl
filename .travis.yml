@@ -15,15 +15,15 @@ cache:
     - ~/.julia/artifacts
 before_install: 
 #          - pip3 -m install -U matplotlib
-         - sudo apt-get install python3-matplotlib 
+  - sudo apt-get install python3-matplotlib 
 jobs:
   fast_finish: true
   allow_failures:
     - julia: nightly
   include:  
-     - stage: Documentation
-       julia: 1.5
-       script: |
+    - stage: Documentation
+      julia: 1.5
+      script: |
           julia --project=docs -e '
           using Pkg
           Pkg.develop(PackageSpec(path=pwd()))
