@@ -13,7 +13,6 @@ arch:
 cache:
   directories:
     - ~/.julia/artifacts
-
 before_install: 
 #          - pip3 -m install -U matplotlib
          - sudo apt-get install python3-matplotlib 
