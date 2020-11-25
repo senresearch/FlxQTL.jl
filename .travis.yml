@@ -31,19 +31,19 @@ jobs:
 #         - sudo apt-get install python3-matplotlib 
     - stage: Documentation
       julia: 1.5
-      script:
-        - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-        - julia --project=docs/ docs/make.jl    
-      name: "HTML" 
-#       script: |
-#           julia --project=docs -e '
-#           using Pkg
-#           Pkg.develop(PackageSpec(path=pwd()))
-#           Pkg.instantiate()
-#           using Documenter: doctest
-#           using flxQTL
-#           doctest(flxQTL)
-#           include("docs/make.jl")'
+#       script:
+#         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+#         - julia --project=docs/ docs/make.jl    
+#       name: "HTML" 
+      script: |
+          julia --project=docs -e '
+          using Pkg
+          Pkg.develop(PackageSpec(path=pwd()))
+          Pkg.instantiate()
+          using Documenter: doctest
+          using flxQTL
+          doctest(flxQTL)
+          include("docs/make.jl")'
       after_success: skip
 after_success:
   - |
@@ -52,14 +52,6 @@ after_success:
       Pkg.add("Coverage")
       using Coverage
       Codecov.submit(process_folder())'
-deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep_history: true
-  on:
-    branch: master
-
 
 # before_install:
 #   - julia -e 'ENV["PYTHON"]=""; Pkg.add("Conda"); using Conda;  Conda.add("python==3.9.0"); Conda.add("matplotlib==3.3.2"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'
