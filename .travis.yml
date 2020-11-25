@@ -19,15 +19,16 @@ jobs:
   allow_failures:
     - julia: nightly
   include:  
-    - stage: test 
-      julia:
-        - 1.5
-        - nightly
-      os: linux 
-      dist: focal     
-      before_install: 
-#          - pip3 -m install -U matplotlib
-        - sudo apt-get install python3-matplotlib 
+#     - stage: test 
+#       julia:
+#         - 1.5
+#         - nightly
+#       os: linux 
+#       dist: focal     
+#       before_install: 
+#         - sudo apt-get update
+# #          - pip3 -m install -U matplotlib
+#         - sudo apt-get install python3-matplotlib 
     - stage: Documentation
       julia: 1.5
       script:
