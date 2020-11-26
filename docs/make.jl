@@ -22,4 +22,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/hkim89/flxQTL.jl.git",
+    devurl="stable",
 )
