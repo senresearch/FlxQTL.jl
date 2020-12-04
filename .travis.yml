@@ -6,14 +6,17 @@ julia:
   - 1.5
   - nightly
 os:
-#   - linux
-  - osx
+  - linux
+#   - osx
 arch:
   - x64 
 cache:
   directories:
     - ~/.julia/artifacts
-
+before_install: 
+  - sudo apt-get update
+#          - pip3 -m install -U matplotlib
+  - sudo apt-get install python3-matplotlib 
 jobs:
   fast_finish: true
   allow_failures:
