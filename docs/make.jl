@@ -1,14 +1,14 @@
-using flxQTL
+using FlxQTL
 using Documenter
 
 makedocs(;
-    modules=[flxQTL],
+    modules=[FlxQTL],
     authors="Hyeonju Kim <hyeonjukm01@gmail.com>",
 #     repo="https://github.com/hkim89/flxQTL.jl/blob/{commit}{path}#L{line}",
-    sitename="flxQTL.jl",
+    sitename="FlxQTL.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://hkim89.github.io/flxQTL.jl/stable",
+        canonical="https://hkim89.github.io/FlxQTL.jl/stable",
         assets=String[],
     ),
 #     doctest=false,
@@ -21,6 +21,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/hkim89/flxQTL.jl.git",
+    repo="github.com/hkim89/FlxQTL.jl.git",
     devurl="stable",
 )

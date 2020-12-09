@@ -1,6 +1,6 @@
 using Distributed, LinearAlgebra
 addprocs(3)
-@everywhere using flxQTL, Random,Test
+@everywhere using FlxQTL, Random,Test
 
 flxQTL.Util.setSeed(2,100);
 #test for cross=1 (genotype data)

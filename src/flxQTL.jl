@@ -1,6 +1,6 @@
 """
 
-    flxQTL  
+    FlxQTL  
 
 flexible Multivariate Linear Mixed Model based QTL analysis tools for structured multiple traits. 
 
