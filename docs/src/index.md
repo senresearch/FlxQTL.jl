@@ -1,6 +1,6 @@
-# flxQTL.jl
+# FlxQTL.jl
 
-A package for a *flex*ible multivariate linear mixed model (MLMM) suitable for *QTL (Quantitative Trait Loci)* analysis of
+A package for a *Fl*e*x*ible multivariate linear mixed model (MLMM) suitable for *QTL (Quantitative Trait Loci)* analysis of
 structured multivariate traits. 
 
 ## Package Features

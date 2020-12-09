@@ -7,13 +7,13 @@ The package can installed in following ways.
 In a Julia REPL, press `]` to enter a package mode,
 
 ```julia
-pkg> add flxQTL
+pkg> add FlxQTL
 ```
 
 Or, equivalently, 
 
 ```julia
-julia> using Pkg; Pkg.add("flxQTL")
+julia> using Pkg; Pkg.add("FlxQTL")
 ```
 Currently Julia `1.5` supports for the package.
 
@@ -21,12 +21,12 @@ Currently Julia `1.5` supports for the package.
 To remove the package from the Julia REPL,
 
 ```julia
-pkg> rm flxQTL
+pkg> rm FlxQTL
 ```
 Equivalently,
 
 ```julia
-julia> using Pkg; Pkg.rm("flxQTL")
+julia> using Pkg; Pkg.rm("FlxQTL")
 ```
 
 

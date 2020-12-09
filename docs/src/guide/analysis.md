@@ -4,13 +4,13 @@ This section describes a step-by-step guide for QTL analysis.
 
 ## Input data file format
 
-The package `flxQTL` does not require any particular data format.  Any file readable in Julia is fine, but the input should contain traits (or phenotypes), genotype (probability), marker information on marker names, chromosomes, and marker positions, and optionally climatic information.  All inputs are types of 
+The package `FlxQTL` does not require any particular data format.  Any file readable in Julia is fine, but the input should contain traits (or phenotypes), genotype (probability), marker information on marker names, chromosomes, and marker positions, and optionally climatic information.  All inputs are types of 
 Arrays in Julia and should have no missing values, i.e. imputation is required if missing values exist.
 
 ## Reading the data files and processing arrays
 
 Use any Julia package able to read data files (`.txt`, `.csv`, etc.).  Julia's built-in module `DelimitedFiles` supports read, and write files. 
-Let's try using an example dataset in `flxQTL`. It is plant data: Arabidopsis thaliana in the `data` folder.  Detailed description on the data can be 
+Let's try using an example dataset in `FlxQTL`. It is plant data: Arabidopsis thaliana in the `data` folder.  Detailed description on the data can be 
 referred to `README` in the folder.
 
 ```julia
@@ -39,14 +39,15 @@ In the genotype data, `1`, `2` indicate Italian, Swedish parents, respectively. 
 julia> geno[geno.==1.0].=0.0;geno[geno.==2.0].=1.0; 
 
 ```
-For genome scan, we need restructure the standardized genotype matrix combined with marker information.  Note that the genome scan in `flxQTL` is 
+For genome scan, we need restructure the standardized genotype matrix combined with marker information.  Note that the genome scan in `FlxQTL` is 
 implemented by CPU parallelization, so we need to add workers (or processes) before the genome scan.  Depending on the computer CPU, one can add as many 
-processes as possible. If your computer has 16 cores, then you can add 15 or little more.  The dimension of a genotype (probability) matrix should be 
+processes as possible. If your computer has 16 cores, then you can add 15 or little more.  Note that you need to type `@everywhere` followed by `using PackageName` for parallel computing.  The dimension of a genotype (probability) matrix should be 
 `the number of markers x the number of individuals`.
 
 ```julia
 julia> addprocs(16) 
-julia> XX=flxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
+julia> @everywhere using FlxQTL 
+julia> XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
 
 ```
 Optionally, one can generate a fixed (low-dimensional) trait covariate matrix (Z).  The first column indicates overall mean between the two regions, and 
@@ -68,12 +69,12 @@ For the Arabidopsis genotype data, we will use a genetic relatedness matrix usin
 LOCO option.
 
 ```julia
-julia> Kg = flxQTL.shrinkgLoco(flxQTL.kinshipMan,50,XX)
+julia> Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,50,XX)
 ```
 For no LOCO option with shrinkage,
 
 ```julia
-julia> K = flxQTL.shinkg(flxQTL.kinshipMan,50,XX.X)
+julia> K = FlxQTL.shinkg(FlxQTL.kinshipMan,50,XX.X)
 ```
 
 
@@ -92,23 +93,23 @@ For a non-identity climatic relatedness, and a kinship with LOCO, you can do eig
 relatedness, you can use `Matrix(1.0I,6,6)` for a matrix of eigenvectors and `ones(6)` for a vector of eigenvalues.
 
 ```julia
-julia> Tg,Λg,Tc,λc = flxQTL.K2Eig(Kg,Kc,true); # the last argument: LOCO::Bool = false (default)
+julia> Tg,Λg,Tc,λc = FlxQTL.K2Eig(Kg,Kc,true); # the last argument: LOCO::Bool = false (default)
 ```
 
 For no LOCO option,
 
 ```julia
-julia> T,λ = flxQTL.K2eig(K)
+julia> T,λ = FlxQTL.K2eig(K)
 ```
 Now start with 1D genome scan with (or without) LOCO including `Z` or not.  
 For the genome scan with LOCO including `Z`, 
 
 ```julia
-julia> LODs,B,est0 = flxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,Z,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,Z,true); 
 ```
 For the genome scan with LOCO excluding `Z`, i.e. an identity matrix, 
 ```julia
-julia> LODs,B,est0 = flxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,true); 
 ```
 Note that the first argument in `geneScan` is `cross::Int64`, which indicates a type of genotype or genotype probability.  For instance, if you use a 
 genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype probability matrices, depending on the number of alleles or genotypes in a marker, one can type the corresponding number. i.e. `4-way cross: 4`, `HS DO mouse: 8 for alleles, 32 for genotypes`, etc.   
@@ -116,9 +117,9 @@ genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype proba
 For no LOCO option,
 
 ```julia
-julia> LODs,B,est0 = flxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z);
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z);
 
-julia> LODs,B,est0 = flxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX);
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX);
 ```
 The function `geneScan` has three arguments: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`.  
 In particular, you can extract values from each matrix in `B` (3D array of matrices) to generate an effects plot.
@@ -130,7 +131,7 @@ To produce a plot (or plots) for LOD scores or effects, you need first a struct 
 LOD scores (or effects).
 
 ```julia
-julia> Arab_lod = flxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs)
+julia> Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs)
 
 julia> plot1d(Arab_lod;title= "LOD scores for Arabidopsis thaliana",ylabel="LOD")
 ```
@@ -140,9 +141,9 @@ color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location 
 
 ## Performing a permutation test
 
-Since the statistical inference for `flxQTL` relies on LOD scores and LOD scores, the function `permTest` finds thresholds for a type I error.  The first 
+Since the statistical inference for `FlxQTL` relies on LOD scores and LOD scores, the function `permTest` finds thresholds for a type I error.  The first 
 argument is `nperm::Int64` to set the number of permutations for the test. For `Z = I`, type `Matrix(1.0I,6,6)` for the Arabidopsis thaliana data.
 
 ```julia
-julia> maxLODs, H1par_perm, cutoff = flxQTL.permTest(1000,1,Kg,Kc,Ystd,XX,Z;pval=[0.05 0.01])
+julia> maxLODs, H1par_perm, cutoff = FlxQTL.permTest(1000,1,Kg,Kc,Ystd,XX,Z;pval=[0.05 0.01])
 ```

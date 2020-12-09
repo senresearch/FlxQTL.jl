@@ -2,7 +2,7 @@ using Distributed, LinearAlgebra
 addprocs(3)
 @everywhere using FlxQTL, Random,Test
 
-flxQTL.Util.setSeed(2,100);
+FlxQTL.Util.setSeed(2,100);
 #test for cross=1 (genotype data)
 geno=[0.0  0.0  0.0;
  1.0  1.0  1.0;
@@ -31,32 +31,32 @@ pheno=[ 3.0719   -2.42177  -0.0790196  3.22021  1.18245  2.84663  0.291765   0.8
 marname=["X1" ;"X2";"X3"]
 chr=Any[1;1;2]
 pos=[1.4;2.0;3.44]
-XX=flxQTL.Util.Markers(marname,chr,pos,geno')
+XX=FlxQTL.Util.Markers(marname,chr,pos,geno')
 @test XX.name == marname
 @test XX.chr == chr
 @test size(XX.X)== size(geno')
 
 #test shrinkgLoco with kinshipMan, shrinkg
-Kg=flxQTL.GRM.shrinkgLoco(flxQTL.GRM.kinshipMan,6,XX)
+Kg=FlxQTL.GRM.shrinkgLoco(FlxQTL.GRM.kinshipMan,6,XX)
 for j=1:2 
       println(@test isposdef(Kg[:,:,j])== true)
 end
 
-K= flxQTL.GRM.shrinkg(flxQTL.GRM.kinshipMan,6,XX.X)
+K= FlxQTL.GRM.shrinkg(FlxQTL.GRM.kinshipMan,6,XX.X)
 @test isposdef(K)==true
 Kc=Matrix(1.0I,3,3)
 
 #eigen decomposition
-Tg,Λg,Tc,λc = flxQTL.flxMLMM.K2Eig(Kg,Kc,true)
-T,λ =flxQTL.flxMLMM.K2eig(K)
+Tg,Λg,Tc,λc = FlxQTL.flxMLMM.K2Eig(Kg,Kc,true)
+T,λ =FlxQTL.flxMLMM.K2eig(K)
 
 #test Z=I vs no Z & loco vs no loco
 Z=Matrix(1.0I,3,3)
 
 #no loco
-LOD2,B2,est2=flxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX,Z); 
+LOD2,B2,est2=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX,Z); 
 @test sum((LOD2.< 0.0))==0
-LOD,B,est=flxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX); 
+LOD,B,est=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX); 
 @test sum((LOD.< 0.0))==0
 
 @test LOD ≈ LOD2
@@ -66,9 +66,9 @@ LOD,B,est=flxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX);
 @test est.loglik ≈ est2.loglik
 
 #loco
-LOD1,B1,est01=flxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,true); 
+LOD1,B1,est01=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,true); 
 @test sum((LOD1.< 0.0))==0.0
-LOD0,B0,est00=flxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,Z,true); 
+LOD0,B0,est00=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,Z,true); 
 @test sum((LOD0.< 0.0))==0.0
 
 @test LOD0 ≈ LOD1

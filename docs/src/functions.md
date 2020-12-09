@@ -2,13 +2,13 @@
 
 
 ```@meta
-CurrentModule = flxQTL
+CurrentModule = FlxQTL
 ```
 
 ## Flexible Multivariate Linear Mixed Models (flxMLMM)
 
 ```@autodocs
-Modules = [flxQTL, flxMLMM, EcmNestrv]
+Modules = [FlxQTL, flxMLMM, EcmNestrv]
 ```
 ## Genetic Relatedness Matrices (GRM)
 
