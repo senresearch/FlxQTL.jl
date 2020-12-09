@@ -17,11 +17,7 @@ multivariate genome scans, visualization of genome scans, support for
 LOCO (leave-one-chromosome-out), computation of kinship matrices, and
 support for distributed computing.
 
-<!-- and auxillary functions for standardization of
-trait data using the Huber loss, transformation of LOD scores to
-``\\log_{10}P``,
-reording genotype data, etc.  
--->
+![1D Genome Scan](image/ex1.png)
 
 The package is written in [Julia](https://www.julialang.org) and
 includes extensive
@@ -33,8 +29,8 @@ directory.  For details about the method, you may want to read our
 paper available as a
 [preprint](https://doi.org/10.1101/2020.03.27.012690).
 
-![1D Genome Scan](image/ex1.png)
-![2D Genome Scan](image/ex2.pdf)
+
+![2D Genome Scan](image/ex2.jpg)
 
 ## Paper
 
