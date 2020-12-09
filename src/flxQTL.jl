@@ -5,7 +5,7 @@
 flexible Multivariate Linear Mixed Model based QTL analysis tools for structured multiple traits. 
 
 """
-module flxQTL
+module FlxQTL
 
 # # Write your package code here.
  __precompile__(true)
