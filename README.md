@@ -33,6 +33,8 @@ directory.  For details about the method, you may want to read our
 paper available as a
 [preprint](https://doi.org/10.1101/2020.03.27.012690).
 
+![1D Genome Scan](image/ex1.png)
+![2D Genome Scan](image/ex2.pdf)
 
 ## Paper
 
