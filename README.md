@@ -4,7 +4,7 @@
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://hkim89.github.io/FlxQTL.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://hkim89.github.io/FlxQTL.jl/dev)
-[![Build Status](https://travis-ci.com/hkim89/flxQTL.jl.svg?branch=master)](https://travis-ci.org/github/hkim89/FlxQTL.jl)
+[![Build Status](https://travis-ci.com/hkim89/FlxQTL.jl.svg?branch=master)](https://travis-ci.org/github/hkim89/FlxQTL.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/hkim89/FlxQTL.jl?svg=true)](https://ci.appveyor.com/project/hkim89/FlxQTL-jl)
 [![Coverage](https://codecov.io/gh/hkim89/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/hkim89/FlxQTL.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
@@ -23,10 +23,10 @@ support for distributed computing.
 
 The package is written in [Julia](https://www.julialang.org) and
 includes extensive
-[documentation](https://hkim89.github.io/flxQTL.jl/stable).  If you
+[documentation](https://hkim89.github.io/FlxQTL.jl/stable).  If you
 are new to Julia you may want to learn more by looking at [Julia
 documentation](https://julialang.org).  Example data sets are located
-in the [data](https://github.com/hkim89/flxQTL.jl/tree/master/data)
+in the [data](https://github.com/hkim89/FlxQTL.jl/tree/master/data)
 directory.  For details about the method, you may want to read our
 paper available as a
 [preprint](https://doi.org/10.1101/2020.03.27.012690).
@@ -49,13 +49,13 @@ In a Julia REPL, press `]` to enter a package mode,
 
 ```julia
 julia> ]
-pkg> add flxQTL
+pkg> add FlxQTL
 ```
 
 Or, equivalently, 
 
 ```julia
-julia> using Pkg; Pkg.add("flxQTL")
+julia> using Pkg; Pkg.add("FlxQTL")
 ```
 Currently Julia `1.5` supports for the package.
 
@@ -64,12 +64,12 @@ To remove the package from the Julia REPL,
 
 ```julia
 julia> ] 
-pkg> rm flxQTL
+pkg> rm FlxQTL
 ```
 Equivalently,
 
 ```julia
-julia> using Pkg; Pkg.rm("flxQTL")
+julia> using Pkg; Pkg.rm("FlxQTL")
 ```
 
 ## Choice of BLAS vendors
