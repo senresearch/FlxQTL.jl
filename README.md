@@ -19,6 +19,8 @@ support for distributed computing.
 
 ![1D Genome Scan](image/ex1.png)
 
+![2D Genome Scan](image/ex2.jpg)
+
 The package is written in [Julia](https://www.julialang.org) and
 includes extensive
 [documentation](https://hkim89.github.io/flxQTL.jl/stable).  If you
@@ -30,7 +32,7 @@ paper available as a
 [preprint](https://doi.org/10.1101/2020.03.27.012690).
 
 
-![2D Genome Scan](image/ex2.jpg)
+
 
 ## Paper
 
