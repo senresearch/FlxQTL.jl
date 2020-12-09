@@ -2,7 +2,7 @@
 *.jl.cov
 *.jl.mem
 /docs/build/
-/image/
+
 
 Manifest.toml
 .ipynb_checkpoints
