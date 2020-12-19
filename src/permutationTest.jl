@@ -77,7 +77,7 @@ end
 ##              %%%   rows: # of markers(B and loglik), columns: # of permutations
 
 ## finding distribution of max lod's for a multivariate model by permutation for 4waycross/intercross
-function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Array{Float64,2},
+function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Flot64,3}},
         Z::Array{Float64,2},Nullpar::Approx,λg::Array{Float64,1},λc::Array{Float64,1}
         ;Xnul::Array{Float64,2}=ones(1,size(Y,2)),tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
@@ -102,7 +102,7 @@ function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Flo
 end
 
 #MVLMM
-function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Array{Float64,2},
+function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Flot64,3}},
         Nullpar::Result,λg::Array{Float64,1};Xnul::Array{Float64,2}=ones(1,size(Y,2)),tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
      m=size(Y,1);
