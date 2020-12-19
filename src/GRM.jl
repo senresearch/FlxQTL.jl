@@ -165,7 +165,7 @@ r=size(mat,1)/cross; n=size(mat,2)
    @views for j=1:n
         K[j,j]=1.0
           end
-    return K
+    return convert(Array{Float64,2},K)
 end
 
 
@@ -192,7 +192,7 @@ function kinshipCtr(genmat::Array{Float64,2})
     # K=(1-ρ)*transpose(cgene)*cgene/n+ρ*Matrix(1.0I,n,n)
      #K=cgene'*cgene/p
      K=Symmetric(BLAS.syrk('U','T',1.0,cgene))/p
-    return K
+    return convert(Array{Float64,2},K)
 
 end
 
@@ -219,8 +219,9 @@ function kinshipStd(genmat::Array{Float64,2})
     p=size(genmat,1)
     sgene=(genmat.-mean(genmat,dims=2))./std(genmat,dims=2)
    #(1-ρ)*transpose(sgene)*sgene/n+ρ*Matrix(1.0I,n,n)
-
-    return Symmetric(BLAS.syrk('U','T',1.0,sgene))/p
+     K=Symmetric(BLAS.syrk('U','T',1.0,sgene))/p
+ 
+    return convert(Array{Float64,2},K)
 end
 
 
