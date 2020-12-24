@@ -77,7 +77,7 @@ end
 ##              %%%   rows: # of markers(B and loglik), columns: # of permutations
 
 ## finding distribution of max lod's for a multivariate model by permutation for 4waycross/intercross
-function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Flot64,3}},
+function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
         Z::Array{Float64,2},Nullpar::Approx,λg::Array{Float64,1},λc::Array{Float64,1}
         ;Xnul::Array{Float64,2}=ones(1,size(Y,2)),tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
@@ -94,7 +94,7 @@ function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Flo
         #initial parameter values for permutations are from genome scanning under the null hypothesis.
         perm_est0=NestrvAG(kmin,Y2,Xnul_t,Z,Nullpar.B,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol,ρ=ρ)
    @time LODs,H1par0=marker1Scan(q,kmin,cross,perm_est0,λg,λc,Y2,Xnul_t,X,Z;tol0=tol0,tol1=tol,ρ=ρ)
-         println("$(l)th replication is done.")
+       #  println("$(l)th replication is done.")
           lod[l]= maximum(LODs);  H1par=[H1par; H1par0]
         end
 
@@ -102,7 +102,7 @@ function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Flo
 end
 
 #MVLMM
-function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Flot64,3}},
+function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
         Nullpar::Result,λg::Array{Float64,1};Xnul::Array{Float64,2}=ones(1,size(Y,2)),tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
      m=size(Y,1);
@@ -117,7 +117,7 @@ function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Flo
         #initial parameter values for permutations are from genome scanning under the null hypothesis.
         perm_est0=ecmNestrvAG(kmin,Y2,Xnul_t,Z,Nullpar.B,Nullpar.Vc,Nullpar.Σ,λg;tol=tol,ρ=ρ)
        @time LODs,H1par0=marker1Scan(m,kmin,cross,perm_est0,λg,Y2,Xnul_t,X;tol0=tol0,tol1=tol,ρ=ρ)
-        println("$(l)th replication is done.")
+     #   println("$(l)th replication is done.")
          lod[l]= maximum(LODs);  H1par=[H1par; H1par0]
         end
 
