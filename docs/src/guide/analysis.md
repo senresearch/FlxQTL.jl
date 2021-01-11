@@ -74,7 +74,7 @@ julia> Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,50,XX)
 For no LOCO option with shrinkage,
 
 ```julia
-julia> K = FlxQTL.shinkg(FlxQTL.kinshipMan,50,XX.X)
+julia> K = FlxQTL.shrinkg(FlxQTL.kinshipMan,50,XX.X)
 ```
 
 
