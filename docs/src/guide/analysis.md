@@ -105,11 +105,11 @@ Now start with 1D genome scan with (or without) LOCO including `Z` or not.
 For the genome scan with LOCO including `Z`, 
 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,Z,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z,true); 
 ```
 For the genome scan with LOCO excluding `Z`, i.e. an identity matrix, 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,true); 
 ```
 Note that the first argument in `geneScan` is `cross::Int64`, which indicates a type of genotype or genotype probability.  For instance, if you use a 
 genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype probability matrices, depending on the number of alleles or genotypes in a marker, one can type the corresponding number. i.e. `4-way cross: 4`, `HS DO mouse: 8 for alleles, 32 for genotypes`, etc.   
