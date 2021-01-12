@@ -33,7 +33,7 @@ end
 
 """
     
-      plot1d(xx::layers;title= " ",ylabel="LOD",yint=[],yint_color=["red"],Legend=[],loc="upper right") 
+      plot1d(xx::layers;title= " ",ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize="medium",loc="upper right") 
 
 
 Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome scan on a single plot.
@@ -48,11 +48,12 @@ Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome 
 - `yint` :  A vector of y-intercept(s)
 - `yint_color` : A vector of colors (strings) of y-intercepts in yint
 - `Legend` : A vector of titles corresponding to graphs in `layers`
+- 'fontsize` : A string or number to set `Legend` fontsize. i.e. "small", "medium", "large", or any integer, '15'
 - `loc` : A string of Legend's position. Default is "upper right".
 
 
 """
-function plot1d(xx::layers;title= " ",ylabel="LOD",yint=[],yint_color=["red"],Legend=[],loc="upper right")
+function plot1d(xx::layers;title= " ",ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize="medium",loc="upper right")
 
 Chr=unique(xx.chr); nchr=length(Chr);np=size(xx.lod,2)
  #generating a set of line segments
@@ -120,7 +121,7 @@ ax.yaxis.set_minor_locator(my) # Set interval of minor ticks
         lbox0= matplotlib.lines.Line2D([], [], color=c[l],label=Legend[l])  
         lbox=vcat(lbox,lbox0)
        end
-     legend(handles=lbox, loc=loc)
+     legend(handles=lbox, loc=loc,fontsize=fontsize)
     end
 #legend(handles=lbox, bbox_to_anchor=(1, 1))
 #fig, ax = subplots(figsize=(10,10))
