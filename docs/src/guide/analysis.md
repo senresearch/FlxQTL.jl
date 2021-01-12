@@ -16,9 +16,9 @@ referred to `README` in the folder.
 ```julia
 julia> using DelimitedFiles
 
-julia> pheno = readdlm("data/Arabidopsis_fitness.csv";skipstart=1); # skip to read the first row (column names) to obtain a matrix only
+julia> pheno = readdlm("data/Arabidopsis_fitness.csv",",";skipstart=1); # skip to read the first row (column names) to obtain a matrix only
 
-julia> geno = readdlm("data/Arabidopsis_genotypes.csv";skipstart=1); 
+julia> geno = readdlm("data/Arabidopsis_genotypes.csv",",";skipstart=1); 
 
 julia> markerinfo = readdlm("data/Arabidopsis_markerinfo_1d.csv",',';skipstart=1);
 
@@ -74,7 +74,7 @@ julia> Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,50,XX)
 For no LOCO option with shrinkage,
 
 ```julia
-julia> K = FlxQTL.shinkg(FlxQTL.kinshipMan,50,XX.X)
+julia> K = FlxQTL.shrinkg(FlxQTL.kinshipMan,50,XX.X)
 ```
 
 
@@ -105,11 +105,11 @@ Now start with 1D genome scan with (or without) LOCO including `Z` or not.
 For the genome scan with LOCO including `Z`, 
 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,Z,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z,true); 
 ```
 For the genome scan with LOCO excluding `Z`, i.e. an identity matrix, 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ytd,XX,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,true); 
 ```
 Note that the first argument in `geneScan` is `cross::Int64`, which indicates a type of genotype or genotype probability.  For instance, if you use a 
 genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype probability matrices, depending on the number of alleles or genotypes in a marker, one can type the corresponding number. i.e. `4-way cross: 4`, `HS DO mouse: 8 for alleles, 32 for genotypes`, etc.   
