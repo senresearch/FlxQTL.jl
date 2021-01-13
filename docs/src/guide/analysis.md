@@ -29,6 +29,7 @@ from 1.774 to 34.133, so that it is better to narow the range of values in [0,1]
 the dimension of a phenotype matrix should be `the number of traits x the number of individuals`.
 
 ```julia
+julia> using Statistics, StatsBase
 julia> Y=convert(Array{Float64,2},pheno'); #convert from transposed one to a Float64 matrix
 julia> Ystd=(Y.-mean(Y,dims=2))./std(Y,dims=2); # sitewise normalization
 ```
@@ -45,6 +46,7 @@ processes as possible. If your computer has 16 cores, then you can add 15 or lit
 `the number of markers x the number of individuals`.
 
 ```julia
+julia> using Distributed
 julia> addprocs(16) 
 julia> @everywhere using FlxQTL 
 julia> XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
