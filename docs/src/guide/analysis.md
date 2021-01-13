@@ -16,9 +16,9 @@ referred to `README` in the folder.
 ```julia
 julia> using DelimitedFiles
 
-julia> pheno = readdlm("data/Arabidopsis_fitness.csv",",";skipstart=1); # skip to read the first row (column names) to obtain a matrix only
+julia> pheno = readdlm("data/Arabidopsis_fitness.csv",',';skipstart=1); # skip to read the first row (column names) to obtain a matrix only
 
-julia> geno = readdlm("data/Arabidopsis_genotypes.csv",",";skipstart=1); 
+julia> geno = readdlm("data/Arabidopsis_genotypes.csv",',';skipstart=1); 
 
 julia> markerinfo = readdlm("data/Arabidopsis_markerinfo_1d.csv",',';skipstart=1);
 
