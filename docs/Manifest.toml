@@ -269,12 +269,6 @@ uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.1.2"
 
 [[Revise]]
-deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "Requires", "UUIDs", "Unicode"]
-git-tree-sha1 = "176c817f5e5a9c78fd0d91483dadc88cc5805c41"
-uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "3.1.11"
-
-[[Revise]]
 deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "UUIDs", "Unicode"]
 git-tree-sha1 = "d6b380e331f5ace89033617b575cfac40f9b312d"
 uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
