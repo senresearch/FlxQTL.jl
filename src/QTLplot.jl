@@ -9,6 +9,7 @@ A module for generating PyPlot-based 1D-, 2D-plots for LOD scores (or effects).
 module QTLplot
 
 using PyPlot
+import Statistics:median
 
 
 """
