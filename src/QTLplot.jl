@@ -168,7 +168,7 @@ end
 #where the first digit is the number of rows, the second the number of columns, and the third the index of the subplot.
 """
 
-     subplot2d(S::layers,sub_dim::Int64;label="Chromosome"):
+     subplot2d(S::layers,sub_dim::Int64;label="Chromosome")
 
 
 Generates a matrix of 2-d heatmap subplots for LOD scores obtained from 2d-genome scan  

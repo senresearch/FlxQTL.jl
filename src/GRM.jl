@@ -365,7 +365,7 @@ For a non-positive definite kinship, a tweak like a weighted average of kinship 
 
 # Arguments
 
-- `kin` :  A function of computing a kinship. Can only use with [`kinshipCtr`](@ref), [`kinshipStd`](@ref) for genotypes, and with [`kinshipLin](@ref) 
+- `kin` :  A function of computing a kinship. Can only use with [`kinshipCtr`](@ref), [`kinshipStd`](@ref) for genotypes, and with [`kinshipLin`](@ref) 
           for genotype (or allele) probabilities.
 - `g`   : A struct of arrays, type  [`Markers`](@ref).
 - `cross` :  A scalar indicating the number of alleles or genotypes. ex. 1 for genotypes (0,1,2) as default, 2 for RIF, 4 for four-way cross, 
