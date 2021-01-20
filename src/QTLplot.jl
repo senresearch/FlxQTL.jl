@@ -21,7 +21,7 @@ Creates a struct of arrays for plotting LOD scores, (or main, interaction) effec
 # Argument
 
 - `chr` : A vector of strings or numbers indicating Chromosome names, ex. 1,2,3,... or 1K,1N,2K,2N,...
-- `pos` : A vector of marker positions
+- `pos` : A vector of marker positions.
 - `lod` : A matrix of LOD scores obtained from 1d- or 2d-genome scan.  Can be a matrix of effects (main, or interaction).
 
 """
@@ -46,10 +46,10 @@ Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome 
 ## Keyword arguements,
 
 - `title` : A string of title. Default is blank.
-- `yint` :  A vector of y-intercept(s)
-- `yint_color` : A vector of colors (strings) of y-intercepts in yint
-- `Legend` : A vector of titles corresponding to graphs in `layers`
-- 'fontsize` : A string or number to set `Legend` fontsize. i.e. "small", "medium", "large", or any integer, '15'
+- `yint` :  A vector of y-intercept(s).
+- `yint_color` : A vector of colors (strings) of y-intercepts in yint.
+- `Legend` : A vector of titles corresponding to graphs in `layers`.
+- `fontsize` : A string or number to set `Legend` fontsize. i.e. "small", "medium", "large", or any integer, '15'.
 - `loc` : A string of Legend's position. Default is "upper right".
 
 
@@ -146,7 +146,7 @@ Generates 2-d heatmap plots of LOD scores from 2d-genome scan
  
 # Argument
 
-- `S`: a type of 'layers' that consists of chromosome names, marker positions, and a matrix of LODs.
+- `S`: a type of 'layers' that consists of chromosome names, marker positions, and a matrix of LODs
 
 """
 function plot2d(S::layers)
@@ -176,7 +176,7 @@ Generates a matrix of 2-d heatmap subplots for LOD scores obtained from 2d-genom
 # Arguments 
 
 - `sub_dim`: A two digit integer, where the first digit (m) is the number of rows, the second (n) the number of columns. 
-             It returns a m x n matrix of subplots
+             It returns a m x n matrix of subplots.
 - `label`: A string of the title of each subplot. It concatenates each entry of S.chr. 
 
 """
