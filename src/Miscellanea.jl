@@ -10,7 +10,7 @@ module Util
 
 using Random
 using Distributed
-import LossFunctions: HuberLoss
+import LossFunctions: HuberLoss, value
 import Distributions: Chisq,ccdf
 import StatsBase: mad, sample
 import Statistics: mean, var, median
