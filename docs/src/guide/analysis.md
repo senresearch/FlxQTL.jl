@@ -37,7 +37,7 @@ julia> Ystd=(Y.-mean(Y,dims=2))./std(Y,dims=2); # sitewise normalization
 In the genotype data, `1`, `2` indicate Italian, Swedish parents, respectively. You can rescale the genotypes for efficiency. 
 
 ```julia
-julia> geno[geno.==1.0].=0.0;geno[geno.==2.0].=1.0; 
+julia> geno[geno.==1.0].=0.0;geno[geno.==2.0].=1.0; # or can do geno[geno.==1.0].=-1.0 for only genome scan
 
 ```
 For genome scan, we need restructure the standardized genotype matrix combined with marker information.  Note that the genome scan in `FlxQTL` is 
@@ -52,7 +52,7 @@ julia> @everywhere using FlxQTL
 julia> XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
 
 ```
-Optionally, one can generate a fixed (low-dimensional) trait covariate matrix (Z).  The first column indicates overall mean between the two regions, and 
+Optionally, one can generate a trait covariate matrix (Z).  The first column indicates overall mean between the two regions, and 
 the second implies site difference: `-1` for Italy, and `1` for Sweden.
 
 ```@repl
@@ -63,20 +63,20 @@ m,q = size(Z) # check the dimension
 ## Computing a genetic (or climatic) relatedness matrix
 
 The submodule `GRM` contains functions for computing kinship matrices, `kinshipMan`, `kinship4way`, `kinshipGs`, `kinshipLin`, `kinshipCtr`, and computing 
-3D array of kinship matrices for LOCO (Leave One Chromosome Out) with (or without) a shrinkage method for nonpositive definiteness for the both, 
+3D array of kinship matrices for LOCO (Leave One Chromosome Out) with a shrinkage method for nonpositive definiteness, 
 `shrinkg`, `shrinkgLoco`, `kinshipLoco`.  
-Note that the shrinkage option is only for `kinshipMan`, `kinship4way`.
+Note that the shrinkage option is only used for `kinshipMan`, `kinship4way`.
 
-For the Arabidopsis genotype data, we will use a genetic relatedness matrix using manhattan distance measure, `kinshipMan` with a shrinkage and a 
-LOCO option.
+For the Arabidopsis genotype data, we will use a genetic relatedness matrix using manhattan distance measure, `kinshipMan` with a shrinkage with 
+the LOCO option.
 
 ```julia
-julia> Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,50,XX)
+julia> Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,10,XX)
 ```
 For no LOCO option with shrinkage,
 
 ```julia
-julia> K = FlxQTL.shrinkg(FlxQTL.kinshipMan,50,XX.X)
+julia> K = FlxQTL.shrinkg(FlxQTL.kinshipMan,10,XX.X)
 ```
 
 
@@ -107,11 +107,13 @@ Now start with 1D genome scan with (or without) LOCO including `Z` or not.
 For the genome scan with LOCO including `Z`, 
 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z,true); # FlxQTL for including Z (trait covariates) or Z=I
 ```
-For the genome scan with LOCO excluding `Z`, i.e. an identity matrix, 
+For the genome scan with LOCO excluding `Z`, i.e. an identity matrix, we have two options: a FlxQTL model and a conventional MLMM 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,true); 
+julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,true); # FlxQTL for Z=I 
+
+julia> LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX,true); # MLMM
 ```
 Note that the first argument in `geneScan` is `cross::Int64`, which indicates a type of genotype or genotype probability.  For instance, if you use a 
 genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype probability matrices, depending on the number of alleles or genotypes in a marker, one can type the corresponding number. i.e. `4-way cross: 4`, `HS DO mouse: 8 for alleles, 32 for genotypes`, etc.   
@@ -122,6 +124,8 @@ For no LOCO option,
 julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z);
 
 julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX);
+
+julia> LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX); # MLMM
 ```
 The function `geneScan` has three arguments: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`.  
 In particular, you can extract values from each matrix in `B` (3D array of matrices) to generate an effects plot.

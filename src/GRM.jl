@@ -25,11 +25,11 @@ import ..Util: Markers
       kinshipMan(genematrix::Array{Float64,2})
 
 Calculates a kinship matrix using a manhattan distance. Missing values need to be either omitted or imputed. 
-This function is not for 4-way cross genotype data.  See [`kinship4way`](@ref).
+This function is for recombinant inbred line (RIL) (AA/BB), not for 4-way cross genotype data.  See [`kinship4way`](@ref).
 
 # Argument
 
-- `genematrix` : A matrix of genotypes, i.e. 0,1,2.  size(genematrix)= (p,n) for `p` genetic markers x `n` individuals(or lines).
+- `genematrix` : A matrix of genotypes, i.e. 0,1 or 1,2.  size(genematrix)= (p,n) for `p` genetic markers x `n` individuals(or lines).
                
 
 # Output
@@ -238,7 +238,7 @@ This function runs faster by CPU parallelization.  Add workers/processes using `
 
 - `f `: A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
 - `nb` : An integer indicating the number of bootstrap. It does not have to be a large number.  
-- `geno` : A matrix of genotypes
+- `geno` : A matrix of genotypes. See [`kinshipMan`](@ref), [`kinship4way`](@ref) for dimension.
 
 # Example
 
@@ -339,7 +339,7 @@ function shrinkgLoco(kin,nb::Int64,g::Markers)
     K_loco=zeros(ind,ind,nChr)
     for j=1:nChr
         K_loco[:,:,j]=shrinkg(kin,nb,g.X[findall(g.chr.!=Chr[j]),:])
-        println("Kinship leaving Chr $(j) out is completed.")
+        println("Positive definiteness dropping chromosome $(Chr[j]) is ", isposdef(K_loco[:,:,j]),".")
     end
     return K_loco
 end
