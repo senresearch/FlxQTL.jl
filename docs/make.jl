@@ -14,8 +14,8 @@ makedocs(;
 #     doctest=false,
     pages=[
         "Home" => "index.md",
-        "Guide" => "guide/tutorial.md",
-                   "guide/analysis.md",
+        "Installation" => "guide/tutorial.md",
+        "QTL Analysis" =>  "guide/analysis.md",
         "Types and Functions" => "functions.md"
     ],
 )

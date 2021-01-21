@@ -14,13 +14,13 @@ Let's try using an example dataset in `FlxQTL`. It is plant data: Arabidopsis th
 referred to `README` in the folder.
 
 ```julia
-julia> using DelimitedFiles
+using DelimitedFiles
 
-julia> pheno = readdlm("data/Arabidopsis_fitness.csv",',';skipstart=1); # skip to read the first row (column names) to obtain a matrix only
+pheno = readdlm("data/Arabidopsis_fitness.csv",',';skipstart=1); # skip to read the first row (column names) to obtain a matrix only
 
-julia> geno = readdlm("data/Arabidopsis_genotypes.csv",',';skipstart=1); 
+geno = readdlm("data/Arabidopsis_genotypes.csv",',';skipstart=1); 
 
-julia> markerinfo = readdlm("data/Arabidopsis_markerinfo_1d.csv",',';skipstart=1);
+markerinfo = readdlm("data/Arabidopsis_markerinfo_1d.csv",',';skipstart=1);
 
 ```
 
@@ -29,15 +29,15 @@ from 1.774 to 34.133, so that it is better to narow the range of values in [0,1]
 the dimension of a phenotype matrix should be `the number of traits x the number of individuals`.
 
 ```julia
-julia> using Statistics, StatsBase
-julia> Y=convert(Array{Float64,2},pheno'); #convert from transposed one to a Float64 matrix
-julia> Ystd=(Y.-mean(Y,dims=2))./std(Y,dims=2); # sitewise normalization
+using Statistics, StatsBase
+Y=convert(Array{Float64,2},pheno'); #convert from transposed one to a Float64 matrix
+Ystd=(Y.-mean(Y,dims=2))./std(Y,dims=2); # sitewise normalization
 ```
 
 In the genotype data, `1`, `2` indicate Italian, Swedish parents, respectively. You can rescale the genotypes for efficiency. 
 
 ```julia
-julia> geno[geno.==1.0].=0.0;geno[geno.==2.0].=1.0; # or can do geno[geno.==1.0].=-1.0 for only genome scan
+geno[geno.==1.0].=0.0;geno[geno.==2.0].=1.0; # or can do geno[geno.==1.0].=-1.0 for only genome scan
 
 ```
 For genome scan, we need restructure the standardized genotype matrix combined with marker information.  Note that the genome scan in `FlxQTL` is 
@@ -46,12 +46,15 @@ processes as possible. If your computer has 16 cores, then you can add 15 or lit
 `the number of markers x the number of individuals`.
 
 ```julia
-julia> using Distributed
-julia> addprocs(16) 
-julia> @everywhere using FlxQTL 
-julia> XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
+using Distributed
+addprocs(4) 
+@everywhere using FlxQTL 
+XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
 
 ```
+**Julia tip**: Whenever you reload a package, i.e. `using FlxQTL`, you should re-enter `XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno')` to 
+fresh the struct of array.  If not, your genome scan throw an error.  You should also do with another struct of array in a submodule `QTLplot`, `FlxQTL. layers`.
+
 Optionally, one can generate a trait covariate matrix (Z).  The first column indicates overall mean between the two regions, and 
 the second implies site difference: `-1` for Italy, and `1` for Sweden.
 
@@ -71,12 +74,12 @@ For the Arabidopsis genotype data, we will use a genetic relatedness matrix usin
 the LOCO option.
 
 ```julia
-julia> Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,10,XX)
+Kg = FlxQTL.shrinkgLoco(FlxQTL.kinshipMan,10,XX)
 ```
 For no LOCO option with shrinkage,
 
 ```julia
-julia> K = FlxQTL.shrinkg(FlxQTL.kinshipMan,10,XX.X)
+K = FlxQTL.shrinkg(FlxQTL.kinshipMan,10,XX.X)
 ```
 
 
@@ -95,25 +98,27 @@ For a non-identity climatic relatedness, and a kinship with LOCO, you can do eig
 relatedness, you can use `Matrix(1.0I,6,6)` for a matrix of eigenvectors and `ones(6)` for a vector of eigenvalues.
 
 ```julia
-julia> Tg,Λg,Tc,λc = FlxQTL.K2Eig(Kg,Kc,true); # the last argument: LOCO::Bool = false (default)
+Tg,Λg,Tc,λc = FlxQTL.K2Eig(Kg,Kc,true); # the last argument: LOCO::Bool = false (default)
+
+Tg,λg = FlxQTL.K2eig(Kg, true) # for eigen decomposition to one kinship with LOCO
 ```
 
-For no LOCO option,
+For eigen decomposition to one kinship with no LOCO option,
 
 ```julia
-julia> T,λ = FlxQTL.K2eig(K)
+Tg,λg = FlxQTL.K2eig(Kg)
 ```
 Now start with 1D genome scan with (or without) LOCO including `Z` or not.  
 For the genome scan with LOCO including `Z`, 
 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z,true); # FlxQTL for including Z (trait covariates) or Z=I
+LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z,true); # FlxQTL for including Z (trait covariates) or Z=I
 ```
 For the genome scan with LOCO excluding `Z`, i.e. an identity matrix, we have two options: a FlxQTL model and a conventional MLMM 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,true); # FlxQTL for Z=I 
+LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,true); # FlxQTL for Z=I 
 
-julia> LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX,true); # MLMM
+LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX,true); # MLMM
 ```
 Note that the first argument in `geneScan` is `cross::Int64`, which indicates a type of genotype or genotype probability.  For instance, if you use a 
 genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype probability matrices, depending on the number of alleles or genotypes in a marker, one can type the corresponding number. i.e. `4-way cross: 4`, `HS DO mouse: 8 for alleles, 32 for genotypes`, etc.   
@@ -121,28 +126,33 @@ genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype proba
 For no LOCO option,
 
 ```julia
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z);
+LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z);
 
-julia> LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX);
+LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX);
 
-julia> LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX); # MLMM
+LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX); # MLMM
 ```
-The function `geneScan` has three arguments: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`.  
-In particular, you can extract values from each matrix in `B` (3D array of matrices) to generate an effects plot.
+The function `geneScan` has three arguments: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`, which 
+is an `Array{Any,1}`.  If you want to see null parameter esitmate in chromosome 1 for LOCO option, type `est0[1].B`, `est0[1].loglik`, `est0[1].τ2`, 
+`est0[1].Σ`.   
+In particular, you can extract values from each matrix in `B` (3D array of matrices) to generate an effects plot. To print an effect size matrix for the 
+third marker, type `B[:,:,3]`.
 
 
 ## Generating plots
 
 To produce a plot (or plots) for LOD scores or effects, you need first a struct of arrays, `layers` consisting of chromosomes, marker positions, 
-LOD scores (or effects).
-
-```julia
-julia> Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs)
-
-julia> plot1d(Arab_lod;title= "LOD scores for Arabidopsis thaliana",ylabel="LOD")
-```
+LOD scores (or effects), which should be `Array{Float64,2}`.  Therefore, you can generate multiple genenome scan results on a plot.  
 The function `plot1d` has more keyword argument options: `yint=[]` for a vector of y-intercept(s), `yint_color=["red"]` for a vector of y-intercept 
 color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location of `Legend`.
+
+```julia
+Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs[:,:]) # LODs is a vector here, so force to a matrix
+plot1d(Arab_lod;title= "LOD for Arabidopsis thaliana : Fitness (2 site by 3 year, 6 traits)",ylabel="LOD")
+```
+![arabidopsis](guide/arab-lod.png)
+
+
 
 
 ## Performing a permutation test
