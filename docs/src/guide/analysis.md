@@ -150,7 +150,7 @@ color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location 
 Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs[:,:]) # LODs is a vector here, so force to a matrix
 plot1d(Arab_lod;title= "LOD for Arabidopsis thaliana : Fitness (2 site by 3 year, 6 traits)",ylabel="LOD")
 ```
-![arabidopsis](guide/arab-lod.png)
+![arabidopsis](arab-lod.png)
 
 
 
