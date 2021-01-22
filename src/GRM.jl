@@ -387,7 +387,7 @@ function kinshipLoco(kin,g::Markers,cross::Int64=1)
 
         @views for l=1:nChr
           K_loco[:,:,l]=K[l]
-          println("Positive definiteness dropping chromosome $(Chr[l]) is ", isposdef(K_loco[l]),".")
+          println("Positive definiteness dropping chromosome $(Chr[l]) is ", isposdef(K_loco[:,:,l]),".")
             end
 
         else #cross=1: Kinship functions not having 'cross' argument
