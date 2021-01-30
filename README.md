@@ -57,6 +57,17 @@ Or, equivalently,
 ```julia
 julia> using Pkg; Pkg.add("FlxQTL")
 ```
+
+For installing from the source,
+```julia
+pkg> add https://github.com/hkim89/FlxQTL.jl
+```
+or,
+
+```julia
+julia> Pkg.add(url="https://github.com/hkim89/FlxQTL.jl")
+```
+
 Currently Julia `1.5` supports for the package.
 
 

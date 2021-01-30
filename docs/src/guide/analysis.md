@@ -147,7 +147,7 @@ The function `plot1d` has more keyword argument options: `yint=[]` for a vector 
 color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location of `Legend`.
 
 ```julia
-Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs[:,:]) # LODs is a vector here, so force to a matrix
+Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs[:,:]) # LODs is a vector here, so force it to be a matrix
 plot1d(Arab_lod;title= "LOD for Arabidopsis thaliana : Fitness (2 site by 3 year, 6 traits)",ylabel="LOD")
 ```
 ![arabidopsis](arab-lod.png)
@@ -158,8 +158,8 @@ plot1d(Arab_lod;title= "LOD for Arabidopsis thaliana : Fitness (2 site by 3 year
 ## Performing a permutation test
 
 Since the statistical inference for `FlxQTL` relies on LOD scores and LOD scores, the function `permTest` finds thresholds for a type I error.  The first 
-argument is `nperm::Int64` to set the number of permutations for the test. For `Z = I`, type `Matrix(1.0I,6,6)` for the Arabidopsis thaliana data.
+argument is `nperm::Int64` to set the number of permutations for the test. For `Z = I`, type `Matrix(1.0I,6,6)` for the Arabidopsis thaliana data.  In the keyword argument, `pval=[0.05 0.01]` is default to get thresholds of `type I error rates (α)`.
 
 ```julia
-julia> maxLODs, H1par_perm, cutoff = FlxQTL.permTest(1000,1,Kg,Kc,Ystd,XX,Z;pval=[0.05 0.01])
+julia> maxLODs, H1par_perm, cutoff = FlxQTL.permTest(1000,1,Kg,Kc,Ystd,XX,Z;pval=[0.05]) # cutoff at 5 %
 ```
