@@ -34,7 +34,7 @@ end
 
 """
     
-      plot1d(xx::layers;title= " ",ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize="medium",loc="upper right") 
+      function plot1d(xx::layers;title= " ",title_fontsize=25,ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize=20,loc="upper right") 
 
 
 Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome scan on a single plot.
@@ -46,15 +46,20 @@ Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome 
 ## Keyword arguements,
 
 - `title` : A string of title. Default is blank.
+- `title_fontsize` : A string or number to set `title` fontsize (default= 25). i.e. "small", "medium", "large", or any integer.
+- `ylabel` : A string of a y-axis label (default = LOD)
 - `yint` :  A vector of y-intercept(s).
 - `yint_color` : A vector of colors (strings) of y-intercepts in yint.
-- `Legend` : A vector of titles corresponding to graphs in `layers`.
-- `fontsize` : A string or number to set `Legend` fontsize. i.e. "small", "medium", "large", or any integer, '15'.
+- `Legend` : A vector of graph names in `layers`.
+- `fontsize` : A string or number to set fontsizes of `Legend`, `xlabel` and `ylabel` (default= 20). 
+               i.e. "small", "medium", "large", or any integer.
 - `loc` : A string of Legend's position. Default is "upper right".
 
 
 """
-function plot1d(xx::layers;title= " ",ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize="medium",loc="upper right")
+function plot1d(xx::layers;title= " ",title_fontsize=25,ylabel="LOD",yint=[],
+                yint_color=["red"],sub_dim=111,Legend=[],fontsize=20,
+                loc="upper right")
 
 Chr=unique(xx.chr); nchr=length(Chr);np=size(xx.lod,2)
  #generating a set of line segments
@@ -76,15 +81,20 @@ end
 ##  Plot  ##
 ############
 fig=figure(figsize=[20,10])
-ax=subplot(1,1,1) # creates a subplot with just one graphic
+ax=subplot(sub_dim) # creates a subplot with just one graphic
     #major labels
-Mnames=["" for j=1:nchr]; 
+Mnames=["" for j=1:nchr];
 ax.xaxis.set_major_locator(matplotlib.ticker.FixedLocator(Mticks)) # Set interval of major ticks
 ax.xaxis.set_major_formatter(matplotlib.ticker.FixedFormatter(Mnames))
 
 ax.xaxis.set_minor_locator(matplotlib.ticker.FixedLocator(mticks)) # Set interval of major ticks
 ax.xaxis.set_minor_formatter(matplotlib.ticker.FixedFormatter(Chr))
-    
+
+ax.xaxis.set_tick_params(which="major",length=10,width=2,labelsize=20)
+ax.xaxis.set_tick_params(which="minor",length=5,width=2, labelsize=20)
+
+
+
 ## colors
 #c = Vector{Int}[[0,1,0],[0,1,0],[0,1,0],[1, 1, 0]]
 c= repeat([rand(3) for j=1:np],nchr)
@@ -110,31 +120,36 @@ ax.yaxis.set_minor_locator(my) # Set interval of minor ticks
        else
          for j=1:length(yint)
         ax.axhline(y=yint[j],linewidth=0.8,linestyle="dashed",color=yint_color[1])
-         end   
+         end
        end
   end
 # #legend
-# #lbox= Array{PyCall.PyObject,1}(undef,np);
     if (length(Legend)!=0)
      lbox=[];
  #plegend=["Scan 1"]
        for l=1:np
-        lbox0= matplotlib.lines.Line2D([], [], color=c[l],label=Legend[l])  
+        lbox0= matplotlib.lines.Line2D([], [], color=c[l],label=Legend[l])
         lbox=vcat(lbox,lbox0)
        end
-     legend(handles=lbox, loc=loc,fontsize=fontsize)
+     legend(handles=lbox, loc=loc, fontsize=fontsize)
     end
-#legend(handles=lbox, bbox_to_anchor=(1, 1))
-#fig, ax = subplots(figsize=(10,10))
+
 ax.add_collection(line_segments)
 ax.axis("image")
 ax.axis("tight")
-ax.set(xlabel="Chromosome", ylabel=ylabel, title=title)
+# ax.set(xlabel="Chromosome", ylabel=ylabel, title=title)
+# ax.set(xlabel="Chromosome", ylabel=ylabel)
+ax.set_xlabel("Chromosome", fontsize=fontsize)
+ax.set_ylabel(ylabel, fontsize=fontsize)
+ax.set_title(label=title,fontsize=title_fontsize, loc="center")    #
+
+setp(ax.get_yticklabels(), fontsize=15) # Y Axis font formatting
+
+
 ax.grid("on")
 # gcf();
-
+PyPlot.display_figs()
 end
-
 
 ## 2d-plot
 ##plotting 2D-scan PyPlot

@@ -142,9 +142,9 @@ third marker, type `B[:,:,3]`.
 ## Generating plots
 
 To produce a plot (or plots) for LOD scores or effects, you need first a struct of arrays, `layers` consisting of chromosomes, marker positions, 
-LOD scores (or effects), which should be `Array{Float64,2}`.  Therefore, you can generate multiple genenome scan results on a plot.  
+LOD scores (or effects), which should be `Array{Float64,2}`.  You can then generate one genome scan result or multiple genenome scan results on one plot.  Note that the color is randomly selected to generate a plot.   
 The function `plot1d` has more keyword argument options: `yint=[]` for a vector of y-intercept(s), `yint_color=["red"]` for a vector of y-intercept 
-color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location of `Legend`.
+color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location of `Legend`, etc.
 
 ```julia
 Arab_lod = FlxQTL.layers(markerinfo[:,2],markerinfo[:,3],LODs[:,:]) # LODs is a vector here, so force it to be a matrix
