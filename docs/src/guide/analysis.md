@@ -106,7 +106,7 @@ Tg,λg = FlxQTL.K2eig(Kg, true) # for eigen decomposition to one kinship with LO
 For eigen decomposition to one kinship with no LOCO option,
 
 ```julia
-Tg,λg = FlxQTL.K2eig(Kg)
+T,λ = FlxQTL.K2eig(K)
 ```
 Now start with 1D genome scan with (or without) LOCO including `Z` or not.  
 For the genome scan with LOCO including `Z`, 
@@ -126,11 +126,11 @@ genotype matrix whose entry is one of 0,1,2, type `1`. If you use genotype proba
 For no LOCO option,
 
 ```julia
-LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX,Z);
+LODs,B,est0 = FlxQTL.geneScan(1,T,Tc,λ,λc,Ystd,XX,Z);
 
-LODs,B,est0 = FlxQTL.geneScan(1,Tg,Tc,Λg,λc,Ystd,XX);
+LODs,B,est0 = FlxQTL.geneScan(1,T,Tc,λ,λc,Ystd,XX);
 
-LODs,B,est0 =FlxQTL.geneScan(1,Tg,Λg,Ystd,XX); # MLMM
+LODs,B,est0 =FlxQTL.geneScan(1,T,λ,Ystd,XX); # MLMM
 ```
 The function `geneScan` has three arguments: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`, which 
 is an `Array{Any,1}`.  If you want to see null parameter esitmate in chromosome 1 for LOCO option, type `est0[1].B`, `est0[1].loglik`, `est0[1].τ2`, 
@@ -158,8 +158,8 @@ plot1d(Arab_lod;title= "LOD for Arabidopsis thaliana : Fitness (2 site by 3 year
 ## Performing a permutation test
 
 Since the statistical inference for `FlxQTL` relies on LOD scores and LOD scores, the function `permTest` finds thresholds for a type I error.  The first 
-argument is `nperm::Int64` to set the number of permutations for the test. For `Z = I`, type `Matrix(1.0I,6,6)` for the Arabidopsis thaliana data.  In the keyword argument, `pval=[0.05 0.01]` is default to get thresholds of `type I error rates (α)`.
+argument is `nperm::Int64` to set the number of permutations for the test. For `Z = I`, type `Matrix(1.0I,6,6)` for the Arabidopsis thaliana data.  In the keyword argument, `pval=[0.05 0.01]` is default to get thresholds of `type I error rates (α)`.  Note that permutation test is implemented by no LOCO option.
 
 ```julia
-julia> maxLODs, H1par_perm, cutoff = FlxQTL.permTest(1000,1,Kg,Kc,Ystd,XX,Z;pval=[0.05]) # cutoff at 5 %
+julia> maxLODs, H1par_perm, cutoff = FlxQTL.permTest(1000,1,K,Kc,Ystd,XX,Z;pval=[0.05]) # cutoff at 5 %
 ```
