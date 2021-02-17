@@ -87,7 +87,7 @@ julia> using Pkg; Pkg.rm("FlxQTL")
 
 The package can be run with OpenBLAS (built-in Julia dense linear
 algebra routines) or MKL (Intel's Math Kernel Library).  `MKL.jl`
-works best on Intel hardware, although without Intel hardware, it can
-improve performance slightly.  For installation, and details
+works best on Intel hardware, but it can slightly improve performance 
+without Intel hardware,.  For installation, and details
 see: [MKL.jl](https://github.com/JuliaComputing/MKL.jl).
 
