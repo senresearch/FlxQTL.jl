@@ -34,6 +34,9 @@ Y=convert(Array{Float64,2},pheno'); #convert from transposed one to a Float64 ma
 Ystd=(Y.-mean(Y,dims=2))./std(Y,dims=2); # sitewise normalization
 ```
 
+!!! Note
+- If the data are skewed or have outliers, simple standadization may not resolve them.  You may use a `Y_huber` function to rescale the data to be less sensitve to outliers.
+
 In the genotype data, `1`, `2` indicate Italian, Swedish parents, respectively. You can rescale the genotypes for efficiency. 
 
 ```julia
@@ -52,8 +55,7 @@ addprocs(4)
 XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno') # marker names, chromosomes, marker positions, genotypes
 
 ```
-**Julia tip**: Whenever you reload a package, i.e. `using FlxQTL`, you should re-enter `XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno')` to 
-fresh the struct of array.  If not, your genome scan throw an error.  You should also do with another struct of array in a submodule `QTLplot`, `FlxQTL. layers`.
+- **Julia tip**: Whenever you reload a package, i.e. `using FlxQTL`, you should re-enter `XX=FlxQTL.Markers(markerinfo[:,1],markerinfo[:,2],markerinfo[:,3],geno')` to fresh the struct of array.  If not, your genome scan throws an error.  You should also do with another struct of array in a submodule `QTLplot`, `FlxQTL.layers`.
 
 Optionally, one can generate a trait covariate matrix (Z).  The first column indicates overall mean between the two regions, and 
 the second implies site difference: `-1` for Italy, and `1` for Sweden.
