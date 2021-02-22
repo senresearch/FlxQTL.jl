@@ -138,7 +138,6 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.  
 
 !!! Note
-
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not, 
     can reduce both `tol0` and `tol` to `1e-4` or further.
 
