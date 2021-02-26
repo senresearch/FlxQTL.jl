@@ -326,7 +326,7 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
      end
 
     if (tdata) # should use with no LOCO
-        return LODs,B,est0,Y1,X1
+        return LODs,B,est0,Y,X
      else
         return LODs,B,est0
      end
