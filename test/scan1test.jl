@@ -69,7 +69,7 @@ LOD,B,est=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX);
 #MVLMM
 LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,pheno,XX)
 @test sum((LOD3.< 0.0))==0
-@test size(B3)== (2,3,4)
+@test size(B3)== (3,2,4)
 @test est3.Vc >0.0
 @test size(est3.Σ)==(3,3)
 @test est3.loglik <=0.0
@@ -94,9 +94,9 @@ end
 #MVLMM
 LOD4,B4,est4=FlxQTL.geneScan(1,Tg,Λg,pheno,XX,true)
 @test sum(LOD4.<0.0)==0
-@test size(B4)== (2,3,4)
+@test size(B4)== (3,2,4)
 for j=1:2 
-       println(@test est4[j].Vc >0.0)
+       println(@test size(est4[j].Vc) ==(3,3))
 end
 for j=1:2 
        println(@test size(est4[j].Σ)== (3,3) )
@@ -117,7 +117,7 @@ end
 #MVLMM
 LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,pheno,XX)
 @test sum(LOD2d0.<0.0)==0
-@test est2d0.Vc >0.0
+@test size(est2d0.Vc)==(3,3)
 @test size(est2d0.Σ)== (3,3)
 @test est2d0.loglik <=0.0                      
 
@@ -135,10 +135,10 @@ end
 end
 
 #MVLMM
- LOD2d2,est2d2=FlxQTL.gene2Scan(1,Tg,Λg,pheno,XX,Z,true);
+ LOD2d2,est2d2=FlxQTL.gene2Scan(1,Tg,Λg,pheno,XX,true);
 @test sum(LOD2d2.<0.0)==0
 for j=1:2 
-       println(@test est2d2[j].Vc >0.0)
+       println(@test size(est2d2[j].Vc)== (3,3))
 end
 for j=1:2 
        println(@test size(est2d2[j].Σ)== (3,3) )
