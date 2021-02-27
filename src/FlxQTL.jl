@@ -21,16 +21,16 @@ include("flxMLMM.jl")
 using .MLM:mGLM, Estimat
 export mGLM, Estimat
 
-using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,shrinkg,shrinkgLoco,kinshipLoco
-export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr
+using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
+export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
 using .QTLplot:layers, plot1d, plot2d, subplot2d
 export layers, plot1d, plot2d, subplot2d
 
-using .flxMLMM: geneScan,gene2Scan,permTest,K2eig, K2Eig
+using .flxMLMM: geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig
 #selectQTL
-export geneScan,gene2Scan,permTest,K2eig, K2Eig
+export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig
 
 using .Util:setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
 export setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber

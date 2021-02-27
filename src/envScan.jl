@@ -117,13 +117,13 @@ function envScan(Midx::Array{Int64,1},cross::Int64,Tg,Tc::Array{Float64,2},Λg,�
                     init=initial(X,Y0,ones(m,1))   
                     Σ1=convert(Array{Float64,2},Symmetric(BLAS.symm('R','U',init.Σ,Tc)*Tc'))
                     est00=nulScan(init,kmin,Λg,λc,Y1,X,Z1[:,[1]],Σ1;itol=itol,tol=tol,ρ=ρ)
-                    LODs[:,j], H1par1=env1Scan(q,kmin,cross,est00,Λg,λc,Y1,X,Z1;tol0=tol0,tol1=tol,ρ=ρ)
+                    LODs[:,j], H1par1=env1Scan(q,kmin,est00,Λg,λc,Y1,X,Z1;tol0=tol0,tol1=tol,ρ=ρ)
                  else
                     X[:,:]= vcat(Xnul_t,@view X1[[j],:])
                     init=initial(vcat(Xnul,@view Xp[[j],:]),Y0,ones(m,1))  
                     Σ1=convert(Array{Float64,2},Symmetric(BLAS.symm('R','U',init.Σ,Tc)*Tc'))
                     est00=nulScan(init,kmin,Λg,λc,Y1,X,Z1[:,[1]],Σ1;itol=itol,tol=tol,ρ=ρ)
-                    LODs[:,j], H1par1=env1Scan(q,kmin,cross,est00,Λg,λc,Y1,X,Z1;tol0=tol0,tol1=tol,ρ=ρ)
+                    LODs[:,j], H1par1=env1Scan(q,kmin,est00,Λg,λc,Y1,X,Z1;tol0=tol0,tol1=tol,ρ=ρ)
             end #end cross 
                    est0=[est0;est00]; H1par=[H1par;H1par1]
         end #for
