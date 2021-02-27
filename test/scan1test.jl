@@ -1,8 +1,4 @@
-using Distributed, LinearAlgebra
-addprocs(4)
-@everywhere using FlxQTL, Random,Test
 
-FlxQTL.Util.setSeed(2,100);
 #test for cross=1 (genotype data)
 geno=[0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0
@@ -48,14 +44,18 @@ Kc=Matrix(1.0I,3,3)
 
 #eigen decomposition
 Tg,Λg,Tc,λc = FlxQTL.K2Eig(Kg,Kc,true)
-T,λ =FlxQTL.flxMLMM.K2eig(K)
+T,λ =FlxQTL.K2eig(K)
+@test typeof(Tg)==Array{Float64,3}
+@test typeof(T)==Array{Float64,2}
+@test typeof(Λg)==Array{Float64,2}
+@test typeof(λ)==Array{Float64,1}
 
 #test Z=I vs no Z & loco vs no loco
 Z=Matrix(1.0I,3,3)
 
 
 #no loco 
-LOD2,B2,est2=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX,Z); 
+LOD2,B2,est2=FlxQTL.geneScan(1,T,Tc,λ,λc,pheno,XX,Z); 
 @test sum((LOD2.< 0.0))==0
 LOD,B,est=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX); 
 @test sum((LOD.< 0.0))==0
@@ -73,6 +73,18 @@ LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,pheno,XX)
 @test size(est3.Vc) == (3,3)
 @test size(est3.Σ)==(3,3)
 @test est3.loglik <=0.0
+
+#environment scan
+Q=findall(LOD2.==maximum(LOD2))
+Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
+ -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
+ -0.749826  -0.327169   0.20022    0.158106   0.993343]
+eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,pheno,XX,Ze)
+@test sum(eLOD.<0.0)==0.0
+@test size(eB)== (2,2,5)
+@test este[1].τ2>0.0
+@test size(este[1].Σ)==(3,3)
+@test este[1].loglik<=0.0
 
 #loco
 LOD1,B1,est01=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,true); 
@@ -104,6 +116,15 @@ end
  for j=1:2 
        println(@test est4[j].loglik<=0.0)
 end
+
+#environment scan
+Q=findall(LOD0.==maximum(LOD0))
+eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,pheno,XX,Ze,true)
+@test sum(eLOD0.<0.0)==0.0
+@test size(eB0)== (2,2,5)
+@test este0[1].τ2>0.0
+@test size(este0[1].Σ)==(3,3)
+@test este0[1].loglik<=0.0
 
 
 #2d-scan
@@ -161,3 +182,19 @@ maxLODs0, H1par_perm0, cutoff0= FlxQTL.permTest(4,1,K,pheno,XX;pval=[0.05 0.01])
 for j=1:2
 println(@test isless(0.0,cutoff[j]))
 end
+
+#######testing kinships
+
+@test isposdef(FlxQTL.kinshipGs(geno,std(geno)))
+
+
+K0=FlxQTL.kinshipLoco(FlxQTL.kinshipCtr,XX)
+for j=1:2 
+      println(@test isposdef(K0[:,:,j])== true)
+end
+
+K1=FlxQTL.kinshipLoco(FlxQTL.kinshipStd,XX)
+for j=1:2 
+      println(@test isposdef(K1[:,:,j])== true)
+end
+
