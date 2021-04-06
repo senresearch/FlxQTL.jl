@@ -9,7 +9,7 @@
 [![Coverage](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/senresearch/FlxQTL.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
-*FlxQTL.jl* is a a package for a multivariate linear mixed model based
+*FlxQTL.jl* is a package for a multivariate linear mixed model based
 QTL analysis tool that supports incorporating information from trait
 covariates such as time or different environments.  The package
 supports computation of one-dimensional and two-dimensional
