@@ -218,7 +218,7 @@ function getGenoidx(GenoData::Array{Any,2},maf::Float64=0.025)
 #   getId=LinearIndices(id1)[findall(id1.==false)]
 #     return getindex.(findall(var(GenoData,dims=2).>= 0.1),1)  
         af =  mean(GenoData,dims=2)/2.0
-        MAF= replace(x->x > 0.5? 1-x : x, af) 
+        MAF= replace(x->x > 0.5 ? 1-x : x, af) 
     return getindex.(findall(MAF.>= maf),1)   
 end
 
