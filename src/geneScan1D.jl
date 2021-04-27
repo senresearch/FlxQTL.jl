@@ -147,7 +147,6 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 - `LODs` : LOD scores. Can change to ``- \\log_{10}{P}`` in [`lod2logP`](@ref).
 - `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL. 
 - `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL. 
-- `X1,Y1,(or Z1)` : transformed `XX.X, Y0, (or Z0)` by `Tg, Tc` to use permutation test.
 
 """
 function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},
