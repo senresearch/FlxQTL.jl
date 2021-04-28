@@ -59,6 +59,8 @@ LOD2,B2,est2=FlxQTL.geneScan(1,T,Tc,λ,λc,pheno,XX,Z);
 @test sum((LOD2.< 0.0))==0
 LOD,B,est=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX); 
 @test sum((LOD.< 0.0))==0
+LOD_1,B_2,est_2=FlxQTL.geneScan(1,T,Matrix()1.0I,3,3),λ,ones(3),pheno,XX,Z); 
+@test sum((LOD_1.< 0.0))==0
 
 @test LOD ≈ LOD2
 @test B ≈ B2
@@ -198,3 +200,7 @@ for j=1:2
       println(@test isposdef(K1[:,:,j])== true)
 end
 
+### testing maf
+A=rand(15,15)
+Aidx= getGenoidx(A,0.25)
+@test length(Aidx)<=size(A,1)

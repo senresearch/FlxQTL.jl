@@ -98,11 +98,11 @@ end
 
 
     geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;
-                Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+                Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001,LogP::Bool=false)
     geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;
-                Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+                Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001,LogP::Bool=false)
     geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;
-        Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+        Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001,LogP::Bool=false)
 
 
 Implement 1d-genome scan with/without LOCO (Leave One Chromosome Out).  Note that the third `geneScan()` is based on a conventional MLMM: 
@@ -136,6 +136,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 - `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
 - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.  
+- `LogP` : Boolean. Default is `false`.  Prints out `LOD scores` to ``-\\log_{10}{P-values}`` if `true`.
 
 !!! Note
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not, 
@@ -144,13 +145,14 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 # Output
 
-- `LODs` : LOD scores. Can change to ``- \\log_{10}{P}`` in [`lod2logP`](@ref).
+- `LODs` : LOD scores. Can change to ``- \\log_{10}{P-values}`` in [`lod2logP`](@ref).
+- `logP` : ``- \\log_{10}{P-values}`` computed from LOD scores if `LogP = true`.
 - `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL. 
 - `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL. 
 
 """
 function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},
-        XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;tdata::Bool=false,
+        XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
                 Xnul::Array{Float64,2}=ones(1,size(Y0,2)),kmin::Int64=1,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
         m=size(Y0,1);
@@ -207,14 +209,22 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
 
     if (tdata) # should use with no LOCO
         return LODs,B,est0,Y1,X1,Z1
+    elseif (LogP) # transform LOD to -log10(p-value)
+          q1=size(Xnul,1)
+            if(cross>1)
+              logP=lod2logP(LODs,(cross-2+q1)*(q-1))
+              else
+               logP=lod2logP(LODs,q1*(q-1))
+             end
+        return logP,B,est0
      else
-        return LODs,B,est0
+         return LODs,B,est0        
      end
 end
 
 #Z=I
 function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},
-        XX::Markers,LOCO::Bool=false;tdata::Bool=false,
+        XX::Markers,LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
                 Xnul::Array{Float64,2}=ones(1,size(Y0,2)),kmin::Int64=1,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
          m=size(Y0,1);
@@ -271,15 +281,23 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
     end
 
     if (tdata) # should use with no LOCO
-        return LODs,B,est0,Y1,X1
+        return LODs,B,est0,Y1,X1,Z1
+    elseif (LogP) # transform LOD to -log10(p-value)
+          q1=size(Xnul,1)
+            if(cross>1)
+              logP=lod2logP(LODs,(cross-2+q1)*(m-1))
+              else
+               logP=lod2logP(LODs,q1*(m-1))
+             end
+        return logP,B,est0
      else
-        return LODs,B,est0
+         return LODs,B,est0        
      end
 end
 
 
 ##MVLMM
-function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;tdata::Bool=false,
+function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
         Xnul::Array{Float64,2}=ones(1,size(Y0,2)),kmin::Int64=1,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     m=size(Y0,1);
@@ -325,9 +343,17 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
      end
 
     if (tdata) # should use with no LOCO
-        return LODs,B,est0,Y,X
+        return LODs,B,est0,Y1,X1,Z1
+    elseif (LogP) # transform LOD to -log10(p-value)
+          q1=size(Xnul,1)
+            if(cross>1)
+              logP=lod2logP(LODs,(cross-2+q1)*(m-1))
+              else
+               logP=lod2logP(LODs,q1*(m-1))
+             end
+        return logP,B,est0
      else
-        return LODs,B,est0
+         return LODs,B,est0        
      end
 end
 
