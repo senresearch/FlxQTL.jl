@@ -17,7 +17,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 Distributions = "^0.23, 0.24"
-LossFunctions = "~0.6"
+LossFunctions = "~0.6, 0.7"
 PyPlot = "~2.9"
 Revise = "3.1"
 StaticArrays = "1.0.1"
