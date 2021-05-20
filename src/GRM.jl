@@ -29,7 +29,7 @@ This function is for recombinant inbred line (RIL) (AA/BB), not for 4-way cross 
 
 # Argument
 
-- `genematrix` : A matrix of genotypes, i.e. 0,1 or 1,2.  size(genematrix)= (p,n) for `p` genetic markers x `n` individuals(or lines).
+- `genematrix` : A matrix of genotypes, i.e. 0,1 (or 1,2).  size(genematrix)= (p,n) for `p` genetic markers x `n` individuals(or lines).
                
 
 # Output
@@ -148,8 +148,7 @@ Calculates a kinship (or climatic relatedness, [`kinshipGs`](@ref)) matrix by li
 
 - `mat` : A matrix of genotype (or allele) probabilities usually extracted from [R/qtl](https://rqtl.org/tutorials/rqtltour.pdf), 
         [R/qtl2](https://kbroman.org/qtl2/assets/vignettes/user_guide.html), or the counterpart packages. size(mat)= (p,n) for p genetic markers x n individuals. 
-- `cross` : A scalar indicating the number of alleles or genotypes. ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
-          This value is related to degree of freedom when doing genome scan.
+- `cross` : A scalar indicating instances of alleles or genotypes in a genetic marker. ex. 1 for genotypes (labeled as 0,1,2), 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
 
 # Output
 
@@ -232,7 +231,7 @@ end
      shrinkg(f,nb::Int64,geno)
 
 Estimates a full-rank positive definite kinship matrix by shrinkage intensity estimation (bootstrap).  Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
-This function runs faster by CPU parallelization.  Add workers/processes using `addprocs()` function before running. 
+This function runs faster by CPU parallelization.  Add workers/processes using `addprocs()` function before running for speedup. 
 
 # Arguments
 
@@ -331,7 +330,7 @@ Generates 3-d array of full-rank positive definite kinship matrices by shrinkage
 
 # Output
 
-Returns 3-d array of `C` n x n symmetric positive definite matrices for `C` Chromosomes.
+Returns 3-d array of n x n symmetric positive definite matrices as many as Chromosomes.
 
 """
 function shrinkgLoco(kin,nb::Int64,g::Markers)
@@ -361,19 +360,19 @@ end
      kinshipLoco(kin,g::Markers,cross::Int64=1)
 
 Generates a 3-d array of symmetric positive definite kinship matrices using LOCO (Leave One Chromosome Out) witout shrinkage intensity estimation.  
-For a non-positive definite kinship, a tweak like a weighted average of kinship and Identity is used to correct minuscule negative eigenvalues. 
+When a kinship is not positive definate, a tweak like a weighted average of kinship and Identity is used to correct minuscule negative eigenvalues. 
 
 # Arguments
 
 - `kin` :  A function of computing a kinship. Can only use with [`kinshipCtr`](@ref), [`kinshipStd`](@ref) for genotypes, and with [`kinshipLin`](@ref) 
           for genotype (or allele) probabilities.
 - `g`   : A struct of arrays, type  [`Markers`](@ref).
-- `cross` :  A scalar indicating the number of alleles or genotypes. ex. 1 for genotypes (0,1,2) as default, 2 for RIF, 4 for four-way cross, 
-             8 for HS mouse (allele probabilities), etc.  This value is related to degree of freedom when doing genome scan.
+- `cross` :  A scalar indicating instances of alleles or genotypes in a genetic marker. 
+             ex. 1 for genotypes (0,1,2) as default, 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.  
 
 # Output
 
-Returns 3-d array of `C` n x n symmetric positive definite matrices for `C` Chromosomes.
+Returns 3-d array of n x n symmetric positive definite matrices as many as Chromosomes.
 Refer to [`shrinkgLoco`](@ref).
 
 """
@@ -386,7 +385,11 @@ function kinshipLoco(kin,g::Markers,cross::Int64=1)
          K=pmap(kin,[g.X[findall(g.chr.!=Chr[j]),:] for j=1:nChr],[cross for j=1:nChr])
 
         @views for l=1:nChr
-          K_loco[:,:,l]=K[l]
+                     if(!isposdef(K[l]))
+                        K_loco[:,:,l]=K[l]+0.01I
+                       else
+                        K_loco[:,:,l]=K[l]
+                     end
           println("Positive definiteness dropping chromosome $(Chr[l]) is ", isposdef(K_loco[:,:,l]),".")
             end
 
