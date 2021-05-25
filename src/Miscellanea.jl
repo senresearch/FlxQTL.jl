@@ -210,7 +210,7 @@ Attains genotype indices to drop correlated or bad markers.
 
 # Arguments
 - `GenoData` : A matrix of genotype data. size(GenoData)= (p,n) for `p` markers and `n` individuals.
-- `maf` : A scalar for dropping criterion of markers. Default is `0,025` i.e. markers of MAF < 0.025 are dropped.
+- `maf` : A scalar for dropping criterion of markers. Default is `0.025` i.e. markers of MAF < 0.025 are dropped.
 
 """
 function getGenoidx(GenoData::Union{Array{Any,2},Array{Float64,2}},maf::Float64=0.025)
@@ -254,10 +254,7 @@ Caculates ``-\\log_{10}{P}`` from LOD scores.
 - `v` : Degrees of freedom for Chi-squared distribution.  
 
 !!! NOTE
-- To compute Degress of freedom for 1d genome scan (`geneScan`), `v = (cross-1)*(q-1)` for genotype probabilities and 
-`v = q-1` for genotypes, i.e. `cross = 1` assuming no covariate included due to the argument `cross(>1)` in accord with 
-the number of genotypes (or alleles) in a genetic marker.
-    
+- To compute degrees of freedom for 1D-genome scan (`geneScan`), `v = prod(size(B1))-prod(size(B0)`, where `B1` and `B0` are effect size matrices under H1 of a full model (intercept + covariates + QTL) and H0 of no QTL (intercept + covariates), respectively.
 """
 function lod2logP(LODs::Union{Array{Float64,1},Array{Any,1}},v::Int64)
 return -log.(10,(ccdf.(Chisq(v),2*log(10)*LODs)))

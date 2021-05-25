@@ -8,6 +8,21 @@
 function marker2Scan!(LODs,mindex::Array{Int64,1},q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1;ρ=0.001,tol0=1e-3,tol1=1e-4)
     M=length(mindex)
     if (cross!=1)
+        if(size(Xnul_t,1)>1) # added covariates
+
+            B0= @views [Nullpar.B[:,1] zeros(q,2*(cross-1)) Nullpar.B[:,2:end]]
+              for j=1:M-1
+               lod=@distributed (vcat) for l=j+1:M
+                    XX=@views vcat(Xnul_t[1,:],X1[j,2:end,:],X1[l,2:end,:],Xnul_t[2:end,:])
+                      B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
+                       lod0=(loglik0-Nullpar.loglik)/log(10)
+                      est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
+                      (est1.loglik-Nullpar.loglik)/log(10)
+                                   end
+                 @views LODs[mindex[j+1:end],mindex[j]].=lod
+               end
+        else #intercept only
+           
         B0=hcat(Nullpar.B,zeros(q,2*(cross-1)))
  
               for j=1:M-1
@@ -20,6 +35,7 @@ function marker2Scan!(LODs,mindex::Array{Int64,1},q,kmin,cross,Nullpar::Approx,�
                                    end
                  @views LODs[mindex[j+1:end],mindex[j]].=lod
                end
+        end
         
      else #cross=1
         B0=hcat(Nullpar.B,zeros(q,2));
@@ -43,17 +59,34 @@ end
 function marker2Scan!(LODs,mindex::Array{Int64,1},m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1;tol0=1e-3,tol1=1e-4,ρ=0.001)
     M=length(mindex)
     if (cross!=1)
+        if(size(Xnul_t,1)>1) #added covariates
+        
+            B0= @views [Nullpar.B[:,1] zeros(m,2*(cross-1)) Nullpar.B[:,2:end]]
+               for j=1:M-1
+               lod=@distributed (vcat) for l=j+1:M
+                    XX=@views vcat(Xnul_t[1,:],X1[j,2:end,:],X1[l,2:end,:],Xnul_t[2:end,:])
+                           B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg;tol=tol0)
+                             lod0=(loglik0-Nullpar.loglik)/log(10)
+                           est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
+                           (est1.loglik-Nullpar.loglik)/log(10)
+                                       end
+               @views LODs[mindex[j+1:end],mindex[j]] .=lod
+               end
+        else #intercept only
+                      
         B0=hcat(Nullpar.B,zeros(m,2*(cross-1)))
 
                for j=1:M-1
                lod=@distributed (vcat) for l=j+1:M
                            XX=@views vcat(Xnul_t,X1[j,2:end,:],X1[l,2:end,:])
                            B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg;tol=tol0)
-                           est1=ecmNestrvAG(kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
+                            lod0=(loglik0-Nullpar.loglik)/log(10)
+                           est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
                            (est1.loglik-Nullpar.loglik)/log(10)
                                        end
                @views LODs[mindex[j+1:end],mindex[j]] .=lod
                end
+        end
 
         else #cross=1
           B0=hcat(Nullpar.B,zeros(m,2));
@@ -62,7 +95,8 @@ function marker2Scan!(LODs,mindex::Array{Int64,1},m,kmin,cross,Nullpar::Result,�
                 lod=@distributed (vcat) for l=j+1:M
                          XX=@views vcat(Xnul_t,X1[[j,l],:])
                          B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg;tol=tol0)
-                         est1=ecmNestrvAG(kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
+                             lod0=(loglik0-Nullpar.loglik)/log(10)
+                         est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
                         (est1.loglik-Nullpar.loglik)/log(10)
                 #  println([j l])
                                        end
@@ -109,7 +143,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 ## Keyword Arguments
  
-- `Xnul` :  A matrix of covariates. Default is intercepts (1's).  Unless plugging in particular covariates, just leave as it is.
+- `Xnul` :  A matrix of covariates. Default is intercepts (1's).  Unless adding covariates, just leave as it is.
 - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
@@ -151,8 +185,8 @@ function gene2Scan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1
                    else
                    Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
-                #parameter estimation under the null
-                est=nulScan(init,kmin,Λg[:,i],λc,Y2,Xnul_t,Z1,Σ1;itol=itol,tol=tol,ρ=ρ)
+            
+                  est=nulScan(init,kmin,Λg[:,i],λc,Y2,Xnul_t,Z1,Σ1;itol=itol,tol=tol,ρ=ρ)
                 marker2Scan!(LODs,maridx,q,kmin,cross,est,Λg[:,i],λc,Y2,Xnul_t,X1,Z1;tol0=tol0,tol1=tol,ρ=ρ)
                 est0=[est0;est];
             end
@@ -165,8 +199,8 @@ function gene2Scan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1
                    else
                    Y1,X1=transForm(Tg,Y1,XX.X,cross)
                  end
-            est0=nulScan(init,kmin,Λg,λc,Y1,Xnul_t,Z1,Σ1;itol=itol,tol=tol,ρ=ρ)
-
+               
+                  est0=nulScan(init,kmin,Λg,λc,Y1,Xnul_t,Z1,Σ1;itol=itol,tol=tol,ρ=ρ)
              for i=1:nChr
             maridx=findall(XX.chr.==Chr[i])
             marker2Scan!(LODs,maridx,q,kmin,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1;tol0=tol0,tol1=tol,ρ=ρ)
@@ -196,8 +230,8 @@ function gene2Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bo
                    else
                    Y,X=transForm(Tg[:,:,i],Y0,XX.X[maridx,:],cross)
                  end
-                #parameter estimation under the null
-                est=nulScan(init,kmin,Λg[:,i],Y,Xnul_t;itol=itol,tol=tol,ρ=ρ)
+                
+                   est=nulScan(init,kmin,Λg[:,i],Y,Xnul_t;itol=itol,tol=tol,ρ=ρ)
                 marker2Scan!(LODs,maridx,m,kmin,cross,est,Λg[:,i],Y,Xnul_t,X;tol0=tol0,tol1=tol,ρ=ρ)
                 est0=[est0;est];
             end
@@ -210,8 +244,9 @@ function gene2Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bo
                    else
                    Y,X=transForm(Tg,Y0,XX.X,cross)
                  end
-           est0=nulScan(init,kmin,Λg,Y,Xnul_t;itol=itol,tol=tol,ρ=ρ)
-
+        
+                
+             est0=nulScan(init,kmin,Λg,Y,Xnul_t;itol=itol,tol=tol,ρ=ρ)
         for i=1:nChr
             maridx=findall(XX.chr.==Chr[i])
             marker2Scan!(LODs,maridx,m,kmin,cross,est0,Λg,Y,Xnul_t,X;tol0=tol0,tol1=tol,ρ=ρ)

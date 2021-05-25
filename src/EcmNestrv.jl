@@ -662,14 +662,17 @@ end
 
 
 
+function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1};tol::Float64,ρ=1e-4)
 
-function ecmNestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1};tol::Float64,ρ=1e-5)
-
-
+             if(lod0>0.0)
              result=  NestrvAG(kmin,Y,X,B0,Vc,Σ,λg;tol=tol,ρ=ρ)
-
-              return result
+                else #keep running ecmLMM
+              B0,Vc,Σ,loglik0 = ecmLMM(Y,X,B0,Vc,Σ,λg;tol=tol)
+              result=  NestrvAG(kmin,Y,X,B0,Vc,Σ,λg;tol=tol,ρ=ρ)
+             end
+             
+      return result
 
 end
 
