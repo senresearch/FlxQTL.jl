@@ -29,14 +29,16 @@ X1=FlxQTL.Markers(mname,chr1,pos1,gpr')
 @test X1.chr == chr1
 @test size(X1.X)== size(gpr')
 
-# K2=FlxQTL.kinshipLoco(FlxQTL.kinshipLin,X1,4)
-# for j=1:2 
-#       println(@test isposdef(K2[:,:,j])== true)
-# end
+
+K2=FlxQTL.kinshipLoco(FlxQTL.kinshipLin,X1,4)
+for j=1:2 
+      println(@test isposdef(K2[:,:,j])== true)
+end
+
 K3=FlxQTL.kinshipLin(X1.X,4);
 @test isposdef(K3)
 
-# T1,λ1 =FlxQTL.K2eig(K2,true)
+T1,λ1 =FlxQTL.K2eig(K2,true)
 T2,λ2 =FlxQTL.K2eig(K3)
 
 
@@ -60,36 +62,37 @@ lod3,b3,es3=FlxQTL.geneScan(4,T2,λ2,pheno,X1)
 @test size(es3.Σ)==(3,3)
 @test es3.loglik <=0.0
 
-# #loco
-# lod1,b1,es01=FlxQTL.geneScan(1,T1,Tc,λ1,λc,pheno,X1,true); 
-# @test sum((lod1.< 0.0))==0.0
-# lod0,b0,es00=FlxQTL.geneScan(1,T1,Tc,λ1,λc,pheno,X1,Z,true); 
-# @test sum((lod0.< 0.0))==0.0
+#loco
+lod1,b1,es01=FlxQTL.geneScan(1,T1,Tc,λ1,λc,pheno,X1,true); 
+@test sum((lod1.< 0.0))==0.0
+lod0,b0,es00=FlxQTL.geneScan(1,T1,Tc,λ1,λc,pheno,X1,Z,true); 
+@test sum((lod0.< 0.0))==0.0
 
-# @test lod0 ≈ lod1
-# @test b0 ≈ b1
-# for j=1:2 
-#        println(@test es00[j].τ2 ≈ es01[j].τ2)
-# end
-# for j=1:2 
-#        println(@test es00[j].Σ ≈ es01[j].Σ)
-# end
-#  for j=1:2 
-#        println(@test es00[j].loglik ≈ es01[j].loglik)
-# end
-# #MVLMM
-# lod4,b4,es4=FlxQTL.geneScan(1,T1,λ1,pheno,X1,true)
-# @test sum(lod4.<0.0)==0
-# @test size(b4)== (3,4,2)
-# for j=1:2 
-#        println(@test size(es4[j].Vc) ==(3,3))
-# end
-# for j=1:2 
-#        println(@test size(es4[j].Σ)== (3,3) )
-# end
-#  for j=1:2 
-#        println(@test es4[j].loglik<=0.0)
-# end
+@test lod0 ≈ lod1
+@test b0 ≈ b1
+for j=1:2 
+       println(@test es00[j].τ2 ≈ es01[j].τ2)
+end
+for j=1:2 
+       println(@test es00[j].Σ ≈ es01[j].Σ)
+end
+ for j=1:2 
+       println(@test es00[j].loglik ≈ es01[j].loglik)
+end
+#MVLMM
+lod4,b4,es4=FlxQTL.geneScan(1,T1,λ1,pheno,X1,true)
+@test sum(lod4.<0.0)==0
+@test size(b4)== (3,4,2)
+for j=1:2 
+       println(@test size(es4[j].Vc) ==(3,3))
+end
+for j=1:2 
+       println(@test size(es4[j].Σ)== (3,3) )
+end
+ for j=1:2 
+       println(@test es4[j].loglik<=0.0)
+end
+    
 #2d-scan
 #no loco
  lod2d,es2d=FlxQTL.gene2Scan(4,T2,Tc,λ2,λc,pheno,X1,Z);

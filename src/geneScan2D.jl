@@ -13,7 +13,7 @@ function marker2Scan!(LODs,mindex::Array{Int64,1},q,kmin,cross,Nullpar::Approx,�
             B0= @views [Nullpar.B[:,1] zeros(q,2*(cross-1)) Nullpar.B[:,2:end]]
               for j=1:M-1
                lod=@distributed (vcat) for l=j+1:M
-                    XX=@views vcat(Xnul_t[1,:],X1[j,2:end,:],X1[l,2:end,:],Xnul_t[2:end,:])
+                    XX=@views vcat(Xnul_t[[1],:],X1[j,2:end,:],X1[l,2:end,:],Xnul_t[2:end,:])
                       B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
                        lod0=(loglik0-Nullpar.loglik)/log(10)
                       est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
@@ -64,7 +64,7 @@ function marker2Scan!(LODs,mindex::Array{Int64,1},m,kmin,cross,Nullpar::Result,�
             B0= @views [Nullpar.B[:,1] zeros(m,2*(cross-1)) Nullpar.B[:,2:end]]
                for j=1:M-1
                lod=@distributed (vcat) for l=j+1:M
-                    XX=@views vcat(Xnul_t[1,:],X1[j,2:end,:],X1[l,2:end,:],Xnul_t[2:end,:])
+                    XX=@views vcat(Xnul_t[[1],:],X1[j,2:end,:],X1[l,2:end,:],Xnul_t[2:end,:])
                            B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg;tol=tol0)
                              lod0=(loglik0-Nullpar.loglik)/log(10)
                            est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)

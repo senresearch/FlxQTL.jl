@@ -7,7 +7,7 @@ function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1;ρ=0.0
         B0=hcat(Nullpar.B,zeros(Float64,q));
  
         lod=@distributed (vcat) for j=1:nmar
-            XX= vcat(Xnul_t,@view X1[[j],:])
+            XX=vcat(Xnul_t,@view X1[[j],:])
         B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
             lod0= (loglik0-Nullpar.loglik)/log(10)
         est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1,numChr=nchr,nuMarker=j)
@@ -21,7 +21,7 @@ function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1;ρ=0.0
         #initialize B under the alternative hypothesis
             B0= @views [Nullpar.B[:,1] zeros(Float64,q,cross-1) Nullpar.B[:,2:end]]
           lod=@distributed (vcat) for j=1:nmar
-                   XX= @views vcat(Xnul_t[1,:],X1[j,2:end,:],Xnul_t[2:end,:])
+                   XX= @views vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:])
                    B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
                   lod0= (loglik0-Nullpar.loglik)/log(10)
                    est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
@@ -52,7 +52,7 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,
         B0=hcat(Nullpar.B,zeros(Float64,m));
        
         lod=@distributed (vcat) for j=1:nmar
-            XX= vcat(Xnul_t,@view X1[[j],:])
+            XX=vcat(Xnul_t,@view X1[[j],:])
         B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
                 lod0= (loglik0-Nullpar.loglik)/log(10)
         est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1,numChr=nchr,nuMarker=j)
@@ -67,8 +67,9 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,
             B0= @views [Nullpar.B[:,1] zeros(Float64,m,cross-1) Nullpar.B[:,2:end]]
          
             lod=@distributed (vcat) for j=1:nmar
-                XX = @views vcat(Xnul_t[1,:],X1[j,2:end,:],Xnul_t[2:end,:])
-                B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
+                XX= @views vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:])
+#                 println(j)
+             B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
                  lod0= (loglik0-Nullpar.loglik)/log(10)
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
             [(est1.loglik-Nullpar.loglik)/log(10) est1]
@@ -79,7 +80,7 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,
         B0=hcat(Nullpar.B,zeros(Float64,m,cross-1))
      
           lod=@distributed (vcat) for j=1:nmar
-                XX= vcat(Xnul_t, @view X1[j,2:end,:])
+                XX=vcat(Xnul_t, @view X1[j,2:end,:])
                 B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
                  lod0= (loglik0-Nullpar.loglik)/log(10)
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
@@ -115,7 +116,7 @@ function marker1Scan(m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1;ρ=0.001,tol0
             
             B0= @views [Nullpar.B[:,1] zeros(Float64,m,cross-1) Nullpar.B[:,2:end]]
         lod=@distributed (vcat) for j=1:nmar
-                   XX= @views vcat(Xnul_t[1,:],X1[j,2:end,:],Xnul_t[2:end,:])
+                   XX= @views vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:])
                    B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg;tol=tol0)
                      lod0= (loglik0-Nullpar.loglik)/log(10)
                    est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
@@ -178,7 +179,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 ## Keyword Arguments
  
-- `Xnul` :  A matrix of covariates. Default is intercepts (1's).  Unless adding covariates, just leave as it is.
+- `Xnul` :  A matrix of covariates. Default is intercepts (1's): 'Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)' where `size(C)=(c,m)` for `m = size(Y0,1)`.
 - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
@@ -192,9 +193,8 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 # Output
 
-- `LODs` : LOD scores. Can change to ``- \\log_{10}{P-values}`` in [`lod2logP`](@ref).
-- `logP` : ``- \\log_{10}{P-values}`` if `LogP = true`.
-- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` by setting `Xnul= [ones(1,size(Y0)); Covarites]`, `Covariates` will be reordered: under H1, Covariates are separated from intertercept and are placed after a marker to do genome scan for `cross > 1`.  ex. For sex covariates in 4-way cross analysis, B[:,2:4], B[:,5] are effects for QTL, sex, respectively.    
+- `LODs` (or `logP`) : LOD scores. Can change to ``- \\log_{10}{P-values}`` in [`lod2logP`](@ref) if `LogP = true`.
+- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` by setting `Xnul= [ones(1,size(Y0)); Covariates]`, `Covariates` will be reordered inside `geneScan`: under H1, Covariates are separated from intertercept and are placed after a marker for genome scan when `cross > 1`.  ex. For sex covariates in 4-way cross analysis, B[:,2:4], B[:,5] are effects for QTL, sex, respectively.    
 - `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL. 
 
 """
