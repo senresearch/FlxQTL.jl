@@ -15,7 +15,7 @@ The model:
 module flxMLMM
 
 #  __precompile__(true)
-using Random
+using Random, SharedArrays
 using LinearAlgebra, Distributed #DelimitedFiles
 import StatsBase: sample, shuffle
 import Statistics: mean, var, quantile
