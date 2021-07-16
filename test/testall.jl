@@ -1,6 +1,6 @@
-using Distributed, LinearAlgebra, Statistics
+using Distributed
 addprocs(4)
-@everywhere using FlxQTL, Random,Test
+@everywhere using FlxQTL, Random,Test, LinearAlgebra, Statistics
 
 FlxQTL.Util.setSeed(2,100);
 include("scan1test.jl")

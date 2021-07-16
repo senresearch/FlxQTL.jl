@@ -34,7 +34,7 @@ XX=FlxQTL.Markers(marname,chr,pos,geno')
 
 #test shrinkgLoco with kinshipMan, shrinkg
 Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,6,XX)
-for j=1:2 
+for j=1:2
       println(@test isposdef(Kg[:,:,j])== true)
 end
 
@@ -54,16 +54,18 @@ T,λ =FlxQTL.K2eig(K)
 Z=Matrix(1.0I,3,3)
 
 
-#no loco 
-LOD2,B2,est2=FlxQTL.geneScan(1,T,Tc,λ,λc,pheno,XX,Z); 
+#no loco
+LOD2,B2,est2=FlxQTL.geneScan(1,T,Tc,λ,λc,pheno,XX,Z);
 @test sum((LOD2.< 0.0))==0
-LOD,B,est=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX); 
+LOD,B,est=FlxQTL.flxMLMM.geneScan(1,T,Tc,λ,λc,pheno,XX);
 @test sum((LOD.< 0.0))==0
+LOD_1,B_2,est_2=FlxQTL.geneScan(1,T,Matrix(1.0I,3,3),λ,ones(3),pheno,XX,Z); 
+@test sum((LOD_1.< 0.0))==0
 
 @test LOD ≈ LOD2
 @test B ≈ B2
 @test est.τ2 ≈ est2.τ2
-@test est.Σ ≈ est2.Σ 
+@test est.Σ ≈ est2.Σ
 @test est.loglik ≈ est2.loglik
 
 #MVLMM
@@ -87,33 +89,33 @@ eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,pheno,XX,Ze)
 @test este[1].loglik<=0.0
 
 #loco
-LOD1,B1,est01=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,true); 
+LOD1,B1,est01=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,true);
 @test sum((LOD1.< 0.0))==0.0
-LOD0,B0,est00=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,Z,true); 
+LOD0,B0,est00=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,pheno,XX,Z,true);
 @test sum((LOD0.< 0.0))==0.0
 
 @test LOD0 ≈ LOD1
 @test B0 ≈ B1
-for j=1:2 
+for j=1:2
        println(@test est00[j].τ2 ≈ est01[j].τ2)
 end
-for j=1:2 
+for j=1:2
        println(@test est00[j].Σ ≈ est01[j].Σ)
 end
- for j=1:2 
+ for j=1:2
        println(@test est00[j].loglik ≈ est01[j].loglik)
 end
 #MVLMM
 LOD4,B4,est4=FlxQTL.geneScan(1,Tg,Λg,pheno,XX,true)
 @test sum(LOD4.<0.0)==0
 @test size(B4)== (3,2,4)
-for j=1:2 
+for j=1:2
        println(@test size(est4[j].Vc) ==(3,3))
 end
-for j=1:2 
+for j=1:2
        println(@test size(est4[j].Σ)== (3,3) )
 end
- for j=1:2 
+ for j=1:2
        println(@test est4[j].loglik<=0.0)
 end
 
@@ -140,31 +142,31 @@ LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,pheno,XX)
 @test sum(LOD2d0.<0.0)==0
 @test size(est2d0.Vc)==(3,3)
 @test size(est2d0.Σ)== (3,3)
-@test est2d0.loglik <=0.0                      
+@test est2d0.loglik <=0.0
 
 #loco
  LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Tc,Λg,λc,pheno,XX,Z,true);
 @test sum(LOD2d1.<0.0)==0
-for j=1:2 
+for j=1:2
        println(@test est2d1[j].τ2 >0.0)
 end
-for j=1:2 
+for j=1:2
        println(@test size(est2d1[j].Σ)== (3,3) )
 end
- for j=1:2 
+ for j=1:2
        println(@test est2d1[j].loglik<=0.0)
 end
 
 #MVLMM
  LOD2d2,est2d2=FlxQTL.gene2Scan(1,Tg,Λg,pheno,XX,true);
 @test sum(LOD2d2.<0.0)==0
-for j=1:2 
+for j=1:2
        println(@test size(est2d2[j].Vc)== (3,3))
 end
-for j=1:2 
+for j=1:2
        println(@test size(est2d2[j].Σ)== (3,3) )
 end
- for j=1:2 
+ for j=1:2
        println(@test est2d2[j].loglik<=0.0)
 end
 
@@ -189,12 +191,16 @@ end
 
 
 K0=FlxQTL.kinshipLoco(FlxQTL.kinshipCtr,XX)
-for j=1:2 
+for j=1:2
       println(@test isposdef(K0[:,:,j])== true)
 end
 
 K1=FlxQTL.kinshipLoco(FlxQTL.kinshipStd,XX)
-for j=1:2 
+for j=1:2
       println(@test isposdef(K1[:,:,j])== true)
 end
 
+### testing maf
+A=rand(15,15)
+Aidx= getGenoidx(A,0.25)
+@test length(Aidx)<=size(A,1)
