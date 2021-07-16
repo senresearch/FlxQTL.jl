@@ -34,7 +34,7 @@ end
 
 """
     
-      function plot1d(xx::layers;title= " ",title_fontsize=25,ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize=20,loc="upper right") 
+      function plot1d(xx::layers;title= " ",title_font=25,ylabel="LOD",yint=[],yint_color=["red"],Legend=[],fontsize=20,loc="upper right") 
 
 
 Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome scan on a single plot.
@@ -43,10 +43,10 @@ Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome 
 
 - `xx` : A type of [`layers`](@ref) that consists of chromosome names, marker positions, and a matrix of LODs(or effects).
 
-## Keyword arguements,
+## Keyword arguements
 
 - `title` : A string of title. Default is blank.
-- `title_fontsize` : A string or number to set `title` fontsize (default= 25). i.e. "small", "medium", "large", or any integer.
+- `title_font` : A string or number to set `title` fontsize (default= 25). i.e. "small", "medium", "large", or any integer.
 - `ylabel` : A string of a y-axis label (default = LOD)
 - `yint` :  A vector of y-intercept(s).
 - `yint_color` : A vector of colors (strings) of y-intercepts in yint.
@@ -141,7 +141,7 @@ ax.axis("tight")
 # ax.set(xlabel="Chromosome", ylabel=ylabel)
 ax.set_xlabel("Chromosome", fontsize=fontsize)
 ax.set_ylabel(ylabel, fontsize=fontsize)
-ax.set_title(label=title,fontsize=title_fontsize, loc="center")    #
+ax.set_title(label=title,fontsize=title_font, loc="center")    #
 
 setp(ax.get_yticklabels(), fontsize=15) # Y Axis font formatting
 
@@ -155,7 +155,7 @@ end
 ##plotting 2D-scan PyPlot
 """
 
-        plot2d(S::layers)
+        plot2d(S::layers;title_font=20,fontsize=15)
 
 Generates 2-d heatmap plots of LOD scores from 2d-genome scan
  
@@ -163,18 +163,27 @@ Generates 2-d heatmap plots of LOD scores from 2d-genome scan
 
 - `S`: a type of 'layers' that consists of chromosome names, marker positions, and a matrix of LODs
 
+## Keyword arguements
+
+- `title_font` : A string or number to set `title` fontsize (default= 20). i.e. "small", "medium", "large", or any integer.
+- `fontsize` : A string or number to set fontsizes of x-, y-ticks, and colorbar (default= 15). 
+               i.e. "small", "medium", "large", or any integer.
+
 """
-function plot2d(S::layers)
+function plot2d(S::layers;title_font=20,fontsize=15)
 Chr=unique(S.chr);
 for i=1:length(Chr)
     cidx=findall(S.chr.==Chr[i])
     Chrom=Array(Symmetric(S.lod[cidx,cidx],:L))
     x,y=S.pos[cidx],S.pos[cidx]
-    figure();imshow(Chrom,cmap="jet",interpolation="bicubic",extent=[minimum(x),maximum(x),maximum(y),minimum(y)]
-        ,vmin=0.0,vmax=maximum(S.lod));
+    figure();imshow(Chrom,cmap="jet",interpolation="bicubic",extent=[minimum(x),maximum(x),maximum(y),minimum(y)],
+        vmin=0.0,vmax=maximum(S.lod));
 
-   eval(Meta.parse(string("""title(string("Chromsome ", """,Chr[i],""")) """)))
-        colorbar()
+#    eval(Meta.parse(string("""title(string("Chromsome ", """,Chr[i],"""),fontsize=20) """)))
+       title(string("Chromosome ",Chr[i]),fontsize=title_font) 
+       xticks(fontsize=fontsize);yticks(fontsize=fontsize)
+        cbar=colorbar()
+        cbar.ax.tick_params(labelsize=fontsize)
         end
 end
 
@@ -183,7 +192,7 @@ end
 #where the first digit is the number of rows, the second the number of columns, and the third the index of the subplot.
 """
 
-     subplot2d(S::layers,sub_dim::Int64;label="Chromosome")
+     subplot2d(S::layers,sub_dim::Int64;title_font=20,fontsize=15)
 
 
 Generates a matrix of 2-d heatmap subplots for LOD scores obtained from 2d-genome scan  
@@ -192,10 +201,14 @@ Generates a matrix of 2-d heatmap subplots for LOD scores obtained from 2d-genom
 
 - `sub_dim`: A two digit integer, where the first digit (m) is the number of rows, the second (n) the number of columns. 
              It returns a m x n matrix of subplots.
-- `label`: A string of the title of each subplot. It concatenates each entry of S.chr. 
 
+## Keyword Arguments
+
+- `title_font` : A string or number to set `title` fontsize (default= 20). i.e. "small", "medium", "large", or any integer.
+- `fontsize` : A string or number to set fontsizes of x-, y-ticks, and colorbar (default= 15). 
+               i.e. "small", "medium", "large", or any integer.
 """
-function subplot2d(S::layers,sub_dim::Int64;label="Chromosome")
+function subplot2d(S::layers,sub_dim::Int64;title_font=20,fontsize=15)
 Chr=unique(S.chr);
     d=digits(sub_dim,base=10)
     inner_num=d[1]*d[2]
@@ -212,8 +225,10 @@ Chr=unique(S.chr);
           subplot(position)
           imshow(Chrom,cmap="jet",interpolation="bicubic",extent=[minimum(x),maximum(x),maximum(y),minimum(y)],vmin=0.0,vmax=maximum(S.lod));
 #          eval(Meta.parse(string("""title(string("Chromsome ", """,Chr[i+inner_num*(j-1)],""")) """)))
-           title(string(label*" ",Chr[i+inner_num*(j-1)]))
-           colorbar()
+           title(string("Chromosome ",Chromosome[i+inner_num*(j-1)]),fontsize=title_font)
+            xticks(fontsize=fontsize);yticks(fontsize=fontsize)
+           cbar=colorbar()
+            cbar.ax.tick_params(labelsize=fontsize)
         end
     end
 end

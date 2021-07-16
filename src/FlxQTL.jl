@@ -1,8 +1,8 @@
 """
 
-    FlxQTL  
+    FlxQTL
 
-flexible Multivariate Linear Mixed Model based QTL analysis tools for structured multiple traits. 
+flexible Multivariate Linear Mixed Model based QTL analysis tools for structured multiple traits.
 
 """
 module FlxQTL
@@ -12,7 +12,7 @@ module FlxQTL
 
 
 include("MLM.jl")
-include("QTLplot.jl") 
+include("QTLplot.jl")
 include("Miscellanea.jl")
 include("GRM.jl")
 include("EcmNestrv.jl")
@@ -34,7 +34,6 @@ export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig
 
 using .Util:setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
 export setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
-
 
 
 end

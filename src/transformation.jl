@@ -18,17 +18,17 @@
 
        K2eig(K,LOCO::Bool=false)
 
-Returns eigenvectors and eigenvalues of a (genetic, climatic) relatedness, or 3-d array of these of a genetic relatedness if `LOCO` is `true`. 
+Returns eigenvectors and eigenvalues of a (genetic, climatic) relatedness, or 3-d array of these of a genetic relatedness if `LOCO` is `true`.
 
 # Arguments
 
-- `K` : A matrix of (genetic or climatic) relatedness (Default).  3-d array of genetic relatedness (`LOCO` sets to be true.) 
+- `K` : A matrix of (genetic or climatic) relatedness (Default).  3-d array of genetic relatedness (`LOCO` sets to be true.)
 - `LOCO` : Boolean. Default is `false` (no LOCO). (Leave One Chromosome Out).
 
 # Output
 
-- `T` : A matrix of eigenvectors, or 3-d array of eigenvectors if `LOCO` sets to be `true`. 
-- `λ` : A vector of eigenvalues, or matrix of eigenvalues if `LOCO` sets to be `true`. 
+- `T` : A matrix of eigenvectors, or 3-d array of eigenvectors if `LOCO` sets to be `true`.
+- `λ` : A vector of eigenvalues, or matrix of eigenvalues if `LOCO` sets to be `true`.
 
 
 See also [`K2Eig`](@ref).
@@ -69,11 +69,11 @@ end
 
 
 """
- 
+
       K2Eig(Kg,Kc::Array{Float64,2},LOCO::Bool=false)
 
 
-Returns a two pairs of eigenvectors and eigenvalues for genetic and climatic relatedness matrices.  
+Returns a two pairs of eigenvectors and eigenvalues for genetic and climatic relatedness matrices.
 
 # Arguments
 
@@ -81,10 +81,10 @@ Returns a two pairs of eigenvectors and eigenvalues for genetic and climatic rel
 - `Kc` : A matrix of a climatic relatedness.
 - `LOCO` : Boolean. Default is `false` (no LOCO). (Leave One Chromosome Out). `LOCO` is only connected to the genetic kinship (`Kg`).
 
-# Output 
+# Output
 
-- `Tg` : A matrix of eigenvectors for `Kg`, or 3-d array of eigenvectors if `LOCO` sets to be `true`. 
-- `λg` : A vector of eigenvalues for `Kg`, or matrix of eigenvalues if `LOCO` sets to be `true`. 
+- `Tg` : A matrix of eigenvectors for `Kg`, or 3-d array of eigenvectors if `LOCO` sets to be `true`.
+- `λg` : A vector of eigenvalues for `Kg`, or matrix of eigenvalues if `LOCO` sets to be `true`.
 - `Tc` : A matrix of eigenvectors for `Kc`.
 - `λc` : A vector of eigenvalues for `Kc`
 
@@ -97,7 +97,7 @@ For a genetic kinship calculated under `LOCO` (3-d array of kinship),
 ```
  Tg,λg,Tc,λc = K2Eig(Kg,Kc,true)
 
-``` 
+```
 produces a 3-d array of `Tg`, matrices of `λg`, `Tc`, and a vector of `λc`.
 
 """
@@ -198,7 +198,7 @@ end
 function initial(Xnul,Y0,incl_τ2::Bool=true)
      m=size(Y0,1);
     init_val=MLM.mGLM(convert(Array{Float64,2},Y0'),convert(Array{Float64,2},Xnul'))
- 
+
       if (incl_τ2)
         lmul!(sqrt(1/m),init_val.Σ)
         τ2 =mean(Diagonal(init_val.Σ))
@@ -218,7 +218,7 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Z1,Σt;ρ=0.001,itol=1e-3,tol
 
             B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc;tol=itol)
             nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
-        
+
     return nulpar
 end
 
@@ -227,7 +227,7 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e
 
             B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc;tol=itol)
             nulpar= NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
-        
+
     return nulpar
 end
 
@@ -235,7 +235,7 @@ end
 function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
 
         B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg;tol=itol)
-        nulpar=ecmNestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg;tol=tol,ρ=ρ)
+        nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg;tol=tol,ρ=ρ)
 
        return nulpar
 end
@@ -258,6 +258,3 @@ function arrngB(H1par,p1::Int64,q,p,cross)
         end
     return B
 end
-
-
-
