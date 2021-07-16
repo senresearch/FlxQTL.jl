@@ -3,41 +3,41 @@ language: julia
 notifications:
   email: false
 julia:
-  - 1.5
+  - 1.6
   - nightly
 os:
   - linux
 #   - osx
 arch:
-  - x64 
+  - x64
 cache:
   directories:
     - ~/.julia/artifacts
-before_install: 
+before_install:
   - sudo apt-get update
 #          - pip3 -m install -U matplotlib
-  - sudo apt-get install python3-matplotlib 
+  - sudo apt-get install python3-matplotlib
 jobs:
   fast_finish: true
   allow_failures:
     - julia: nightly
-  include:  
-#     - stage: test 
+  include:
+#     - stage: test
 #       julia:
 #         - 1.5
 #         - nightly
-#       os: linux 
-#       dist: focal     
-#       before_install: 
+#       os: linux
+#       dist: focal
+#       before_install:
 #         - sudo apt-get update
 # #          - pip3 -m install -U matplotlib
-#         - sudo apt-get install python3-matplotlib 
+#         - sudo apt-get install python3-matplotlib
     - stage: Documentation
-      julia: 1.5
+      julia: 1.6
 #       script:
 #         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
-#         - julia --project=docs/ docs/make.jl    
-#       name: "HTML" 
+#         - julia --project=docs/ docs/make.jl
+#       name: "HTML"
       script: |
           julia --project=docs -e '
           using Pkg
