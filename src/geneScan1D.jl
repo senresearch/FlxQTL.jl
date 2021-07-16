@@ -16,18 +16,6 @@ function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1;ρ=0.0
 
     else # cross>1
         ## scanning genotype probabilities
-       if(size(Xnul_t,1)>1) #added covariates
-
-        #initialize B under the alternative hypothesis
-            B0= @views [Nullpar.B[:,1] zeros(Float64,q,cross-1) Nullpar.B[:,2:end]]
-          lod=@distributed (vcat) for j=1:nmar
-                   XX= @views vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:])
-                   B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
-                  lod0= (loglik0-Nullpar.loglik)/log(10)
-                   est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
-                  [(est1.loglik-Nullpar.loglik)/log(10) est1]
-                                  end
-        else #intercept only
 
             B0=hcat(Nullpar.B,zeros(Float64,q,cross-1))
 
@@ -38,7 +26,7 @@ function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1;ρ=0.0
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
             [(est1.loglik-Nullpar.loglik)/log(10) est1]
                                   end
-        end
+
      end
 
     return lod[:,1],lod[:,2]
@@ -47,7 +35,7 @@ end
 #Z=I
 function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,tol0=1e-3,tol1=1e-4,nchr=0)
 
-        nmar=size(X1,1); #lod1=SharedArray{Float64}(nmar); #lod2=SharedArray{Approx}(nmar)
+        nmar=size(X1,1);
     if (cross==1) ## scanning genotypes
         B0=hcat(Nullpar.B,zeros(Float64,m));
 
@@ -61,21 +49,6 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,
 
     else # cross>1
         ## scanning genotype probabilities
-        if(size(Xnul_t,1)>1) #added covariates
-
-            #initialize B under the alternative hypothesis
-            B0= @views [Nullpar.B[:,1] zeros(Float64,m,cross-1) Nullpar.B[:,2:end]]
-
-            lod=@distributed (vcat) for j=1:nmar
-                # XX= @views vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:])
-                # println(typeof(XX))
-             B0,τ2,Σ,loglik0 =ecmLMM(Y1,vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:]),B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
-                 lod0= (loglik0-Nullpar.loglik)/log(10)
-                est1=ecmNestrvAG(lod0,kmin,Y1,vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:]),B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
-              [(est1.loglik-Nullpar.loglik)/log(10) est1]
-
-                                  end
-        else #intercept only
 
         #initialize B under the alternative hypothesis
         B0=hcat(Nullpar.B,zeros(Float64,m,cross-1))
@@ -87,7 +60,7 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1)
             [(est1.loglik-Nullpar.loglik)/log(10) est1]
                                   end
-        end
+
      end
 
     return lod[:,1],lod[:,2]
@@ -113,17 +86,6 @@ function marker1Scan(m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1;ρ=0.001,tol0
                            end
 
     else #cross>1
-        if(size(Xnul_t,1)>1) #added covariates
-
-            B0= @views [Nullpar.B[:,1] zeros(Float64,m,cross-1) Nullpar.B[:,2:end]]
-        lod=@distributed (vcat) for j=1:nmar
-                   XX= @views vcat(Xnul_t[[1],:],X1[j,2:end,:],Xnul_t[2:end,:])
-                   B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg;tol=tol0)
-                     lod0= (loglik0-Nullpar.loglik)/log(10)
-                   est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
-                     [(est1.loglik-Nullpar.loglik)/log(10) est1]
-                          end
-        else #intercept only
 
         B0=hcat(Nullpar.B,zeros(m,cross-1))
 
@@ -134,7 +96,6 @@ function marker1Scan(m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1;ρ=0.001,tol0
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg;tol=tol1,ρ=ρ)
                      [(est1.loglik-Nullpar.loglik)/log(10) est1]
                           end
-        end
 
     end
     return lod[:,1], lod[:,2]
@@ -195,7 +156,8 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 # Output
 
 - `LODs` (or `logP`) : LOD scores. Can change to ``- \\log_{10}{P-values}`` in [`lod2logP`](@ref) if `LogP = true`.
-- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` by setting `Xnul= [ones(1,size(Y0)); Covariates]`, `Covariates` will be reordered inside `geneScan`: under H1, Covariates are separated from intertercept and are placed after a marker for genome scan when `cross > 1`.  ex. For sex covariates in 4-way cross analysis, B[:,2:4], B[:,5] are effects for QTL, sex, respectively.
+- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` : `Xnul= [ones(1,size(Y0)); Covariates]`,
+        ex. For sex covariates in 4-way cross analysis, B[:,2,100], B[:,3:5,100] are effects for sex, the rest genotypes of the 100th QTL, respectively.
 - `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL.
 
 """
@@ -275,7 +237,7 @@ end
 
 #Z=I
 function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::Array{Float64,2},Λg::Union{Array{Float64,2},Array{Float64,1}},λc::Array{Float64,1},Y0::Array{Float64,2},
-        XX::Markers,LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
+        XX::Markers,LOCO::Bool=false;LogP::Bool=false,
                 Xnul::Array{Float64,2}=ones(1,size(Y0,2)),kmin::Int64=1,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
          m=size(Y0,1);
@@ -332,9 +294,8 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
           B = arrngB(H1par,size(Xnul,1),m,p,cross)
     end
 
-    if (tdata) # should use with no LOCO
-        return LODs,B,est0,Y1,X1,Z1
-    elseif (LogP) # transform LOD to -log10(p-value)
+
+    if (LogP) # transform LOD to -log10(p-value)
           if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
             else
@@ -343,7 +304,7 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
              logP=lod2logP(LODs,df)
 
         return logP,B,est0
-     else
+      else
          return LODs,B,est0
      end
 end
@@ -398,7 +359,7 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
      end
 
     if (tdata) # should use with no LOCO
-        return LODs,B,est0,Y1,X1,Z1
+        return LODs,B,est0,Y,X
     elseif (LogP) # transform LOD to -log10(p-value)
           if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
