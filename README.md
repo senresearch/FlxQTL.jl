@@ -3,10 +3,9 @@
 ## *Fl*e*x*ible Multivariate Linear Mixed Model based *QTL* Analysis for Structured Multiple Traits 
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://senresearch.github.io/FlxQTL.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://senresearch.github.io/FlxQTL.jl/dev)
 [![Build Status](https://travis-ci.com/senresearch/FlxQTL.jl.svg?branch=master)](https://travis-ci.com/github/senresearch/FlxQTL.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/senresearch/FlxQTL.jl?svg=true)](https://ci.appveyor.com/project/sens/flxqtl-jl)
-[![Coverage](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/senresearch/FlxQTL.jl)
+[![codecov](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg?token=wNYkIkfRx1)](https://codecov.io/gh/senresearch/FlxQTL.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
 *FlxQTL.jl* is a package for a multivariate linear mixed model based
