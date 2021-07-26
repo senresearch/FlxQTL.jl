@@ -21,6 +21,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/senresearch/FlxQTL.jl.git",
+    repo="github.com/hkim89/FlxQTL.jl.git",
     devurl="stable",
 )
