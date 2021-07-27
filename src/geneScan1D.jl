@@ -146,7 +146,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 - `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
 - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
-- `LogP` : Boolean. Default is `false`.  Returns ``-\\log_{10}{P-values}`` instead of LOD scores if `true`.
+- `LogP` : Boolean. Default is `false`.  Returns ``-\\log_{10}{P}`` instead of LOD scores if `true`.
 
 !!! Note
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not,
@@ -155,7 +155,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 # Output
 
-- `LODs` (or `logP`) : LOD scores. Can change to ``- \\log_{10}{P-values}`` in [`lod2logP`](@ref) if `LogP = true`.
+- `LODs` (or `logP`) : LOD scores. Can change to ``- \\log_{10}{P}`` in [`lod2logP`](@ref) if `LogP = true`.
 - `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` : `Xnul= [ones(1,size(Y0)); Covariates]`,
         ex. For sex covariates in 4-way cross analysis, B[:,2,100], B[:,3:5,100] are effects for sex, the rest genotypes of the 100th QTL, respectively.
 - `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL.
