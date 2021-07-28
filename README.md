@@ -1,11 +1,11 @@
 # FlxQTL
 
-## *Fl*e*x*ible Multivariate Linear Mixed Model based *QTL* Analysis for Structured Multiple Traits 
+## *Fl*e*x*ible Multivariate Linear Mixed Model based *QTL* Analysis for Structured Multiple Traits
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://senresearch.github.io/FlxQTL.jl/stable)
-[![Build Status](https://travis-ci.com/senresearch/FlxQTL.jl.svg?branch=master)](https://travis-ci.com/github/senresearch/FlxQTL.jl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://hkim89.github.io/FlxQTL.jl/stable)
+[![Build Status](https://travis-ci.com/senresearch/FlxQTL.jl.svg?branch=master)](https://travis-ci.com/github/hkim89/FlxQTL.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/senresearch/FlxQTL.jl?svg=true)](https://ci.appveyor.com/project/sens/flxqtl-jl)
-[![codecov](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/senresearch/FlxQTL.jl)
+[![codecov](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/hkim89/FlxQTL.jl)
 <!-- [![codecov](https://codecov.io/gh/hkim89/FlxQTL.jl/branch/master/graph/badge.svg?token=wNYkIkfRx1)](https://codecov.io/gh/hkim89/FlxQTL.jl) -->
 
 *FlxQTL.jl* is a package for a multivariate linear mixed model based
@@ -36,10 +36,10 @@ paper available as a
 ## Paper
 
 Flexible multivariate linear mixed models for structured multiple
-traits  
+traits
 Hyeonju Kim, Gregory Farage, John T. Lovell, John K. Mckay, Thomas
-E. Juenger, Śaunak Sen  
-doi: https://doi.org/10.1101/2020.03.27.012690 
+E. Juenger, Śaunak Sen
+doi: https://doi.org/10.1101/2020.03.27.012690
 
 ## Installation
 
@@ -51,7 +51,7 @@ julia> ]
 pkg> add FlxQTL
 ```
 
-Or, equivalently, 
+Or, equivalently,
 
 ```julia
 julia> using Pkg; Pkg.add("FlxQTL")
@@ -73,7 +73,7 @@ Currently Julia `1.5` supports for the package.
 To remove the package from the Julia REPL,
 
 ```julia
-julia> ] 
+julia> ]
 pkg> rm FlxQTL
 ```
 Equivalently,
@@ -86,7 +86,6 @@ julia> using Pkg; Pkg.rm("FlxQTL")
 
 The package can be run with OpenBLAS (built-in Julia dense linear
 algebra routines) or MKL (Intel's Math Kernel Library).  `MKL.jl`
-works best on Intel hardware, but it can slightly improve performance 
-without Intel hardware.  For installation and details, 
+works best on Intel hardware, but it can slightly improve performance
+without Intel hardware.  For installation and details,
 see: [MKL.jl](https://github.com/JuliaComputing/MKL.jl).
-
