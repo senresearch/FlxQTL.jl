@@ -246,7 +246,7 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
         ## picking up initial values for parameter estimation under the null hypothesis
             init=initial(Xnul,Y0)
          if(λc!= ones(m))
-            Σ1=Symmetric(BLAS.symm('R','U',init.Σ,Tc)*Tc')
+            Σ1=convert(Array{Float64,2},Symmetric(BLAS.symm('R','U',init.Σ,Tc)*Tc'))
             Y1= transForm(Tc,Y0,init.Σ) # transform Y only by row (Tc)
            else
             Σ1 =init.Σ
