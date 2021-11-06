@@ -40,7 +40,7 @@ end
 
 K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,6,XX.X)
 @test isposdef(K)==true
-Kc=Matrix(1.0I,3,3)
+Kc=0.5*Matrix(1.0I,3,3)
 
 #eigen decomposition
 Tg,Λg,Tc,λc = FlxQTL.K2Eig(Kg,Kc,true)
