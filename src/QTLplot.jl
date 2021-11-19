@@ -57,11 +57,23 @@ Generates one or more graphs of LOD scores (or effects) obtained from 1d-genome 
 
 
 """
-function plot1d(xx::layers;title= " ",title_fontsize=25,ylabel="LOD",yint=[],
+function plot1d(xx::layers;title= " ",title_font=25,ylabel="LOD",yint=[],
                 yint_color=["red"],sub_dim=111,Legend=[],fontsize=20,
                 loc="upper right")
 
+    
 Chr=unique(xx.chr); nchr=length(Chr);np=size(xx.lod,2)
+    
+    
+# #sanity check
+#     for j = axes(xx.lod)
+#         if (sum(xx.lod[:,j].<0.0)
+#                 println("Error! LOD or -log₁₀P can't be negative.")
+#             else 
+#                 idx = findall(xx.lod[:,j].==-0.0)
+#                 xx.lod[idx,j].=0.0
+#         end
+#     end
  #generating a set of line segments
 
 idx=findall(xx.chr.==Chr[1])
