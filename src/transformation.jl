@@ -56,13 +56,14 @@ function K2eig(K,LOCO::Bool=false)
         n=size(K,1);
         T=zeros(n,n,nChr);
         λ=zeros(n,nChr);
-       @inbounds Threads.@threads for j=1:nChr
-            Λ=eigen(K[:,:,j]);
-            T[:,:,j],λ[:,j]=Λ.vectors',Λ.values
+#        @inbounds Threads.@threads for j=1:nChr
+       @inbounds for j=1:nChr
+            Λ=svd(K[:,:,j]);
+            T[:,:,j],λ[:,j]=Λ.Vt,Λ.S
         end
         else #no loco
-        Λ=eigen(K);
-        T,λ=convert(Array{Float64,2},Λ.vectors'),Λ.values
+        Λ=svd(K);
+        T,λ=Λ.Vt,Λ.S
     end
     return T,λ
 end
@@ -139,6 +140,18 @@ function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ_0::Array{Float64
     end
 end
 
+# MLMM for H0 (FlxQTL)
+function transform(Kc::Array{Float64,2},Y1::Array{Float64,2},Z0::Array{Float64,2},Σ_0::Array{Float64,2})
+     A = similar(Kc); Z=similar(Z0)
+     
+      Tc,λc = K2eig(Kc)
+      mul!(A,Diagonal(λc),Tc)
+       Y2 = A\Y1
+      Σ=Symmetric(BLAS.symm('R','U',Σ_0,A)*A')
+      mul!(Z,A,Z0)
+      τ1 = mean(Diagonal(Kc)/sqrt(size(Kc),1))
+    return Y2,convert(Array{Float64,2},Σ),Z,τ1
+end
 
 # rotate by column (individual-wise)
 function transForm(Tg::Array{Float64,2},Y0::Array{Float64,2},X0,cross::Int64)
@@ -182,16 +195,23 @@ Vc::Array{Float64,2}
 Σ::Array{Float64,2}
 end
 
-
-function initial(Xnul,Y0,Z0)
+# including MLMM
+function initial(Xnul,Y0,Z0,incl_τ2::Bool=true)
      m=size(Y0,1);
     init_val=MLM.mGLM(convert(Array{Float64,2},Y0'),convert(Array{Float64,2},Xnul'),Z0)
-
+         
+       if (incl_τ2)
 #         Σ0= init_val.Σ*sqrt(1/m);  τ2 =mean(Diagonal(Σ0));
-        lmul!(sqrt(1/m),init_val.Σ)
-        τ2 =mean(Diagonal(init_val.Σ))
+          lmul!(sqrt(1/m),init_val.Σ)
+          τ2 =mean(Diagonal(init_val.Σ))
 
-          return Init(init_val.B',τ2,init_val.Σ)
+            return Init(init_val.B',τ2,init_val.Σ)
+        else #H0 for MLMM
+        
+        lmul!(sqrt(1/m),init_val.Σ)
+        return Init0(init_val.B',0.5*init_val.Σ,0.5*init_val.Σ)
+        end
+        
 end
 
 #Z=I (including MLMM)
@@ -208,7 +228,7 @@ function initial(Xnul,Y0,incl_τ2::Bool=true)
 #             c=rand(1)[1]
 #            Vc=c*init_val.Σ;    Σ0=(1-c)*init_val.Σ
         lmul!(sqrt(1/m),init_val.Σ)
-          return Init0(init_val.B',init_val.Σ,init_val.Σ)
+          return Init0(init_val.B',0.5*init_val.Σ,0.5*init_val.Σ)
        end
 
 end
@@ -231,11 +251,19 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e
     return nulpar
 end
 
-#MVLMM
+#MVLMM :Z=I
 function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
 
         B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg;tol=itol)
         nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg;tol=tol,ρ=ρ)
+
+       return nulpar
+end
+
+function nulScan(init::Init0,kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e-3,tol=1e-4)
+
+        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,Z,init.B,init.Vc,init.Σ,λg;tol=itol)
+        nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Vc_0,Σ1,λg;tol=tol,ρ=ρ)
 
        return nulpar
 end
