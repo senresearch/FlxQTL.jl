@@ -634,7 +634,7 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B,Vc::Array{Float64,2},Σ,λg
 
 end
 
-function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B,Vc::Array{Float64,2},Σ,λg,m)
+function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B::Array{Float64,2},Vc::Array{Float64,2},Σ,λg,m)
 
           eStep!(Ghat,Θ,Y,X,Z,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,Z,symXs,Ghat,Θ,Σ,λg,m)

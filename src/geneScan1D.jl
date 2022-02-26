@@ -38,13 +38,16 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1;ρ=0.001,
         nmar=size(X1,1);
     if (cross==1) ## scanning genotypes
         B0=hcat(Nullpar.B,zeros(Float64,m));
-
+#      f= open(homedir()*"/GIT/fmulti-lmm/result/test_ecmlmm.txt","w")
         lod=@distributed (vcat) for j=1:nmar
             XX=vcat(Xnul_t,@view X1[[j],:])
         B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,B0,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol0)
                 lod0= (loglik0-Nullpar.loglik)/log(10)
         est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,τ2,Σ,λg,λc;ρ=ρ,tol=tol1,numChr=nchr,nuMarker=j)
             [(est1.loglik-Nullpar.loglik)/log(10) est1]
+#             f=open(homedir()*"/GIT/fmulti-lmm/result/test_ecmlmm.txt","a")
+#               writedlm(f,[loglik0 est1.loglik Nullpar.loglik])
+#             close(f)
                  end
 
     else # cross>1
