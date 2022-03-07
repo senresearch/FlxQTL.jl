@@ -339,7 +339,7 @@ function Loglik(dev::Array{Float64,2},Σ::Array{Float64,2},τ2::Float64,λg::Arr
 
           loglik=zero(eltype(dev))
           if(λc!=ones(m))
-              Λc= τ2*Diagonal(1.0./λc)
+              Λc= τ2*Diagonal(1.0.*λc)
            else
               Λc=τ2*Matrix(1.0I,m,m)
          end
