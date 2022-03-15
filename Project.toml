@@ -20,7 +20,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 [compat]
 Distributions = "^0.23, 0.24, 0.25"
 LossFunctions = "~0.7"
-PyPlot = "~2.9"
+PyPlot = "~2.10"
 Revise = "3.3"
 StaticArrays = "1.4"
 StatsBase = "~0.33"
