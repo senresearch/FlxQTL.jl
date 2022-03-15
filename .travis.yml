@@ -3,7 +3,7 @@ language: julia
 notifications:
   email: false
 julia:
-  - 1.7
+  - 1.6
   - nightly
 os:
   - linux
@@ -33,7 +33,7 @@ jobs:
 # #          - pip3 -m install -U matplotlib
 #         - sudo apt-get install python3-matplotlib
     - stage: Documentation
-      julia: 1.7
+      julia: 1.6
 #       script:
 #         - julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 #         - julia --project=docs/ docs/make.jl
