@@ -398,7 +398,8 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::
     crit=1.0;
     while (crit >=tol)
          B_new,τ2_new,Σ_new,loglik1=fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B_cur,τ2_cur,Σ_cur,λg,λc,m)
-         crit=norm(Σ_new-Σ_cur)+abs(τ2_new-τ2_cur)+norm(B_new-B_cur)
+#          crit=norm(Σ_new-Σ_cur)+abs(τ2_new-τ2_cur)+norm(B_new-B_cur)
+         crit=abs(loglik1-loglik0)
          B_cur=B_new;τ2_cur=τ2_new;Σ_cur=Σ_new;loglik0=loglik1;
     end
 
@@ -428,7 +429,8 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
     crit=1.0;
     while (crit >=tol)
          B_new,τ2_new,Σ_new,loglik1=fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B_cur,τ2_cur,Σ_cur,λg,λc,m)
-         crit=norm(Σ_new-Σ_cur)+abs(τ2_new-τ2_cur)+norm(B_new-B_cur)
+#          crit=norm(Σ_new-Σ_cur)+abs(τ2_new-τ2_cur)+norm(B_new-B_cur)
+         crit=abs(loglik1-loglik0)
          B_cur=B_new;τ2_cur=τ2_new;Σ_cur=Σ_new;loglik0=loglik1;
     end
 
@@ -526,7 +528,8 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{F
 #                 itrnum+=1
             end
 
-            crit=norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)
+#             crit=norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)
+            crit=abs(loglik1-loglik0)
 
             b00=b0;b0=b1;b1=b2; τ00=τ0;τ0=τ1;τ1=τ2;Σ00=Σ0;Σ0=Σ1; Σ1=Σ2;loglik0=loglik1;
 
@@ -572,7 +575,8 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{
 #                 itrnum+=1
             end
 
-            crit=norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)
+#             crit=norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)
+            crit=abs(loglik1-loglik0)
 
             b00=b0;b0=b1;b1=b2; τ00=τ0;τ0=τ1;τ1=τ2;Σ00=Σ0;Σ0=Σ1; Σ1=Σ2;loglik0=loglik1;
 
@@ -660,7 +664,8 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
     crit=1.0;
     while (crit >=tol)
          B_new, Vc_new, Σ_new, loglik1 = fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B_cur,Vc_cur,Σ_cur,λg,m)
-         crit=norm(Σ_new-Σ_cur)+norm(Vc_new-Vc_cur)+norm(B_new-B_cur)
+#          crit=norm(Σ_new-Σ_cur)+norm(Vc_new-Vc_cur)+norm(B_new-B_cur)
+         crit=abs(loglik1-loglik0)
          B_cur=B_new;Vc_cur=Vc_new;Σ_cur=Σ_new;loglik0=loglik1;
     end
 
@@ -672,9 +677,9 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::
         Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1};tol::Float64=1e-4)
 
     symXs=fixX(X)
-    m,n = size(Y);p=size(X,1)
+    m,n = size(Y);p=size(X,1);q=size(Z,2);
     Ghat=zeros(m,n); Θ=Array{Array{Float64,2}}(undef,n);fill!(Θ,zeros(m,m))
-    dev=zeros(m,n);B_new=zeros(m,p);Vg=zeros(m,m,n);Ve=zeros(m,m,n)
+    dev=zeros(m,n);B_new=zeros(q,p);Vg=zeros(m,m,n);Ve=zeros(m,m,n)
     #B0,Vc,Σ are arbitrary initial values
     B_cur=B0;Vc_cur=Vc;Σ_cur=Σ;loglik0=0.0;tol=tol
 
@@ -682,7 +687,8 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::
     crit=1.0;
     while (crit >=tol)
          B_new, Vc_new, Σ_new, loglik1 = fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B_cur,Vc_cur,Σ_cur,λg,m)
-         crit=norm(Σ_new-Σ_cur)+norm(Vc_new-Vc_cur)+norm(B_new-B_cur)
+#          crit=norm(Σ_new-Σ_cur)+norm(Vc_new-Vc_cur)+norm(B_new-B_cur)
+         crit=abs(loglik1-loglik0)
          B_cur=B_new;Vc_cur=Vc_new;Σ_cur=Σ_new;loglik0=loglik1;
     end
 
@@ -725,7 +731,8 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{
                 j=j+1
             end
 
-            crit=norm(Σ1-Σ0)+norm(V1-V0)+norm(b1-b0)+abs(loglik1-loglik0)
+#             crit=norm(Σ1-Σ0)+norm(V1-V0)+norm(b1-b0)
+              crit=abs(loglik1-loglik0)
             b00=b0;b0=b1;b1=b2; V00=V0;V0=V1;V1=V2;Σ00=Σ0;Σ0=Σ1; Σ1=Σ2;loglik0=loglik1;
 #             i+=1
            end
@@ -736,10 +743,10 @@ end
 function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::Array{Float64,2},
         Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1};ρ=0.001,tol::Float64)
 
-      m,n =size(Y);p=size(X,1);
+      m,n =size(Y);p=size(X,1);q=size(Z,2)
       symXs = fixX(X)
       Ghat=zeros(m,n); Θ=Array{Array{Float64,2}}(undef,n);fill!(Θ,zeros(m,m))
-      dev=zeros(m,n);B_new=zeros(m,p);Vg=zeros(m,m,n);Ve=zeros(m,m,n)
+      dev=zeros(m,n);B_new=zeros(q,p);Vg=zeros(m,m,n);Ve=zeros(m,m,n)
 
         #initialize parameters
             V0=Vc;V00=copy(V0);  V1=copy(V0);V2=copy(V0);
@@ -767,7 +774,8 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{F
                 j=j+1
             end
 
-            crit=norm(Σ1-Σ0)+norm(V1-V0)+norm(b1-b0)+abs(loglik1-loglik0)
+#             crit=norm(Σ1-Σ0)+norm(V1-V0)+norm(b1-b0)
+            crit=abs(loglik1-loglik0)
             b00=b0;b0=b1;b1=b2; V00=V0;V0=V1;V1=V2;Σ00=Σ0;Σ0=Σ1; Σ1=Σ2;loglik0=loglik1;
 #             i+=1
            end

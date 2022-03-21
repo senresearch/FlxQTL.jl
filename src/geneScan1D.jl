@@ -472,7 +472,7 @@ end
 #         ## picking up initial values for parameter estimation under the null hypothesis
 #             init=initial(Xnul,Y0,Z0,false)
 # #           if(λc!= ones(m))
-# #             Z1,Σ1 =  transForm(Tc,Z0,init.Σ,true)
+# #             Z1,Σ1 =  transForm(Tc,Z0,init.Σ,false)
 # #             Y1= transForm(Tc,Y0,init.Σ) # transform Y only by row (Tc)
 # #            else
 # #             Z1=Z0; Σ1 = init.Σ
