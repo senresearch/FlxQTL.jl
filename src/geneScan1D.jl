@@ -419,120 +419,12 @@ function obtainKc(Kg::Array{Float64,2},Y0::Array{Float64,2},Z0::Array{Float64,2}
     
       T,λ = K2eig(Kg)
       init=initial(Xnul,Y0,Z0,false)
-      Y=BLAS.gemm('N','T',Y0,T)
-      Xnul_t=BLAS.gemm('N','T',Xnul,T)
+      Y, Xnul_t=transForm(T,Y0,Xnul,1)
       est0=nulScan(init,1,λ,Y,Xnul_t,Z0;itol=itol,tol=tol,ρ=ρ)
       return est0.Vc
 end
 
-
-# function gene1Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},
-#                 LOCO::Bool=false;LogP::Bool=false,
-#                 Xnul::Array{Float64,2}=ones(1,size(Y0,2)),kmin::Int64=1,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
-
-    
-      
-#      init=initial(Xnul,Y0,Z0,false)
-          
-#        if (LOCO)
-#         #estimate Kc
-          
-          
-#           @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,1])
-#            Y=BLAS.gemm('N','T',Y0,Tg[:,:,1])
-#            est=nulScan(init,kmin,Λg[:,1],Y,Xnul_t,Z0;itol=itol,tol=tol,ρ=ρ)
-#             Tc,λc=K2eig(est.Vc)
-#            res1,B,est0 = geneScan(cross,Tg,Tc,Λg,λc,Y0,XX,Z0,true;LogP=LogP,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
-        
-#          else
-          
-        
-#           @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,Tg)
-#            Y=BLAS.gemm('N','T',Y0,Tg)
-#            est=nulScan(init,kmin,Λg,Y,Xnul_t,Z0;itol=itol,tol=tol,ρ=ρ)
-#             Tc,λc=K2eig(est.Vc)
-#            res1,B,est0 =geneScan(cross,Tg,Tc,Λg,λc,Y0,XX,Z0;LogP=LogP,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
-        
-        
-#        end
-    
-  
-#     return res1, B, est0
-# end
+include("geneScan1.jl")
 
 
-## upgraded version1: H0:MLMM, H1:FlxQTL (develop further later)
-# function gene0Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},
-#                 LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
-#                 Xnul::Array{Float64,2}=ones(1,size(Y0,2)),kmin::Int64=1,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
-#         m=size(Y0,1);
-#         q=size(Z0,2);  p=Int(size(XX.X,1)/cross);
-
-#         ## picking up initial values for parameter estimation under the null hypothesis
-#             init=initial(Xnul,Y0,Z0,false)
-# #           if(λc!= ones(m))
-# #             Z1,Σ1 =  transForm(Tc,Z0,init.Σ,false)
-# #             Y1= transForm(Tc,Y0,init.Σ) # transform Y only by row (Tc)
-# #            else
-# #             Z1=Z0; Σ1 = init.Σ
-# #             Y1=Y0
-# #          end
-#          if (cross!=1)
-#             X0=mat2array(cross,XX.X)
-#          end
-#     if (LOCO)
-#         LODs=zeros(p);
-#         Chr=unique(XX.chr);nChr=length(Chr);est0=[];H1par=[]
-
-#            for i=1:nChr
-#                 maridx=findall(XX.chr.==Chr[i])
-# #                 Xnul_t=Xnul*Tg[:,:,i]';
-#    @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
-#                  if (cross!=1)
-#                    Y1,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
-#                    else
-#                    Y1,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
-#                  end
-#                 #parameter estimation under the null using MLMM
-#                 est00=nulScan(init,kmin,Λg[:,i],Y1,Xnul_t,Z0;itol=itol,tol=tol,ρ=ρ)
-#                 Y2,Σ1,Z,τ1=transform(est00.Vc,Y1,Z0,est00.Σ)
-#              lods,H1par1=marker1Scan(m,q,kmin,cross,Λg[:,i],Y2,Xnul_t,X1,Z,est00,Σ1,τ1;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
-#                 LODs[maridx]=lods
-#                 H1par=[H1par;H1par1]
-#                 est0=[est0;est00];
-#             end
-#            # rearrange B into 3-d array
-#            B = arrngB(H1par,size(Xnul,1),q,p,cross)
-
-#         else #no LOCO
-# #          Xnul_t=Xnul*Tg';
-#             Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
-#                  if (cross!=1)
-#                    Y1,X1=transForm(Tg,Y1,X0,cross)
-#                    else
-#                    Y1,X1=transForm(Tg,Y1,XX.X,cross)
-#                  end
-
-#                   est0=nulScan(init,kmin,Λg,λc,Y1,Xnul_t,Z1,Σ1;itol=itol,tol=tol,ρ=ρ)
-#                 LODs,H1par=marker1Scan(q,kmin,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1;tol0=tol0,tol1=tol,ρ=ρ)
-#              # rearrange B into 3-d array
-#           B = arrngB(H1par,size(Xnul,1),q,p,cross)
-#     end
-
-#     # Output choice
-#     if (tdata) # should use with no LOCO to do permutation
-#         return LODs,B,est0,Y1,X1,Z1
-#     elseif (LogP) # transform LOD to -log10(p-value)
-#             if(LOCO)
-#                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
-#             else
-#                 df= prod(size(B[:,:,1]))-prod(size(est0.B))
-#             end
-#              logP=lod2logP(LODs,df)
-
-#         return logP,B,est0
-#     else
-#          return LODs,B,est0
-#      end
-# end
