@@ -414,14 +414,14 @@ end
 # export geneScan,marker1Scan
 ## upgraded version: H0:MLMM, H1:FlxQTL
 
-function obtainKc(Kg::Array{Float64,2},Y0::Array{Float64,2},Z0::Array{Float64,2};
-        Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+function obtainKc(T::Array{Float64,2},λ::Array{Float64,1},Y0::Array{Float64,2},Z0::Array{Float64,2};
+        Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
     
-      T,λ = K2eig(Kg)
+#       T,λ = K2eig(Kg)
       init=initial(Xnul,Y0,Z0,false)
       Y, Xnul_t=transForm(T,Y0,Xnul,1)
-      est0=nulScan(init,1,λ,Y,Xnul_t,Z0;itol=itol,tol=tol,ρ=ρ)
-      return est0.Vc
+      est0=nulScan1(init,1,λ,Y,Xnul_t,Z0;itol=itol,tol=tol,ρ=ρ)
+      return est0.Vc, Y, Xnul_t
 end
 
 include("geneScan1.jl")
