@@ -141,8 +141,8 @@ end
 """
 
 
-    geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;
-                Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001,LogP::Bool=false)
+    geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},
+         LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001,LogP::Bool=false)
     geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;
                 Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001,LogP::Bool=false)
     geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;
@@ -223,9 +223,9 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
 #                 Xnul_t=Xnul*Tg[:,:,i]';
    @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                  if (cross!=1)
-                   Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+   @fastmath @inbounds @views Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
                    else
-                   Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
+  @fastmath @inbounds @views  Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                   est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Z1,Σ1;ρ=ρ,itol=itol,tol=tol)
@@ -254,7 +254,7 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
 
     # Output choice
     if (tdata) # should use with no LOCO to do permutation
-        return LODs,B,est0,Y1,X1,Z1
+        return est0,Xnul_t,Y1,X1,Z1
     elseif (LogP) # transform LOD to -log10(p-value)
             if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
@@ -299,9 +299,9 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
 #                 Xnul_t=Xnul*Tg[:,:,i]';
    @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                  if (cross!=1)
-                   Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+      @fastmath @inbounds @views Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
                    else
-                   Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
+      @fastmath @inbounds @views Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                 est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Σ1;ρ=ρ,itol=itol,tol=tol)
@@ -363,9 +363,9 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
 #                 Xnul_t=Xnul*Tg[:,:,i]';
               @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                 if (cross!=1)
-                   Y,X=transForm(Tg[:,:,i],Y0,X0[maridx,:,:],cross)
+          @fastmath @inbounds @views Y,X=transForm(Tg[:,:,i],Y0,X0[maridx,:,:],cross)
                    else
-                   Y,X=transForm(Tg[:,:,i],Y0,XX.X[maridx,:],cross)
+           @fastmath @inbounds @views Y,X=transForm(Tg[:,:,i],Y0,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                     est00=nulScan(init,1,Λg[:,i],Y,Xnul_t;itol=itol,tol=tol,ρ=ρ)
@@ -393,7 +393,7 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
      end
 
     if (tdata) # should use with no LOCO
-        return LODs,B,est0,Y,X
+        return est0,Xnul_t,Y,X
     elseif (LogP) # transform LOD to -log10(p-value)
           if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))

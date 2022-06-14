@@ -225,3 +225,53 @@ function gene2Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bo
         end #LOCO
     return LODs,est0
 end
+
+
+#new version adding estimating Kc inside
+function gene2Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;
+        ρ=0.001,Xnul::Array{Float64,2}=ones(1,size(Y0,2))
+        ,kmin::Int64=1,itol=1e-4,tol0=1e-3,tol::Float64=1e-4)
+
+    p=Int(size(XX.X,1)/cross);q=size(Z0,2);m=size(Y0,1);
+    LODs=zeros(p,p);  Chr=unique(XX.chr); nChr=length(Chr);
+           ## initialization
+            init=initial(Xnul,Y0,Z0,false)#type: Init0
+
+         if (cross!=1)
+            X0=mat2array(cross,XX.X)
+         end
+    if (LOCO)
+        est0=[];
+         for i=1:nChr
+             λc, Y1, Xnul_t,Z1,init=updateKc(m,init,Tg[:,:,i],Λg[:,i],Y0,Z0,Xnul;itol=itol,tol=tol,ρ=ρ) #type: Init1 for H0 estimates
+                maridx=findall(XX.chr.==Chr[i]);
+                
+                 if (cross!=1) #individual-wise tranformation 
+                   X1=transForm(Tg[:,:,i],X0[maridx,:,:],cross)
+                   else
+                   X1=transForm(Tg[:,:,i],XX.X[maridx,:],cross)
+                 end
+
+                est=nulScan(init,kmin,Λg[:,i],λc,Y1,Xnul_t,Z1;itol=itol,tol=tol,ρ=ρ)
+                marker2Scan!(LODs,maridx,q,kmin,cross,est,Λg[:,i],λc,Y1,Xnul_t,X1,Z1;tol0=tol0,tol1=tol,ρ=ρ)
+                est0=[est0;est];
+            end
+
+     else #no LOCO
+         λc, Y1, Xnul_t,Z1,init=updateKc(m,init,Tg,Λg,Y0,Z0,Xnul;itol=itol,tol=tol,ρ=ρ)
+                 if (cross!=1) #individual-wise tranformation 
+                   X1=transForm(Tg,X0,cross)
+                   else
+                   X1=transForm(Tg,XX.X,cross)
+                 end
+
+                  est0=nulScan(init,kmin,Λg,λc,Y1,Xnul_t,Z1;itol=itol,tol=tol,ρ=ρ)
+             for i=1:nChr
+            maridx=findall(XX.chr.==Chr[i])
+            marker2Scan!(LODs,maridx,q,kmin,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1;tol0=tol0,tol1=tol,ρ=ρ)
+             end
+    end
+    return LODs,est0
+end
+
+ 

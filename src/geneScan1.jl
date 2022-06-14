@@ -33,7 +33,7 @@ function updateKc(m::Int64,initial::Union{Init0,Init1},Tg::Array{Float64,2},λg:
            lmul!(sqrt(1/m),Vc)
            τ2 =mean(Diagonal(Vc))
            
-      return λc, Y1, Xnul_t,Z1, Init1(est0.B,τ2,Σ1,est0.Vc)
+      return  λc, Y1, Xnul_t,Z1, Init1(est0.B,τ2,Σ1,est0.Vc)
     
     end
         
@@ -60,7 +60,7 @@ function gene1Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Arra
 
            for i=1:nChr
             #compute Kc & update intital values
-       λc, Y1, Xnul_t,Z1,init1=updateKc(m,init,Tg[:,:,i],Λg[:,i],Y0,Z0,Xnul;itol=itol,tol=tol,ρ=ρ)
+             λc, Y1, Xnul_t,Z1,init=updateKc(m,init,Tg[:,:,i],Λg[:,i],Y0,Z0,Xnul;itol=itol,tol=tol,ρ=ρ) #type: Init1 for H0 estimates
                 maridx=findall(XX.chr.==Chr[i])
            
                  if (cross!=1) #individual-wise tranformation 
@@ -69,11 +69,11 @@ function gene1Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Arra
                    X1=transForm(Tg[:,:,i],XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
-                est00=nulScan(init1,1,Λg[:,i],λc,Y1,Xnul_t,Z1;ρ=ρ,itol=itol,tol=tol); 
+                est00=nulScan(init,1,Λg[:,i],λc,Y1,Xnul_t,Z1;ρ=ρ,itol=itol,tol=tol); 
                 lods,H1par1=marker1Scan(q,1,cross,est00,Λg[:,i],λc,Y1,Xnul_t,X1,Z1;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
                 LODs[maridx]=lods;
                 H1par=[H1par;H1par1]
-                est0=[est0;est00];init=init1
+                est0=[est0;est00]; #init=init1
             end
            # rearrange B into 3-d array
            B = arrngB(H1par,size(Xnul,1),q,p,cross)
@@ -95,7 +95,7 @@ function gene1Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Arra
 
     # Output choice
     if (tdata) # should use with no LOCO to do permutation
-        return LODs,B,est0,Y1,X1,Z1
+        return λc,est0,Xnul_t,Y1,X1,Z1 
     elseif (LogP) # transform LOD to -log10(p-value)
             if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
@@ -110,7 +110,7 @@ function gene1Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Arra
      end
 end
 
-
+## to compare with gene1Scan for testing
 function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;
         tdata::Bool=false,LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y0,2)),itol=1e-3,
         tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
@@ -174,7 +174,7 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,Z0::Array
 
     # Output choice
     if (tdata) # should use with no LOCO to do permutation
-        return LODs,B,est0,Y1,X1,Z1
+        return est0,Xnul_t,Y1,X1,Z1
     elseif (LogP) # transform LOD to -log10(p-value)
             if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
