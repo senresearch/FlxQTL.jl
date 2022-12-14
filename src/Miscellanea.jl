@@ -18,16 +18,13 @@ import Statistics: mean, var, median
 
 """
 
-    setSeed(lw::Int64,up::Int64,replace::Bool=false)
+    setSeed(seedNum::Int64)
 
-Assigns different numbers of seeds to workers (or processes).
+Assigns different numbers of seeds to workers (or processes) for reproducibility.
 
 # Arguments
 
-- `lw` : A lower bound to set seeds.
-- `up` : A upper bound to set seeds.
-- `replace` : Sampling seed numbers between `lw` and `up` with/without replacement. Default is `false: without replacement`. 
-          Since the function itself recognize the number of processes (or workers) and their id, a wider range of seed numbers needs to set for default.
+- `seedNum`: An integer.  A minimum seed number to assign a worker.  For distributed computing, seed numbers are generated for multiple workers by increasing 1, e.g. seedNum = 123 & 10 workers, `setSeed` generates seeds from 123 to 132 and assigns to corresponding workers (processes). 
 
 # Examples
 
@@ -35,14 +32,14 @@ Assigns different numbers of seeds to workers (or processes).
 julia> using Distributed
 julia> addprocs(10)
 julia> @everywhere using flxQTL
-julia> setSeed(1,20)
+julia> setSeed(123)
 
 ```
 
 """
-function setSeed(lw::Int64,up::Int64,replace::Bool=false)
+function setSeed(seedNum::Int64)
 np=nprocs();pid=procs()
-seed=sample(lw:up,np,replace=replace)
+seed=collect(seedNum:1:seedNum+np-1)
 
 for i=1:np
 remotecall_fetch(()->Random.seed!(seed[i]),pid[i])

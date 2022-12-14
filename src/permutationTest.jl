@@ -77,27 +77,21 @@ end
 ##              %%%   rows: # of markers(B and loglik), columns: # of permutations
 
 ## finding distribution of max lod's for a multivariate model by permutation for 4waycross/intercross
-function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},
-        Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
-        Z::Array{Float64,2},Nullpar::Approx,λg::Array{Float64,1},λc::Array{Float64,1}
-        ;Xnul::Array{Float64,2}=ones(1,size(Y,2)),tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
+        Z::Array{Float64,2},Nullpar::Approx,λg::Array{Float64,1},λc::Array{Float64,1},Xnul_t::Array{Float64,2}
+        ;tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
 #     n=size(Y,2); p=size(X,1);
     q=size(Z,2);
     kmin=1; lod=zeros(nperm);H1par=[]
 
-    #     Xnul_t=Xnul*Tg';
-    Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
     init=Init(Nullpar.B,Nullpar.τ2,Nullpar.Σ)
-#     Σ1=Symmetric(BLAS.symm('R','U',Nullpar.Σ,Tc)*Tc')
     
     for l= 1:nperm
         ### permuting a phenotype matrix by individuals
-        Y2=permutY(Y,Nullpar.τ2,Nullpar.Σ,λg,λc);
+        Y2=permutY(Y,init.τ2,init.Σ,λg,λc);
         #initial parameter values for permutations are from genome scanning under the null hypothesis.
-#         perm_est0=NestrvAG(kmin,Y2,Xnul_t,Z,Nullpar.B,Nullpar.τ2,Nullpar.Σ,λg,λc;tol=tol,ρ=ρ)
-           
-         perm_est0=nulScan(init,kmin,λg,λc,Y2,Xnul_t,Z,Nullpar.Σ;itol=tol0,tol=tol,ρ=ρ)    
+        perm_est0=nulScan(init,kmin,λg,λc,Y2,Xnul_t,Z,Nullpar.Σ;itol=tol0,tol=tol,ρ=ρ)    
         LODs,H1par0=marker1Scan(q,kmin,cross,perm_est0,λg,λc,Y2,Xnul_t,X,Z;tol0=tol0,tol1=tol,ρ=ρ)
          
           lod[l]= maximum(LODs);  H1par=[H1par; H1par0]
@@ -109,14 +103,14 @@ function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},
     return lod, H1par
 end
 
+
 #MVLMM
-function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
-        Nullpar::Result,λg::Array{Float64,1};Xnul::Array{Float64,2}=ones(1,size(Y,2)),tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
+        Nullpar::Result,λg::Array{Float64,1},Xnul_t;tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
      m=size(Y,1);
-#     Xnul_t=Xnul*Tg';
     kmin=1;lod=zeros(nperm);H1par=[]
-    Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
+   
     init=Init0(Nullpar.B,Nullpar.Vc,Nullpar.Σ)
     
      for l= 1:nperm
@@ -124,7 +118,6 @@ function permutation(nperm::Int64,cross::Int64,Tg::Array{Float64,2},Y::Array{Flo
         Y2=permutY(Y,Nullpar.Vc,Nullpar.Σ,λg);
 
         #initial parameter values for permutations are from genome scanning under the null hypothesis.
-#         perm_est0=ecmNestrvAG(kmin,Y2,Xnul_t,Nullpar.B,Nullpar.Vc,Nullpar.Σ,λg;tol=tol,ρ=ρ)
          perm_est0=nulScan(init,kmin,λg,Y2,Xnul_t;itol=tol0,tol=tol,ρ=ρ)
         LODs,H1par0=marker1Scan(m,kmin,cross,perm_est0,λg,Y2,Xnul_t,X;tol0=tol0,tol1=tol,ρ=ρ)
     
@@ -142,8 +135,9 @@ end
 """
 
       permTest(nperm,cross,Kg,Kc,Y0,XX::Markers,Z0;pval=[0.05 0.01],Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
+      permTest(nperm,cross,Kg,Y0,XX::Markers,Z0;pval=[0.05 0.01],Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
       permTest(nperm,cross,Kg,Y0,XX::Markers;pval=[0.05 0.01],Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
-
+   
 Implement permutation test to get thresholds at the levels of type 1 error, `α`.  Note that the second `permTest()` is for the conventional MLMM: 
 ```math
 vec(Y)\\sim MVN((I \\otimes X)vec(B) (or BX), K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2),
@@ -185,20 +179,35 @@ function permTest(nperm::Int64,cross,Kg,Kc,Y0,XX::Markers,Z0;pval=[0.05 0.01],
         Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
     #permutation without LOCO
        Tg,λg,Tc,λc=K2Eig(Kg,Kc)
-       LODs,B,est0,Y,X,Z = geneScan(cross,Tg,Tc,λg,λc,Y0,XX,Z0;tdata=true,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
-       maxLODs, H1par_perm= permutation(nperm,cross,Tg,Y,X,Z,est0,λg,λc;Xnul=Xnul,tol0=tol0,tol=tol,ρ=ρ)
+       est0,Xnul_t,Y,X,Z = geneScan(cross,Tg,Tc,λg,λc,Y0,XX,Z0;tdata=true,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
+       maxLODs, H1par_perm= permutation(nperm,cross,Y,X,Z,est0,λg,λc,Xnul_t;tol0=tol0,tol=tol,ρ=ρ)
        maxLODs=convert(Array{Float64,1},maxLODs)
        cutoff= quantile(maxLODs,1.0.-pval)
     return maxLODs, H1par_perm, cutoff
 
 end
 
+
+#new version
+function permTest(nperm::Int64,cross,Kg,Y0,XX::Markers,Z0;pval=[0.05 0.01],
+        Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
+    #permutation without LOCO
+       Tg,λg=K2eig(Kg)
+       λc,est0,Xnul_t,Y,X,Z  = gene1Scan(cross,Tg,λg,Y0,XX,Z0;tdata=true,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
+       maxLODs, H1par_perm= permutation(nperm,cross,Y,X,Z,est0,λg,λc,Xnul_t;tol0=tol0,tol=tol,ρ=ρ)
+       maxLODs=convert(Array{Float64,1},maxLODs)
+       cutoff= quantile(maxLODs,1.0.-pval)
+    return maxLODs, H1par_perm, cutoff
+
+end
+
+
 #MVLMM
 function permTest(nperm::Int64,cross,Kg,Y0,XX::Markers;pval=[0.05 0.01],Xnul=ones(1,size(Y0,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
     #permutation without LOCO
        Tg,λg=K2eig(Kg)
-       LODs,B,est0,Y,X = geneScan(cross,Tg,λg,Y0,XX;tdata=true,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
-       maxLODs, H1par_perm= permutation(nperm,cross,Tg,Y,X,est0,λg;Xnul=Xnul,tol0=tol0,tol=tol,ρ=ρ)
+       est0,Xnul_t,Y,X = geneScan(cross,Tg,λg,Y0,XX;tdata=true,Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
+       maxLODs, H1par_perm= permutation(nperm,cross,Y,X,est0,λg,Xnul_t;tol0=tol0,tol=tol,ρ=ρ)
        maxLODs=convert(Array{Float64,1},maxLODs)
        cutoff= quantile(maxLODs,1.0.-pval)
     return maxLODs, H1par_perm, cutoff

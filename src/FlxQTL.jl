@@ -28,9 +28,9 @@ export shrinkg,shrinkgLoco,kinshipLoco
 using .QTLplot:layers, plot1d, plot2d, subplot2d
 export layers, plot1d, plot2d, subplot2d
 
-using .flxMLMM: geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig
+using .flxMLMM: geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, obtainKc,gene1Scan,updateKc
 #selectQTL
-export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig
+export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, obtainKc,gene1Scan,updateKc
 
 using .Util:setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
 export setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
