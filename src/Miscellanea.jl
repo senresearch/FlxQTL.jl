@@ -10,7 +10,7 @@ module Util
 
 using Random
 using Distributed
-import LossFunctions: HuberLoss, value
+import LossFunctions: HuberLoss
 import Distributions: Chisq,ccdf
 import StatsBase: mad, sample
 import Statistics: mean, var, median
@@ -341,7 +341,7 @@ function huberize(y::Vector{Float64})
 m = median(y)
 s = mad(y,normalize=true)
 z = (y.-m)./s
-l = value.(HuberLoss(1),z)
+l = HuberLoss().(z)
 x = sign.(z).* sqrt.(2*l)
 return m .+ s.*x
 end
