@@ -16,7 +16,7 @@ multivariate genome scans, visualization of genome scans, support for
 LOCO (leave-one-chromosome-out), computation of kinship matrices, and
 support for distributed computing.
 
-![1D Genome Scan](image/ex1.png)
+![1D Genome Scan](https://senresearch.github.io/FlxQTL.jl/image/ex1.png)
 
 ![2D Genome Scan](image/ex2.jpg)
 
