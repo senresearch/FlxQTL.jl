@@ -4,8 +4,6 @@
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://senresearch.github.io/FlxQTL.jl/stable)
 [![CI](https://github.com/senresearch/FlxQTL.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/senresearch/FlxQTL.jl/actions/workflows/ci.yml)
-<!-- [![Build Status](https://travis-ci.com/senresearch/FlxQTL.jl.svg?branch=master)](https://travis-ci.com/github/senresearch/FlxQTL.jl)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/senresearch/FlxQTL.jl?svg=true)](https://ci.appveyor.com/project/sens/flxqtl-jl) -->
 [![codecov](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/senresearch/FlxQTL.jl)
 <!-- [![codecov](https://codecov.io/gh/hkim89/FlxQTL.jl/branch/master/graph/badge.svg?token=wNYkIkfRx1)](https://codecov.io/gh/hkim89/FlxQTL.jl) -->
 
