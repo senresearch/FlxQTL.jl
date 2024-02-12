@@ -12,7 +12,7 @@ module FlxQTL
 
 
 include("MLM.jl")
-include("QTLplot.jl")
+# include("QTLplot.jl")
 include("Miscellanea.jl")
 include("GRM.jl")
 include("EcmNestrv.jl")
@@ -25,8 +25,8 @@ using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shr
 export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
-using .QTLplot:layers, plot1d, plot2d, subplot2d
-export layers, plot1d, plot2d, subplot2d
+# using .QTLplot:layers, plot1d, plot2d, subplot2d
+# export layers, plot1d, plot2d, subplot2d
 
 using .flxMLMM: geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, obtainKc,gene1Scan,updateKc
 #selectQTL
