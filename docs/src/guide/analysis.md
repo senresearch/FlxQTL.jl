@@ -143,7 +143,7 @@ third marker, type `B[:,:,3]`.
 
 ## Generating plots
 
-The `QTLplot` module is currently unavailable but will replaced with [BigRiverQTLPlots.jl](https://github.com/senresearch/BigRiverQTLPlots.jl) soon.
+The `QTLplot` module is currently unavailable but will be replaced with [BigRiverQTLPlots.jl](https://github.com/senresearch/BigRiverQTLPlots.jl) soon.  One can generate plots using `BigRiverQTLPlots.jl` after getting results from 1D or 2D genome scan.
 
 <!-- To produce a plot (or plots) for LOD scores or effects, you need first a struct of arrays, `layers` consisting of chromosomes, marker positions, 
 LOD scores (or effects), which should be `Array{Float64,2}`.  You can then generate one genome scan result or multiple genenome scan results on one plot.  Note that the color is randomly selected to generate a plot.   
