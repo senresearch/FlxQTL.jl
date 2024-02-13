@@ -30,8 +30,3 @@ Modules = [MLM]
 Modules = [Util]
 ```
 
-<!-- ## Visualization (QTLplot)
-
-```@autodocs
-Modules = [QTLplot]
-``` -->
