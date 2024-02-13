@@ -16,12 +16,6 @@ Modules = [FlxQTL, flxMLMM, EcmNestrv]
 Modules = [GRM]
 ```
 
-## Visualization (QTLplot)
-
-```@autodocs
-Modules = [QTLplot]
-```
-
 ## Multivariate Linear Models (MLM)
 
 ```@autodocs
@@ -35,3 +29,4 @@ Modules = [MLM]
 ```@autodocs
 Modules = [Util]
 ```
+

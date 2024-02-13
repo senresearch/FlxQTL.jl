@@ -7,9 +7,9 @@ structured multivariate traits.
 
 - Genome scan (1D, 2D) for univariate, multivariate trait(s), and genotype (probability) data
 - LOCO (Leave One Chromosome Out) support for genome scan 
-- Visualization (1D, 2D plots)
 - Computation for Genetic (or Climatic) Relatedness matrix (or kinship) 
 - CPU parallelization
+<!-- - Visualization (1D, 2D plots) -->
 
 ## Guide
 

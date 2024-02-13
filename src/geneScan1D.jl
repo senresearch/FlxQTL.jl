@@ -221,11 +221,11 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
            for i=1:nChr
                 maridx=findall(XX.chr.==Chr[i])
 #                 Xnul_t=Xnul*Tg[:,:,i]';
-   @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
+   @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul, Tg[:,:,i])
                  if (cross!=1)
-   @fastmath @inbounds @views Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+   @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
                    else
-  @fastmath @inbounds @views  Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
+  @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                   est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Z1,Σ1;ρ=ρ,itol=itol,tol=tol)
@@ -297,11 +297,11 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
            for i=1:nChr
                 maridx=findall(XX.chr.==Chr[i])
 #                 Xnul_t=Xnul*Tg[:,:,i]';
-   @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
+   @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,Tg[:,:,i])
                  if (cross!=1)
-      @fastmath @inbounds @views Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+      @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
                    else
-      @fastmath @inbounds @views Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
+      @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                 est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Σ1;ρ=ρ,itol=itol,tol=tol)
@@ -363,9 +363,9 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
 #                 Xnul_t=Xnul*Tg[:,:,i]';
               @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                 if (cross!=1)
-          @fastmath @inbounds @views Y,X=transForm(Tg[:,:,i],Y0,X0[maridx,:,:],cross)
+          @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y0,X0[maridx,:,:],cross)
                    else
-           @fastmath @inbounds @views Y,X=transForm(Tg[:,:,i],Y0,XX.X[maridx,:],cross)
+           @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y0,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                     est00=nulScan(init,1,Λg[:,i],Y,Xnul_t;itol=itol,tol=tol,ρ=ρ)
