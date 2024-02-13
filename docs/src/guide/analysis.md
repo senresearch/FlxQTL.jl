@@ -143,7 +143,9 @@ third marker, type `B[:,:,3]`.
 
 ## Generating plots
 
-To produce a plot (or plots) for LOD scores or effects, you need first a struct of arrays, `layers` consisting of chromosomes, marker positions, 
+The `QTLplot` module is currently unavailable but will replaced with [BigRiverQTLPlots.jl](https://github.com/senresearch/BigRiverQTLPlots.jl) soon.
+
+<!-- To produce a plot (or plots) for LOD scores or effects, you need first a struct of arrays, `layers` consisting of chromosomes, marker positions, 
 LOD scores (or effects), which should be `Array{Float64,2}`.  You can then generate one genome scan result or multiple genenome scan results on one plot.  Note that the color is randomly selected to generate a plot.   
 The function `plot1d` has more keyword argument options: `yint=[]` for a vector of y-intercept(s), `yint_color=["red"]` for a vector of y-intercept 
 color(s), `Legend=[]` for multiple graphs, `loc="upper right"` for the location of `Legend`, etc.
@@ -155,7 +157,7 @@ plot1d(Arab_lod;title= "LOD for Arabidopsis thaliana : Fitness (2 site by 3 year
 ![arabidopsis](arab-lod.png)
 
 
-
+ -->
 
 ## Performing a permutation test
 

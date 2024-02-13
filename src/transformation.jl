@@ -158,7 +158,7 @@ function transForm(Tg::Array{Float64,2},X0,cross::Int64)
         else #cross>1 size(X0)= (p,cross,n)
           p=size(X0,1); n=size(X0,3)
             X=zeros(p,cross,n)
-       @fastmath @inbounds @views  for j=1:cross
+       @fastmath @inbounds @views for j=1:cross
 #             X[:,j,:] = X0[:,j,:]*Tg'
              X[:,j,:]= BLAS.gemm('N','T',X0[:,j,:],Tg)
                      end

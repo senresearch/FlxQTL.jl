@@ -15,7 +15,7 @@ Or, equivalently,
 ```julia
 julia> using Pkg; Pkg.add("FlxQTL")
 ```
-Currently Julia `1.5` supports for the package.
+<!-- Currently Julia `1.5` supports for the package. -->
 
 
 To remove the package from the Julia REPL,
