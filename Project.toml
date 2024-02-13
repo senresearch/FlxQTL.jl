@@ -24,13 +24,9 @@ Distributions = "^0.23, 0.24, 0.25"
 LossFunctions = "~0.11"
 PyPlot = "~2.11"
 Revise = "3.5"
-StaticArrays = "1.7"
-<<<<<<< HEAD
+StaticArrays = "1.9"
 StatsBase = "0.33, 0.34"
-=======
 Statistics = "1"
-StatsBase = "0.33"
->>>>>>> 8353b55b7ff31c221941bf2028568d8ace75ba4d
 julia = "~1.9"
 
 [extras]
