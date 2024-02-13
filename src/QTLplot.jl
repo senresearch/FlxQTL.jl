@@ -8,7 +8,7 @@ A module for generating PyPlot-based 1D-, 2D-plots for LOD scores (or effects).
 """
 module QTLplot
 
-using PyPlot
+using PyPlot, LinearAlgebra
 import Statistics:median
 
 
@@ -237,7 +237,7 @@ Chr=unique(S.chr);
           subplot(position)
           imshow(Chrom,cmap="jet",interpolation="bicubic",extent=[minimum(x),maximum(x),maximum(y),minimum(y)],vmin=0.0,vmax=maximum(S.lod));
 #          eval(Meta.parse(string("""title(string("Chromsome ", """,Chr[i+inner_num*(j-1)],""")) """)))
-           title(string("Chromosome ",Chromosome[i+inner_num*(j-1)]),fontsize=title_font)
+           title(string("Chromosome ",Chr[i+inner_num*(j-1)]),fontsize=title_font)
             xticks(fontsize=fontsize);yticks(fontsize=fontsize)
            cbar=colorbar()
             cbar.ax.tick_params(labelsize=fontsize)
