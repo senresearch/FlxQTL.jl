@@ -9,7 +9,6 @@ structured multivariate traits.
 - LOCO (Leave One Chromosome Out) support for genome scan 
 - Computation for Genetic (or Climatic) Relatedness matrix (or kinship) 
 - CPU parallelization
-<!-- - Visualization (1D, 2D plots) -->
 
 ## Guide
 
