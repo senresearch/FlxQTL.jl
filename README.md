@@ -65,9 +65,6 @@ or,
 julia> Pkg.add(url="https://github.com/senresearch/FlxQTL.jl")
 ```
 
-Currently Julia `1.6` supports for the package.
-
-
 To remove the package from the Julia REPL,
 
 ```julia
