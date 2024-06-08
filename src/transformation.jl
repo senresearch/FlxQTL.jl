@@ -124,6 +124,20 @@ end
 # Y,X,Z,Σ : transformed matrices
 # See also: K2eig, K2Eig
 
+function transZ!(Z::Array{Float64,2},Tc::Array{Float64,2},Z0::Array{Float64,2})
+
+    mul!(Z,Tc,Z0)
+end
+
+# rotate Σ₀ or Ψ₀ (prior parameter for Σ)
+function transPD(Tc::Array{Float64,2},Σ₀::Array{Float64,2})
+
+    Σ=Symmetric(BLAS.symm('R','U',Σ₀,Tc)*Tc')
+
+    return convert(Array{Float64,2},Σ)
+end
+
+
 #rotate by row (trait(or site)-wise)
 function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ_0::Array{Float64,2},both::Bool=false)
 
@@ -131,13 +145,27 @@ function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ_0::Array{Float64
     if (both)
 #          Z=Tc*Z0
 #          Σ=Symmetric((Tc*Σ_0)*Tc')
-          mul!(Z,Tc,Z0)
-          Σ=Symmetric(BLAS.symm('R','U',Σ_0,Tc)*Tc')
-         return Z,convert(Array{Float64,2},Σ)
+          transZ!(Z,Tc,Z0)
+          Σ= transPD(Tc,Σ_0)
+         return Z,Σ
      else
-         return  mul!(Z,Tc,Z0)
+         return  transZ!(Z,Tc,Z0)
     end
 end
+
+function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ₀::Array{Float64,2},Ψ₀::Array{Float64,2})
+
+    if (isposdef(Ψ₀) && isposdef(Σ₀))
+    Z, Σ = transForm(Tc,Z0,Σ₀,true)
+    Ψ = transPD(Tc,Ψ₀)
+    else 
+        println("Error! Plug in postivie definite matrices!")
+    end
+
+    return Z, Σ, Ψ
+end
+      
+    
 
 
 # rotate by column (individual-wise)
