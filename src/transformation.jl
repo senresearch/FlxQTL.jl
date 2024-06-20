@@ -155,17 +155,17 @@ end
 
 function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ₀::Array{Float64,2},Ψ₀::Array{Float64,2})
 
-    if (isposdef(Ψ₀) && isposdef(Σ₀))
+    if (isposdef(Ψ₀))
     Z, Σ = transForm(Tc,Z0,Σ₀,true)
     Ψ = transPD(Tc,Ψ₀)
     else 
-        println("Error! Plug in postivie definite matrices!")
+        println("Error! Plug in a postivie definite Prior!")
     end
 
     return Z, Σ, Ψ
 end
       
-    
+ 
 
 
 # rotate by column (individual-wise)
@@ -270,6 +270,16 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Z1,Σt;ρ=0.001,itol=1e-3,tol
     return nulpar
 end
 
+#including prior
+function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Z1,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
+ 
+return nulpar
+end
+#######
+# pre-computed Kc included 
 function nulScan(init::Init1,kmin,λg,λc,Y1,Xnul_t,Z1;ρ=0.001,itol=1e-3,tol=1e-4)
     
             B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,init.Σ1,λg,λc;tol=itol)
@@ -278,6 +288,7 @@ function nulScan(init::Init1,kmin,λg,λc,Y1,Xnul_t,Z1;ρ=0.001,itol=1e-3,tol=1e
     return nulpar
     
 end
+######
 
 #Z=I
 function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e-4)
@@ -288,6 +299,17 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e
     return nulpar
 end
 
+#including prior
+function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    nulpar= NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
+
+return nulpar
+end
+
+
+##########
 #new version to estimate Kc
 function nulScan1(init::Union{Init1,Init0},kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e-3,tol=1e-4)
        
@@ -300,7 +322,7 @@ function nulScan1(init::Union{Init1,Init0},kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e
         end
        return nulpar
 end
-
+###########
 
 #MVLMM :Z=I
 function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
@@ -311,6 +333,14 @@ function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
        return nulpar
 end
 
+#including prior
+function nulScan(init::Init0,kmin,λg,Y1,Xnul_t,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
+        nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+
+       return nulpar
+end
 
 
 ##rearrange Bs estimated under H1 into 3-d array
