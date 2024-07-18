@@ -122,3 +122,10 @@ lod2d0,es2d0=FlxQTL.gene2Scan(4,T2,λ2,y,X1)
 @test isposdef(es2d0.Vc)
 @test isposdef(es2d0.Σ)
 @test es2d0.loglik <=0.0
+
+
+lod2d,es2d=FlxQTL.gene2Scan(4,T2,λ2,y,X1,Z);
+@test sum(lod2d.<0.0)==0
+@test es2d.τ2 >0.0
+@test isposdef(es2d.Σ)
+@test es2d.loglik <=0.0

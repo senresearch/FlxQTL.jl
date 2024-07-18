@@ -105,29 +105,29 @@ end
 
 
 ######### actual two genescan versions including prior
-function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y0::Array{Float64,2},
-        XX::Markers,Z0::Array{Float64,2},LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
-                Xnul::Array{Float64,2}=ones(1,size(Y0,2)),df_prior=length(λc)+1,
-                Prior::Matrix{Float64}=diagm(ones(df_prior-1)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y::Array{Float64,2},
+        XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
+                Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,
+                Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
-        m=size(Y0,1);
-        q=size(Z0,2);  p=Int(size(XX.X,1)/cross); 
+        
+        q=size(Z,2);  p=Int(size(XX.X,1)/cross); 
 
         ## picking up initial values for parameter estimation under the null hypothesis
-            init=initial(Xnul,Y0,Z0)
+            init=initial(Xnul,Y,Z)
           if (λc!= ones(m))
             if (Prior!= diagm(ones(m)))
-                Z1, Σ1, Ψ =transForm(Tc,Z0,init.Σ,Prior)
+                Z1, Σ1, Ψ =transForm(Tc,Z,init.Σ,Prior)
              else # prior =I 
-                Z1,Σ1 =  transForm(Tc,Z0,init.Σ,true)
+                Z1,Σ1 =  transForm(Tc,Z,init.Σ,true)
                 Ψ =Prior
             end
             
-            Y1= transForm(Tc,Y0,init.Σ) # transform Y only by row (Tc)
+            Y1= transForm(Tc,Y,init.Σ) # transform Y only by row (Tc)
 
            else
-            Z1=Z0; Σ1 = init.Σ
-            Y1=Y0;Ψ = Prior
+            Z1=Z; Σ1 = init.Σ
+            Y1=Y;Ψ = Prior
          end
          if (cross!=1)
             X0=mat2array(cross,XX.X)
@@ -188,11 +188,11 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
 end
 
 #Z=I
-function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::Array{Float64,2},Λg::Union{Array{Float64,2},Array{Float64,1}},λc::Array{Float64,1},Y0::Array{Float64,2},
-        XX::Markers,LOCO::Bool=false;LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y0,2)),df_prior=length(λc)+1,
-        Prior::Matrix{Float64}=diagm(ones(df_prior-1)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::Array{Float64,2},Λg::Union{Array{Float64,2},Array{Float64,1}},λc::Array{Float64,1},Y::Array{Float64,2},
+        XX::Markers,LOCO::Bool=false;LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,
+        Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
-         m=size(Y0,1);
+        #  
          p=Int(size(XX.X,1)/cross);
          
          #check the prior
@@ -200,18 +200,18 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
             println("Error! Plug in a postivie definite Prior!")
          end
         ## picking up initial values for parameter estimation under the null hypothesis
-            init=initial(Xnul,Y0)
+            init=initial(Xnul,Y)
 
          if(λc!= ones(m))
             if (Prior!= diagm(ones(m)))
-                Y1,Σ1,Ψ= transForm(Tc,Y0,init.Σ,Prior) # transform Y only by row (Tc)
+                Y1,Σ1,Ψ= transForm(Tc,Y,init.Σ,Prior) # transform Y only by row (Tc)
             else #prior =I
-                Y1,Σ1 =  transForm(Tc,Y0,init.Σ,true)
+                Y1,Σ1 =  transForm(Tc,Y,init.Σ,true)
                 Ψ =Prior
             end
            else
             Σ1 =init.Σ
-            Y1=Y0;Ψ =Prior
+            Y1=Y;Ψ =Prior
          end
 
          if (cross!=1)
@@ -272,11 +272,11 @@ end
 
 
 ##MVLMM
-function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y0,2)),
-    df_prior=size(Y0,1)+1,Prior::Matrix{Float64}=diagm(ones(df_prior-1)),tdata::Bool=false,LogP::Bool=false,
+function geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+    m=size(Y,1), df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),tdata::Bool=false,LogP::Bool=false,
     itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
-    m=size(Y0,1);
+   
     p=Int(size(XX.X,1)/cross);
 
     #check the prior
@@ -285,7 +285,7 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
      end
 
      #initialization
-       init=initial(Xnul,Y0,false)
+       init=initial(Xnul,Y,false)
         if (cross!=1)
             X0=mat2array(cross,XX.X)
          end
@@ -297,9 +297,9 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
 #                 Xnul_t=Xnul*Tg[:,:,i]';
               @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                 if (cross!=1)
-          @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y0,X0[maridx,:,:],cross)
+          @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,X0[maridx,:,:],cross)
                    else
-           @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y0,XX.X[maridx,:],cross)
+           @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                     est00=nulScan(init,1,Λg[:,i],Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
@@ -314,9 +314,9 @@ function geneScan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Boo
 #             Xnul_t=Xnul*Tg';
              Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
                 if (cross!=1)
-                   Y,X=transForm(Tg,Y0,X0,cross)
+                   Y,X=transForm(Tg,Y,X0,cross)
                    else
-                   Y,X=transForm(Tg,Y0,XX.X,cross)
+                   Y,X=transForm(Tg,Y,XX.X,cross)
                  end
 
 
@@ -345,7 +345,7 @@ end
 
 ## estimating Kc + prior
 function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;m=size(Y,1),
-    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(df_prior-1)),
+    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),
     tdata::Bool=false,LogP::Bool=false,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     
@@ -426,23 +426,23 @@ function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{
 end
 
 #Z=I: estimating Kc + prior
-function gene1Scan(cross::Int64,Tg,Λg,Y0::Array{Float64,2},XX::Markers,LOCO::Bool=false;
-    Xnul::Array{Float64,2}=ones(1,size(Y0,2)),m=size(Y0,1),df_prior=m+1,Prior=diagm(ones(df_prior-1)),
+function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;
+    Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,Prior=diagm(ones(m)),
     tdata::Bool=false,LogP::Bool=false,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     
       p=Int(size(XX.X,1)/cross);
 
     ## picking up initial values for parameter estimation under the null hypothesis
-        init= getKc(Y0; df_prior=df_prior, Prior=Prior,Xnul=Xnul,itol=itol,tol=tol0,ρ=ρ)
+        init= getKc(Y; df_prior=df_prior, Prior=Prior,Xnul=Xnul,itol=itol,tol=tol0,ρ=ρ)
         Tc, λc = K2eig(init.Kc) 
 
         
           if (Prior!= diagm(ones(m)))
-             Y1,Σ1,Ψ= transForm(Tc,Y0,init.Σ,Prior) # transform Y only by row (Tc)
+             Y1,Σ1,Ψ= transForm(Tc,Y,init.Σ,Prior) # transform Y only by row (Tc)
               
            else # prior =I 
-              Y1,Σ1 =  transForm(Tc,Y0,init.Σ,true)
+              Y1,Σ1 =  transForm(Tc,Y,init.Σ,true)
               Ψ =Prior
           end
               
