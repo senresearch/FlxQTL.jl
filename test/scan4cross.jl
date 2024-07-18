@@ -68,6 +68,7 @@ lod3,b3,es3=FlxQTL.geneScan(4,T2,λ2,y,X1)
 @test es3.loglik <=0.0
 
 #permutation
+K1=FlxQTL.getKc(y)
 maxlod, H1perm, cutoff1= FlxQTL.permTest(4,4,K3,K1.Kc,y,X1,Z;pval=[0.05,0.01]);
 @test sum(maxlod.<0.0)==0
 for l=1:2

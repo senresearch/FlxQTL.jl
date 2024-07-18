@@ -208,7 +208,7 @@ struct InitKc
  end
  
 
- 
+
  """
 
     getKc(Y::Array{Float64,2};Z=diagm(ones(m)), df_prior=m+1,
@@ -237,7 +237,7 @@ Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental cov
 # Output
 
 - `InitKc` :  A type of struct of arrays, including pre-estimated `Kc`,`and null estimates of B`, `Σ`,`τ2`used as initial values inside 
-      [`gene1Scan`](@ref) or [`gene2Scan`](@ref).
+     `gene1Scan`, one of [`geneScan`](@ref) functions, or [`gene2Scan`](@ref).
 
 # Examples
 
