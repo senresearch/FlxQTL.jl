@@ -196,9 +196,33 @@ function transForm(Tg::Array{Float64,2},X0,cross::Int64)
     
 end
 
-
-
-
+##########
+#pre-estimate Kc using prior
+struct InitKc
+    Kc::Matrix{Float64} 
+    B::Matrix{Float64}
+    Σ::Matrix{Float64}
+    τ2::Float64
+ end
+ 
+ 
+ function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
+     Prior::Matrix{Float64}=diagm(ones(df_prior-1)),
+     Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
+     
+     if(Z!=diagm(ones(m)))
+         init0=initial(Xnul,Y,Z,false)
+      else #Z0=I
+         init0=initial(Xnul,Y,false)
+      end
+ 
+     est0= nul1Scan(init0,1,Y,Xnul,Z,m,df_prior,Prior;ρ=ρ,itol=itol,tol=tol)
+       τ² =mean(Diagonal(est0.Σ))
+     return InitKc(est0.Vc, est0.B, est0.Σ, τ²)
+ 
+ end
+ 
+###########
 
 
 ##initialize parameters(B,τ2 (or Vc),Σ) (H0:no qtl case)
@@ -215,13 +239,13 @@ Vc::Array{Float64,2}
 Σ::Array{Float64,2}
 end
 
-#initialize parameters after computing Kc
-struct Init1
-B::Array{Float64,2}
-τ2::Float64
-Σ1::Array{Float64,2} #trait-wise transformed
-Kc::Array{Float64,2}
-end
+# #initialize parameters after computing Kc
+# struct Init1
+# B::Array{Float64,2}
+# τ2::Float64
+# Σ1::Array{Float64,2} #trait-wise transformed
+# Kc::Array{Float64,2}
+# end
 
 # including MLMM
 function initial(Xnul,Y0,Z0,incl_τ2::Bool=true)
@@ -278,16 +302,24 @@ function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Z1,Σt,ν₀,Ψ
  
 return nulpar
 end
-#######
-# pre-computed Kc included 
-function nulScan(init::Init1,kmin,λg,λc,Y1,Xnul_t,Z1;ρ=0.001,itol=1e-3,tol=1e-4)
-    
-            B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,init.Σ1,λg,λc;tol=itol)
-            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
-        
-    return nulpar
-    
+#Z=I:including prior
+function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
+ 
+return nulpar
 end
+#######
+# # pre-computed Kc included 
+# function nulScan(init::Init1,kmin,λg,λc,Y1,Xnul_t,Z1;ρ=0.001,itol=1e-3,tol=1e-4)
+    
+#             B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,init.Σ1,λg,λc;tol=itol)
+#             nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
+        
+#     return nulpar
+    
+# end
 ######
 
 #Z=I
@@ -299,30 +331,21 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e
     return nulpar
 end
 
-#including prior
-function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
-
-    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
-    nulpar= NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
-
-return nulpar
-end
-
 
 ##########
-#new version to estimate Kc
-function nulScan1(init::Union{Init1,Init0},kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e-3,tol=1e-4)
+# #new version to estimate Kc
+# function nulScan1(init::Union{Init1,Init0},kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e-3,tol=1e-4)
        
-       if (typeof(init)==Init1)   
-           B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Kc,init.Σ1,λg;tol=itol)
-           nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
-        else #typeof(Init)==Init0)
-           B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Vc,init.Σ,λg;tol=itol)
-           nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
-        end
-       return nulpar
-end
-
+#        if (typeof(init)==Init1)   
+#            B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Kc,init.Σ1,λg;tol=itol)
+#            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
+#         else #typeof(Init)==Init0)
+#            B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Vc,init.Σ,λg;tol=itol)
+#            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
+#         end
+#        return nulpar
+# end
+###########
 #estimate Kc with prior
 function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
        
@@ -330,11 +353,11 @@ function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e
 
     if (Z!=diagm(ones(m)))   
         B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,Z,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
-        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,ν₀,Ψ;tol=tol,ρ=ρ)
-
+        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+        
        else #Z=I
         B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
-        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+        nulpar=NestrvAG(kmin,Y,Xnul,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
      end
     return nulpar
 end

@@ -24,7 +24,7 @@ using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shr
 export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
-using .flxMLMM: geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig,gene1Scan,getKc #,obtainKc,updateKc
+using .flxMLMM: geneScan,gene1Scan,gene2Scan,envScan,permTest,K2eig, K2Eig,getKc #,obtainKc,updateKc
 #selectQTL
 export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, gene1Scan,getKc #,obtainKc,updateKc
 
