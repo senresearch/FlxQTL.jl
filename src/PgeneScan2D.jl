@@ -198,7 +198,7 @@ end
 
 #new version adding estimating Kc inside
 function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;m=size(Y,1),
-    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),
+    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),kmin::Int64=1,
    itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     p=Int(size(XX.X,1)/cross);q=size(Z,2);
