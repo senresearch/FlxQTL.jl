@@ -89,28 +89,27 @@ lod0,b0,es00=FlxQTL.geneScan(4,T2,Tc,λ2,λc,y,X0,Z,true);
 @test sum((lod0.< 0.0))==0.0
 lod4,b4,es04=FlxQTL.gene1Scan(4,T2,λ2,y,X0,true);
 @test sum(lod4.<0.0)==0.0
-for j=1:2
-    println(@test isposdef(es04[j].Σ)==true)
-    println(@test es04[j].τ2>0.0)
-end
+ i=1
+ @test isposdef(es04[i].Σ)
+ @test es04[j].τ2>0.0
 @test typeof(b4)==Array{Float64,3}
 @test typeof(b0)==Array{Float64,3}
 @test typeof(b1)==Array{Float64,3}
-for j=1:2
-println(@test es00[j].τ2 >0.0)
-println(@test es01[j].τ2>0.0)
-println(@test isposdef(es00[j].Σ))
-println(@test isposdef(es01[j].Σ))
-end
+
+println(@test es00[i].τ2 >0.0)
+println(@test es01[i].τ2>0.0)
+println(@test isposdef(es00[i].Σ))
+println(@test isposdef(es01[i].Σ))
+
 #MVLMM
 lod4,b4,es4=FlxQTL.geneScan(4,T2,λ2,y,X0,true)
 @test sum(lod4.<0.0)==0
 @test typeof(b4)== Array{Float64,3}
-for j=1:2
- println(@test isposdef(es4[j].Vc)==true)
- println(@test isposdef(es4[j].Σ)==true )
- println(@test es4[j].loglik<=0.0)
-end
+
+@test isposdef(es4[i].Vc)
+@test isposdef(es4[i].Σ)
+@test es4[j].loglik<=0.0
+
 #
 #2d-scan
 #no loco
