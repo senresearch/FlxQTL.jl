@@ -207,6 +207,8 @@ struct InitKc
     τ2::Float64
  end
  
+
+ 
  """
 
     getKc(Y::Array{Float64,2};Z=diagm(ones(m)), df_prior=m+1,
@@ -248,7 +250,6 @@ julia> K0.B # for B under H0
 
 
 """
-
  function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
      Prior::Matrix{Float64}=diagm(ones(df_prior-1)),
      Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
