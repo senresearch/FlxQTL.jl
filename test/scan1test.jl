@@ -41,7 +41,7 @@ y=[3.0  19.7616   24.1761   15.6778;
 20.0  12.1524    9.46482  10.8092;
 21.0  16.2286    8.80221   8.11992;
 22.0  14.7742    6.47541  15.525]'
-y=Float64.(y)
+y=Float64.(y); m=size(y,1)
 marname=["X1" ;"X2";"X3";"X4"]
 chr=Any[1;1;2;2]
 pos=[1.4;2.0;3.44;4.25]
@@ -57,10 +57,10 @@ for j=1:2
 end
 
 K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,6,XX.X)
-@test isposdef(K)==true
+@test isposdef(K)
 #precompute Kc
 K1= getKc(y)
-Z1=hcat(ones(4),vcat(-ones(2),ones(2)));
+Z1=hcat(ones(m),vcat(-ones(2),ones(2)));
 K0=getKc(y;Z=Z1)
 @test isposdef(K1.Kc)
 @test isposdef(K0.Kc)
@@ -91,7 +91,7 @@ LOD2,B2,est2=FlxQTL.geneScan(1,T,Tc,λ,λc,y,XX,Z);
 @test sum((LOD2.< 0.0))==0
 LOD,B,est=FlxQTL.geneScan(1,T,Tc,λ,λc,y,XX);
 @test sum((LOD.< 0.0))==0
-LOD_1,B_2,est_2=FlxQTL.geneScan(1,T,Matrix(1.0I,3,3),λ,ones(3),y,XX,Z); 
+LOD_1,B_2,est_2=FlxQTL.geneScan(1,T,Matrix(1.0I,m,m),λ,ones(m),y,XX,Z); 
 @test sum((LOD_1.< 0.0))==0
 lod2,b2,est02=gene1Scan(1,T,λ,XX,Z);
 @test sum(lod2.<0.0)==0
@@ -116,7 +116,8 @@ LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,y,XX)
 Q=findall(LOD2.==maximum(LOD2))
 Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
  -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
- -0.749826  -0.327169   0.20022    0.158106   0.993343]
+ -0.749826  -0.327169   0.20022    0.158106   0.993343
+ 1.01404  0.47499  1.76577  -1.65295  1.41504]
 eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,y,XX,Ze)
 @test sum(eLOD.<0.0)==0.0
 @test typeof(eB)==Array{Float64,3}
