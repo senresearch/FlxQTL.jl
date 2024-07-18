@@ -83,7 +83,7 @@ T1,λ1=K2eig(K0.Kc)
 @test typeof(T1)==Array{Float64,2}
 
 #test Z=I vs no Z & loco vs no loco
-Z=Matrix(1.0I,4,4)
+Z=Matrix(1.0I,m,m)
 
 
 #no loco
@@ -93,7 +93,7 @@ LOD,B,est=FlxQTL.geneScan(1,T,Tc,λ,λc,y,XX);
 @test sum((LOD.< 0.0))==0
 LOD_1,B_2,est_2=FlxQTL.geneScan(1,T,Matrix(1.0I,m,m),λ,ones(m),y,XX,Z); 
 @test sum((LOD_1.< 0.0))==0
-lod2,b2,est02=gene1Scan(1,T,λ,XX,Z);
+lod2,b2,est02=gene1Scan(1,T,λ,y,XX,Z);
 @test sum(lod2.<0.0)==0
 @test est02.τ2 >0.0
 @test typeof(b2)==Array{Float64,3}
