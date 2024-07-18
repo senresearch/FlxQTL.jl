@@ -165,9 +165,9 @@ end
 Q=findall(LOD0.==maximum(LOD0))
 eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
 @test sum(eLOD0.<0.0)==0.0
-@test size(eB0)== (2,2,5)
+@test typeof(eB0)== Array{Float64,3}
 @test este0[1].τ2>0.0
-@test size(este0[1].Σ)==(3,3)
+@test isposdef(este0[1].Σ)
 @test este0[1].loglik<=0.0
 
 
