@@ -424,7 +424,7 @@ function obtainKc(T::Array{Float64,2},λ::Array{Float64,1},Y0::Array{Float64,2},
       return est0.Vc, Y, Xnul_t
 end
 
-include("geneScan1.jl")
+# include("geneScan1.jl")
 
 
 

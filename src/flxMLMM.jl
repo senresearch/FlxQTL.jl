@@ -22,7 +22,7 @@ import Statistics: mean, var, quantile
 
 using ..MLM
 
-using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result
+using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result,updateΣ
 
 using ..Util: mat2array,array2mat, Markers, newMarkers,lod2logP
 

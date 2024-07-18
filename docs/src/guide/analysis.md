@@ -159,7 +159,9 @@ third marker, type `B[:,:,3]`.
 
 ## Generating plots
 
+
 The `QTLplot` module is currently unavailable but plotting functions will be replaced with [BigRiverQTLPlots.jl](https://github.com/senresearch/BigRiverQTLPlots.jl) soon.
+
 
 ![arabidopsis](images/arab-lod.png)
 
