@@ -103,8 +103,74 @@ function marker1Scan(m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1,ν₀,Ψ;ρ=0
 
 end
 
-
 ######### actual two genescan versions including prior
+
+"""
+
+
+    geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},
+             LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,
+                Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+    geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::Array{Float64,2},Λg::Union{Array{Float64,2},Array{Float64,1}},
+             λc::Array{Float64,1},Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,
+        Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+    geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+                df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),tdata::Bool=false,LogP::Bool=false,
+               itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+    gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;
+               Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),
+                 tdata::Bool=false,LogP::Bool=false,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)           
+
+
+Implement 1d-genome scan with/without LOCO (Leave One Chromosome Out).  Note that `gene1Scan` includes [`getKc`](@ref) for 
+    precomputing `Kc`-- no need of precomputing and doing eigen-decomposition to `Kc` separately.  The third `geneScan()` is based on a conventional MLMM:
+```math
+vec(Y) \\sim MVN((Z \\otimes X)vec(B) (or XBZ'),  K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2),
+```
+where `K` is a genetic kinship,
+``\\Sigma_1, \\Sigma_2`` are covariance matrices for
+random and error terms, respectively.  `Z` can be replaced with an identity matrix.
+
+# Arguments
+
+- `cross` : An integer indicating the number of alleles or genotypes. Ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+          This value is related to degree of freedom when doing genome scan.
+- `Tg` : A n x n matrix of eigenvectors from [`K2eig`](@ref), or [`K2Eig`](@ref).
+       Returns 3d-array of eigenvectors as many as Chromosomes if `LOCO` is true.
+- `Tc` : A m x m matrix of eigenvectors from climatic relatedness matrix.
+- `Λg` : A n x 1 vector of eigenvalues from kinship. Returns a matrix of eigenvalues if `LOCO` is true.
+- `λc` : A m x 1 vector of eigenvalues from climatic relatedness matrix. Use `ones(m)` for no climatic information added.
+- `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
+        i.e. `Y0[1,:]` (a vector) ->`Y[[1],:]` (a matrix) .
+- `XX` : A type of [`Markers`](@ref).
+- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
+      If nothing to insert in `Z`, just exclude it or insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates.
+- `LOCO` : Boolean. Default is `false` (no LOCO). Runs genome scan using LOCO (Leave One Chromosome Out).
+
+## Keyword Arguments
+
+- `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
+- `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
+           ``I_m`` (non-informative prior) is default.
+- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (non-informative) is default.
+- `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
+- `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
+- `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
+- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
+- `LogP` : Boolean. Default is `false`.  Returns ``-\\log_{10}{P}`` instead of LOD scores if `true`.
+
+!!! Note
+- When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not,
+    can reduce both `tol0` and `tol` to `1e-4` or further.
+
+
+# Output
+
+- `LODs` (or `logP`) : LOD scores. Can change to ``- \\log_{10}{P}`` in [`lod2logP`](@ref) if `LogP = true`.
+- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` : `Xnul= [ones(1,size(Y0)); Covariates]`,
+        ex. For sex covariates in 4-way cross analysis, B[:,2,100], B[:,3:5,100] are effects for sex, the rest genotypes of the 100th QTL, respectively.
+- `est0` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL.
+"""
 function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y::Array{Float64,2},
         XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
                 Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,

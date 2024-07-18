@@ -198,6 +198,8 @@ end
 
 ##########
 #pre-estimate Kc using prior
+
+
 struct InitKc
     Kc::Matrix{Float64} 
     B::Matrix{Float64}
@@ -205,7 +207,48 @@ struct InitKc
     τ2::Float64
  end
  
- 
+ """
+
+    getKc(Y::Array{Float64,2};Z=diagm(ones(m)), df_prior=m+1,
+           Prior::Matrix{Float64}=diagm(ones(df_prior-1)),Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+           itol=1e-2,tol::Float64=1e-3,ρ=0.001)
+
+Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental covariates under `H0: no QTL`.
+
+# Argument
+
+- `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
+        i.e. `Y0[1,:]` (a vector) ->`Y[[1],:]` (a matrix) .
+
+## Keyword Arguments
+
+- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
+        An identity matrix, ``I_m``, is default. 
+- `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
+- `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
+           ``I_m`` (non-informative prior) is default.
+- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (non-informative) is default.
+- `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
+- `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
+- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
+
+# Output
+
+- `InitKc` :  A type of struct of arrays, including pre-estimated `Kc`,`and null estimates of B`, `Σ`,`τ2`used as initial values inside 
+      [`gene1Scan`](@ref) or [`gene2Scan`](@ref).
+
+# Examples
+
+```
+julia> K0 = getKc(Y)  
+julia> K0.Kc  # for Kc
+julia> K0.B # for B under H0
+
+```
+
+
+"""
+
  function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
      Prior::Matrix{Float64}=diagm(ones(df_prior-1)),
      Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
