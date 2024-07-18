@@ -91,7 +91,7 @@ lod4,b4,es04=FlxQTL.gene1Scan(4,T2,λ2,y,X0,true);
 @test sum(lod4.<0.0)==0.0
  i=1
  @test isposdef(es04[i].Σ)
- @test es04[j].τ2>0.0
+ @test es04[i].τ2>0.0
 @test typeof(b4)==Array{Float64,3}
 @test typeof(b0)==Array{Float64,3}
 @test typeof(b1)==Array{Float64,3}
@@ -108,7 +108,7 @@ lod4,b4,es4=FlxQTL.geneScan(4,T2,λ2,y,X0,true)
 
 @test isposdef(es4[i].Vc)
 @test isposdef(es4[i].Σ)
-@test es4[j].loglik<=0.0
+@test es4[i].loglik<=0.0
 
 #
 #2d-scan
