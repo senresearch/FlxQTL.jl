@@ -208,14 +208,14 @@ function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{
      init= getKc(Y;Z=Z, df_prior=df_prior, Prior=Prior,Xnul=Xnul,itol=itol,tol=tol0,ρ=ρ)
      Tc, λc = K2eig(init.Kc) 
 
-       
      if (Prior!= diagm(ones(m)))
-        Y1,Σ1,Ψ= transForm(Tc,Y,init.Σ,Prior) # transform Y only by row (Tc)
-         
-      else # prior =I 
-         Y1,Σ1 =  transForm(Tc,Y,init.Σ,true)
-         Ψ =Prior
-     end
+        Z1, Σ1, Ψ =transForm(Tc,Z,init.Σ,Prior)
+       else # prior =I 
+          Z1,Σ1 =  transForm(Tc,Z,init.Σ,true)
+          Ψ =Prior
+      end
+      
+      Y1= transForm(Tc,Y,init.Σ) # transform Y only by row (Tc)
              
          if (cross!=1)
             X0=mat2array(cross,XX.X)
@@ -244,11 +244,12 @@ function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{
           else
           Y1,X1=transForm(Tg,Y1,XX.X,cross)
         end
-                est0=nulScan(init,kmin,Λg,λc,Y2,Xnul_t,Z1,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ) 
+                est0=nulScan(init,kmin,Λg,λc,Y1,Xnul_t,Z1,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ) 
             
              for i=1:nChr
             maridx=findall(XX.chr.==Chr[i])
-            marker2Scan!(LODs,maridx,q,kmin,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1;tol0=tol0,tol1=tol,ρ=ρ)
+            marker2Scan!(LODs,maridx,q,kmin,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+
              end
     end
     
