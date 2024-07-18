@@ -3,7 +3,7 @@ include("transformation.jl")
 # include("geneScan2D.jl")
 include("PgeneScan1D.jl")
 include("PgeneScan2D.jl")
-include("permutationTest.jl")
+include("PpermutationTest.jl")
 include("envScan.jl")
 
 

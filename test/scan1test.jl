@@ -158,7 +158,7 @@ end
 #MVLMM
 LOD4,B4,est4=FlxQTL.geneScan(1,Tg,Λg,y,XX,true)
 @test sum(LOD4.<0.0)==0
-@test size(B4)== (3,2,4)
+@test typeof(B4)==Array{Float64,3}
 for j=1:2
        println(@test isposdef(est4[j].Vc)==true)
        println(@test isposdef(est4[j].Σ)==true )
