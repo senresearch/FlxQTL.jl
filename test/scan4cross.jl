@@ -40,10 +40,15 @@ chr0=Any[1;1;1]
 X0=Markers(mname,chr0,pos1,gpr')
 
 #no loco
-lod2,b2,es2=FlxQTL.geneScan(4,T2,Tc,λ2,λc,pheno,X1,Z);
+lod2,b2,es2=FlxQTL.geneScan(4,T2,Tc,λ2,λc,pheno,X1,Matrix(1.0I,3,3));
 @test sum((lod2.< 0.0))==0
 lod,b,es=FlxQTL.geneScan(4,T2,Tc,λ2,λc,pheno,X1);
 @test sum((lod2.< 0.0))==0
+lod1,b1,es1=FlxQTL.gene1Scan(4,T2,λ2,pheno,X1);
+@test sum(lod1.<0.0)==0.0
+@test typeof(b1)==Array{Float64,3}
+@test isposdef(es1.Σ)
+@test es1.τ2>0.0
 
 @test lod ≈ lod2
 @test b ≈ b2
@@ -54,9 +59,9 @@ lod,b,es=FlxQTL.geneScan(4,T2,Tc,λ2,λc,pheno,X1);
 #MVLMM
 lod3,b3,es3=FlxQTL.geneScan(4,T2,λ2,pheno,X1)
 @test sum((lod3.< 0.0))==0
-@test size(b3)== (3,4,3)
-@test size(es3.Vc) == (3,3)
-@test size(es3.Σ)==(3,3)
+@test typeof(b3)== Array{Float64,3}
+@test isposdef(es3.Vc) 
+@test isposdef(es3.Σ)
 @test es3.loglik <=0.0
 
 #permutation
@@ -78,35 +83,42 @@ lod1,b1,es01=FlxQTL.geneScan(4,T2,Tc,λ2,λc,pheno,X0,true);
 @test sum((lod1.< 0.0))==0.0
 lod0,b0,es00=FlxQTL.geneScan(4,T2,Tc,λ2,λc,pheno,X0,Z,true);
 @test sum((lod0.< 0.0))==0.0
+lod4,b4,es04=FlxQTL.gene1Scan(4,T2,λ2,pheno,X0,true);
+@test sum(lod4.<0.0)==0.0
+for j=1:2
+    println(@test isposdef(es04[j].Σ)==true)
+    println(@test es04[j].τ2>0.0)
+end
+@test typeof(b4)==Array{Float64,3}
 
 @test lod0 ≈ lod1
 @test b0 ≈ b1
-j=1
+for j=1:2
 println(@test es00[j].τ2 ≈ es01[j].τ2)
 println(@test es00[j].Σ ≈ es01[j].Σ)
 println(@test es00[j].loglik ≈ es01[j].loglik)
-
+end
 #MVLMM
 lod4,b4,es4=FlxQTL.geneScan(4,T2,λ2,pheno,X0,true)
 @test sum(lod4.<0.0)==0
-@test size(b4)== (3,4,3)
-
- println(@test size(es4[j].Vc) ==(3,3))
- println(@test size(es4[j].Σ)== (3,3) )
+@test typeof(b4)== Array{Float64,3}
+for j=1:2
+ println(@test isposdef(es4[j].Vc)==true)
+ println(@test isposdef(es4[j].Σ)==true )
  println(@test es4[j].loglik<=0.0)
-
+end
 #
 #2d-scan
 #no loco
  lod2d,es2d=FlxQTL.gene2Scan(4,T2,Tc,λ2,λc,pheno,X1,Z);
 @test sum(lod2d.<0.0)==0
 @test es2d.τ2 >0.0
-@test size(es2d.Σ)== (3,3)
+@test isposdef(es2d.Σ)
 @test es2d.loglik <=0.0
 
 #MVLMM
 lod2d0,es2d0=FlxQTL.gene2Scan(4,T2,λ2,pheno,X1)
 @test sum(lod2d0.<0.0)==0
-@test size(es2d0.Vc)==(3,3)
-@test size(es2d0.Σ)== (3,3)
+@test isposdef(es2d0.Vc)
+@test isposdef(es2d0.Σ)
 @test es2d0.loglik <=0.0
