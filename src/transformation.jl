@@ -211,8 +211,8 @@ struct InitKc
 
  """
 
-    getKc(Y::Array{Float64,2};Z=diagm(ones(m)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(df_prior-1)),
-           df_Rprior=m+1,Rprior::Matrix{Float64}=diagm(ones(df_prior-1)),Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+    getKc(Y::Array{Float64,2};Z=diagm(ones(m)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2),
+           df_Rprior=m+1,Rprior::Matrix{Float64}=diagm(ones(m)),Xnul::Array{Float64,2}=ones(1,size(Y,2)),
            itol=1e-2,tol::Float64=1e-3)
 
 Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental covariates under `H0: no QTL`.
@@ -229,10 +229,10 @@ Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental cov
 - `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
 - `df_prior`: degrees of freedom, ``\\nu_0`` of Inverse-Wishart prior distributon for the residual error matrix.  `m+1` (non-informative) is default.
 - `Prior`: A positive definite scale matrix, ``\\Psi``, of Inverse-Wishart prior distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
-           ``I_m`` (non-informative prior) is default.
+           ``cov(Y,dims=2)`` (empirical scale matrix) is default.
 - `df_Rprior`: degrees of freedom, ``\\nu`` of Inverse-Wishart prior distributon for the random effect matrix.  `m+1` (non-informative) is default.
 - `Rprior`: A positive definite scale matrix, ``\\Psi_0``, of Inverse-Wishart prior distributon, i.e. ``\\Sigma_1 \\sim W^{-1}_m (\\Psi_0, \\nu)``.  
-           ``I_m`` (non-informative prior) is default.
+           ``I_m`` (for non-informative prior) is default.
 
 - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
@@ -255,7 +255,7 @@ julia> K0.B # for B under H0
 
 """
  function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
-     Prior::Matrix{Float64}=diagm(ones(df_prior-1)),df_Rprior=m+1,Rprior=diagm(ones(df_Rprior-1)),
+     Prior::Matrix{Float64}=cov(Y,dims=2),df_Rprior=m+1,Rprior=diagm(ones(m)),
      Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3)
      
      if(Z!=diagm(ones(m)))

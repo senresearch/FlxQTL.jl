@@ -245,7 +245,7 @@ function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Floa
 #MVLMM
 #fullECM : update all parameters
 #Z=I
-function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B,Vc::Array{Float64,2},Σ,λg,m,n,ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64})
+function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B,Vc::Array{Float64,2},Σ,λg,m,n,ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2})
 
           eStep!(Ghat,Θ,Y,X,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,symXs,Ghat,Θ,λg,m)
@@ -256,7 +256,7 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B,Vc::Array{Float64,2},Σ,λg
 
 end
 
-function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B::Array{Float64,2},Vc::Array{Float64,2},Σ,λg,m,n,ν₀,Ψ::Array{Float64},ν,Ψ₀::Array{Float64})
+function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B::Array{Float64,2},Vc::Array{Float64,2},Σ,λg,m,n,ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2})
 
           eStep!(Ghat,Θ,Y,X,Z,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,Z,symXs,Ghat,Θ,Σ,λg,m)
@@ -269,7 +269,7 @@ end
 
 #Z=I
 function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64};tol::Float64=1e-4)
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64=1e-4)
 
     symXs=fixX(X)
     m,n = size(Y);p=size(X,1)
@@ -292,7 +292,7 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
 end
 
 function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64};tol::Float64=1e-4)
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64=1e-4)
 
     symXs=fixX(X)
     m,n = size(Y);p=size(X,1);q=size(Z,2);
@@ -316,7 +316,7 @@ end
 
 #Z=I
 function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64};tol::Float64)
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64)
 
       m,n =size(Y);p=size(X,1);
       symXs = fixX(X)
@@ -359,7 +359,7 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{
 end
 
 function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64};tol::Float64)
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64)
 
       m,n =size(Y);p=size(X,1);q=size(Z,2)
       symXs = fixX(X)
@@ -404,7 +404,7 @@ end
 
 #Z=I
 function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64};tol::Float64)
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64)
 
              if(lod0>0.0)
              result=  NestrvAG(kmin,Y,X,B0,Vc,Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
@@ -422,7 +422,7 @@ end
 
 
 function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::Array{Float64,2},
-        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64};tol::Float64)
+        Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64)
 
              if(lod0>0.0)
              result=  NestrvAG(kmin,Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
