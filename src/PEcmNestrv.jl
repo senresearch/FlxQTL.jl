@@ -10,7 +10,7 @@
 #loglik0 : loglikelihood value by estimated parameters
 
 function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::Array{Float64,2},
-        τ2_0::Float64,Σ::Array{Float64,2},λg::Array{Float64,1},λc::Array{Float64,1},ν₀,Ψ::Array{Float64,2};tol::Float64=1e-4)
+        τ2_0::Float64,Σ::Array{Float64,2},λg::Array{Float64,1},λc::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ρ,τ₀::Float64;tol::Float64=1e-4)
 
     symXs=fixX(X)
     m,n = size(Y);q=size(Z,2);p=size(X,1)
@@ -20,7 +20,7 @@ function ecmLMM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::
     B_cur=B0;τ2_cur=τ2_0;Σ_cur=Σ;loglik0=0.0;tol=tol
     crit=1.0;
     while (crit >=tol)
-         B_new,τ2_new,Σ_new,loglik1=fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B_cur,τ2_cur,Σ_cur,λg,λc,m,n,ν₀,Ψ)
+         B_new,τ2_new,Σ_new,loglik1=fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B_cur,τ2_cur,Σ_cur,λg,λc,m,n,ν₀,Ψ,ρ,τ₀)
 #          crit=norm(Σ_new-Σ_cur)+abs(τ2_new-τ2_cur)+norm(B_new-B_cur)
          crit=abs(loglik1-loglik0)
          B_cur=B_new;τ2_cur=τ2_new;Σ_cur=Σ_new;loglik0=loglik1;
