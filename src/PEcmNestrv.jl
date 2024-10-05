@@ -249,7 +249,7 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B,Vc::Array{Float64,2},Σ,λg
 
           eStep!(Ghat,Θ,Y,X,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,symXs,Ghat,Θ,λg,m)
-          Vc_new=updateΣ(Vg,ψ₀,ν,m,n); Σ_new=updateΣ(Ve,Ψ,ν₀,m,n)
+          Vc_new=updateΣ(Vg,Ψ₀,ν,m,n); Σ_new=updateΣ(Ve,Ψ,ν₀,m,n)
           loglik1=Loglik(dev,Σ_new,Vc_new,λg,m)
 
     return B_new,Vc_new,Σ_new,loglik1
@@ -260,7 +260,7 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B::Array{Float64,2},Vc::Arr
 
           eStep!(Ghat,Θ,Y,X,Z,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,Z,symXs,Ghat,Θ,Σ,λg,m)
-          Vc_new=updateΣ(Vg,ψ₀,ν,m,n); Σ_new=updateΣ(Ve,Ψ,ν₀,m,n)
+          Vc_new=updateΣ(Vg,Ψ₀,ν,m,n); Σ_new=updateΣ(Ve,Ψ,ν₀,m,n)
           loglik1=Loglik(dev,Σ_new,Vc_new,λg,m)
 
     return B_new,Vc_new,Σ_new,loglik1
@@ -425,10 +425,10 @@ function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Floa
         Vc::Array{Float64,2},Σ::Array{Float64,2},λg::Array{Float64,1},ν₀,Ψ::Array{Float64,2},ν,Ψ₀::Array{Float64,2};tol::Float64)
 
              if(lod0>0.0)
-             result=  NestrvAG(kmin,Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
+             result=  NestrvAG(kmin,Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
                 else #keep running ecmLMM
-              B0,Vc,Σ,loglik0 = ecmLMM(Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
-              result=  NestrvAG(kmin,Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
+              B0,Vc,Σ,loglik0 = ecmLMM(Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
+              result=  NestrvAG(kmin,Y,X,Z,B0,Vc,Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
              end
              
       return result
