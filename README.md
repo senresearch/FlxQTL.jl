@@ -5,7 +5,6 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://senresearch.github.io/FlxQTL.jl/stable)
 [![CI](https://github.com/senresearch/FlxQTL.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/senresearch/FlxQTL.jl/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/senresearch/FlxQTL.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/senresearch/FlxQTL.jl)
-<!-- [![codecov](https://codecov.io/gh/hkim89/FlxQTL.jl/branch/master/graph/badge.svg?token=wNYkIkfRx1)](https://codecov.io/gh/hkim89/FlxQTL.jl) -->
 
 *FlxQTL.jl* is a package for a multivariate linear mixed model based
 QTL analysis tool that supports incorporating information from trait
@@ -15,9 +14,9 @@ multivariate genome scans, visualization of genome scans, support for
 LOCO (leave-one-chromosome-out), computation of kinship matrices, and
 support for distributed computing.
 
-![1D Genome Scan](image/ex1.png)
+![1D Genome Scan](images/ex1.png)
 
-![2D Genome Scan](image/ex2.jpg)
+![2D Genome Scan](images/ex2.jpg)
 
 The package is written in [Julia](https://www.julialang.org) and
 includes extensive

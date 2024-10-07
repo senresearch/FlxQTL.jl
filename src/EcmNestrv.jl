@@ -221,14 +221,14 @@ function cmStep!(Bnew::Array{Float64,2},dev::Array{Float64,2},Vg::Array{Float64,
            Λc= Diagonal(1.0./λc)
          @fastmath @inbounds @views for i in eachindex(λg)
            Ve[:,:,i]=Θ[i]
-           Vg[i]=tr(LinearAlgebra.lmul!(Λc,Float64.(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))))/(λg[i]*m)
+           Vg[i]=tr(LinearAlgebra.lmul!(Λc,Float64.(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))))/λg[i]
            Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Ve[:,:,i]))
                   end
        else
          @fastmath @inbounds @views for i in eachindex(λg)
-         Ve[:,:,i]=Θ[i]
-         Vg[i]=tr(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))/(λg[i]*m)
-         Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Ve[:,:,i]))
+        #  Ve[:,:,i]=Θ[i]
+         Vg[i]=tr(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))/λg[i]
+         Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Θ[i]))
                  end
     end
 
@@ -246,15 +246,15 @@ function cmStep!(Bnew::Array{Float64,2},dev::Array{Float64,2},Vg::Array{Float64,
     if(λc!= ones(m))
          Λc= Diagonal(1.0./λc)
          @fastmath @inbounds @views for i in eachindex(λg)
-               Ve[:,:,i]=Θ[i]
-               Vg[i]=tr(LinearAlgebra.lmul!(Λc,Float64.(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))))/(λg[i]*m)
-               Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Ve[:,:,i]))
+            #    Ve[:,:,i]=Θ[i]
+               Vg[i]=tr(LinearAlgebra.lmul!(Λc,Float64.(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))))/λg[i]
+               Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Θ[i]))
                         end
          else
            @fastmath @inbounds @views for i in eachindex(λg)
-              Ve[:,:,i]=Θ[i]
-              Vg[i]=tr(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))/(λg[i]*m)
-              Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Ve[:,:,i]))
+            #   Ve[:,:,i]=Θ[i]
+              Vg[i]=tr(Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i])))/λg[i]
+              Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Θ[i]))
                       end
       end
 
@@ -297,9 +297,9 @@ function cmStep!(Bnew::Array{Float64,2},dev::Array{Float64,2},Vg::Array{Float64,
      Ehat=dev-Ghat
 
      @fastmath @inbounds @views for i in eachindex(λg)
-        Ve[:,:,i]=Θ[i]
+        # Ve[:,:,i]=Θ[i]
         Vg[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i]))/λg[i]
-        Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Ve[:,:,i]))
+        Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Θ[i]))
 
     end
 
@@ -318,9 +318,9 @@ function cmStep!(Bnew::Array{Float64,2},dev::Array{Float64,2},Vg::Array{Float64,
      Ehat=dev-Ghat
 
      @fastmath @inbounds @views for i in eachindex(λg)
-        Ve[:,:,i]=Θ[i]
+        # Ve[:,:,i]=Θ[i]
         Vg[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ghat[:,i],Θ[i]))/λg[i]
-        Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Ve[:,:,i]))
+        Ve[:,:,i]=Symmetric(BLAS.syr!('U',1.0,Ehat[:,i],Θ[i]))
 
     end
 
@@ -846,6 +846,6 @@ end
 
 
 
-
+include("PEcmNestrv.jl")
 
 end

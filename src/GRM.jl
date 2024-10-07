@@ -242,7 +242,7 @@ This function runs faster by CPU parallelization.  Add workers/processes using `
 # Example
 
 ```julia
-julia> using flxQTL
+julia> using FlxQTL
 julia> addprocs(8)
 julia> K = shinkage(kinshipMan,20,myGeno)
 ```
