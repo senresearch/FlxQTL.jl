@@ -249,10 +249,10 @@ function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Boo
                  end
 
 
-             est0=nulScan(init,kmin,Λg,Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
+             est0=nulScan(init,kmin,Λg,Y,Xnul_t,df_prior,Prior,df_Rprior,Rprior;itol=itol,tol=tol)
         for i=1:nChr
             maridx=findall(XX.chr.==Chr[i])
-            marker2Scan!(LODs,maridx,m,kmin,cross,est0,Λg,Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
+            marker2Scan!(LODs,maridx,m,kmin,cross,est0,Λg,Y,Xnul_t,X,df_prior,Prior,df_Rprior,Rprior;tol0=tol0,tol1=tol)
         end
 
         end #LOCO
