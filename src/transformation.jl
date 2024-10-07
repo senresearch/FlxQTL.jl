@@ -383,17 +383,17 @@ end
 
 ###########
 #estimate Kc with prior
-function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ,ν,ψ₀;itol=1e-3,tol=1e-4)
+function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ,ν,Ψ₀;itol=1e-3,tol=1e-4)
        
       n=size(Y,2); λg=ones(n)
 
     if (Z!=diagm(ones(m)))   
         B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,Z,init.B,init.Vc,init.Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=itol)
-        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
+        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
         
        else #Z=I
-        B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,init.B,init.Vc,init.Σ,λg,ν₀,Ψ,ν,ψ₀;tol=itol)
-        nulpar=NestrvAG(kmin,Y,Xnul,B0,Kc_0,Σ1,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
+        B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,init.B,init.Vc,init.Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=itol)
+        nulpar=NestrvAG(kmin,Y,Xnul,B0,Kc_0,Σ1,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
      end
     return nulpar
 end
@@ -410,10 +410,10 @@ function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
 end
 
 #including prior
-function nulScan(init::Init0,kmin,λg,Y1,Xnul_t,ν₀,Ψ,ν,ψ₀;itol=1e-3,tol=1e-4)
+function nulScan(init::Init0,kmin,λg,Y1,Xnul_t,ν₀,Ψ,ν,Ψ₀;itol=1e-3,tol=1e-4)
 
-        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg,ν₀,Ψ,ν,ψ₀;tol=itol)
-        nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg,ν₀,Ψ,ν,ψ₀;tol=tol)
+        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg,ν₀,Ψ,ν,Ψ₀;tol=itol)
+        nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg,ν₀,Ψ,ν,Ψ₀;tol=tol)
 
        return nulpar
 end
