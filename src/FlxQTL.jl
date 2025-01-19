@@ -24,9 +24,9 @@ using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shr
 export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
-using .flxMLMM: geneScan,gene1Scan,gene2Scan,envScan,permTest,K2eig, K2Eig,getKc #,obtainKc,updateKc
+using .flxMLMM: geneScan,gene1Scan,gene2Scan,envScan,permTest,K2eig, K2Eig,getKc 
 #selectQTL
-export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, gene1Scan,getKc #,obtainKc,updateKc
+export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, gene1Scan,getKc 
 
 using .Util:setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
 export setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
@@ -39,10 +39,3 @@ end
 
 
 
-# module flxQTL
-
-# using Random
-
-# greet()= print("Hello ", Random.randstring(8))
-
-# end

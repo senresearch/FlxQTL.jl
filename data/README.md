@@ -12,11 +12,11 @@ imputed for missing values and named as `Arabidopsis_fitness.csv`  in this folde
 
 **Genotype data:**
 The genotypes have 699 markers across 5 Chromosomes after adding pseudo markers, labelled `a(=1)`, `b(=2)` as Italian parent, Swedish parent, 
-respectively, and named as `Arabidopsis_genotypes.csv` for 1D genome scan.
+respectively, and named as `Arabidopsis_genotypes.csv` for 1D genome scan, and an additional genotype data of 398 markers for 2D genome scan is `Arabidopsis_genotypes_2d.csv`.
 
 **Genetic marker information data:**
-This auxilliary data is genetic marker information consisting of marker names, chromosome, and marker position (cM) in this order, and named as 
-`Arabidopsis_markerinfo_1d.csv`.
+This auxilliary data sets are genetic marker information consisting of marker names, chromosome, and marker position (cM) in this order and are named as 
+`Arabidopsis_markerinfo_1d.csv` and `Arabidopsis_markerinfo_2d.csv` for 1D and 2D scans, respectively.
 
 
 

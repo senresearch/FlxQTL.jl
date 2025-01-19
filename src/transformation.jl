@@ -211,8 +211,8 @@ struct InitKc
 
  """
 
-    getKc(Y::Array{Float64,2};Z=diagm(ones(m)), df_prior=m+1,
-           Prior::Matrix{Float64}=diagm(ones(df_prior-1)),Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+    getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
+           Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul::Array{Float64,2}=ones(1,size(Y,2)),
            itol=1e-2,tol::Float64=1e-3,ρ=0.001)
 
 Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental covariates under `H0: no QTL`.
@@ -228,8 +228,8 @@ Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental cov
         An identity matrix, ``I_m``, is default. 
 - `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
 - `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
-           ``I_m`` (non-informative prior) is default.
-- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (non-informative) is default.
+           A large scaled covariance matrix (a weakly informative prior) is default.
+- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
 - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
 - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
@@ -251,7 +251,7 @@ julia> K0.B # for B under H0
 
 """
  function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
-     Prior::Matrix{Float64}=diagm(ones(df_prior-1)),
+     Prior::Matrix{Float64}=cov(Y,dims=2)*5,
      Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
      
      if(Z!=diagm(ones(m)))
@@ -283,13 +283,6 @@ Vc::Array{Float64,2}
 Σ::Array{Float64,2}
 end
 
-# #initialize parameters after computing Kc
-# struct Init1
-# B::Array{Float64,2}
-# τ2::Float64
-# Σ1::Array{Float64,2} #trait-wise transformed
-# Kc::Array{Float64,2}
-# end
 
 # including MLMM
 function initial(Xnul,Y0,Z0,incl_τ2::Bool=true)
@@ -354,17 +347,7 @@ function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ
  
 return nulpar
 end
-#######
-# # pre-computed Kc included 
-# function nulScan(init::Init1,kmin,λg,λc,Y1,Xnul_t,Z1;ρ=0.001,itol=1e-3,tol=1e-4)
-    
-#             B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,init.Σ1,λg,λc;tol=itol)
-#             nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
-        
-#     return nulpar
-    
-# end
-######
+
 
 #Z=I
 function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e-4)
@@ -376,20 +359,7 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e
 end
 
 
-##########
-# #new version to estimate Kc
-# function nulScan1(init::Union{Init1,Init0},kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e-3,tol=1e-4)
-       
-#        if (typeof(init)==Init1)   
-#            B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Kc,init.Σ1,λg;tol=itol)
-#            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
-#         else #typeof(Init)==Init0)
-#            B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Vc,init.Σ,λg;tol=itol)
-#            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
-#         end
-#        return nulpar
-# end
-###########
+
 #estimate Kc with prior
 function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
        

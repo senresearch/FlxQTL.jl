@@ -109,16 +109,16 @@ end
 
 
     geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},
-             LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,
-                Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+             LOCO::Bool=false;m=size(Y,1),tdata::Bool=false,LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,
+                Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
     geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::Array{Float64,2},Λg::Union{Array{Float64,2},Array{Float64,1}},
-             λc::Array{Float64,1},Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,
-        Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
-    geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y,2)),
-                df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),tdata::Bool=false,LogP::Bool=false,
+             λc::Array{Float64,1},Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;m=size(Y,1),LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,
+        Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+    geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;m=size(Y,1),Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+                df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,tdata::Bool=false,LogP::Bool=false,
                itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
-    gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;
-               Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),
+    gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;m=size(Y,1),
+               Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,
                  tdata::Bool=false,LogP::Bool=false,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)           
 
 
@@ -151,8 +151,8 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 - `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
 - `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
-           ``I_m`` (non-informative prior) is default.
-- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (non-informative) is default.
+           A large scaled covariance matrix (a weakly informative prior) is default.
+- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
 - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` :  A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
@@ -174,7 +174,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y::Array{Float64,2},
         XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;tdata::Bool=false,LogP::Bool=false,
                 Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,
-                Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+                Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
         
         q=size(Z,2);  p=Int(size(XX.X,1)/cross); 
@@ -256,7 +256,7 @@ end
 #Z=I
 function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::Array{Float64,2},Λg::Union{Array{Float64,2},Array{Float64,1}},λc::Array{Float64,1},Y::Array{Float64,2},
         XX::Markers,LOCO::Bool=false;LogP::Bool=false,Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,
-        Prior::Matrix{Float64}=diagm(ones(m)),itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+        Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
         #  
          p=Int(size(XX.X,1)/cross);
@@ -339,7 +339,7 @@ end
 
 ##MVLMM
 function geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y,2)),
-    m=size(Y,1), df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),tdata::Bool=false,LogP::Bool=false,
+    m=size(Y,1), df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,tdata::Bool=false,LogP::Bool=false,
     itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
    
@@ -411,7 +411,7 @@ end
 
 ## estimating Kc + prior
 function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;m=size(Y,1),
-    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=diagm(ones(m)),
+    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,
     tdata::Bool=false,LogP::Bool=false,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     
@@ -493,7 +493,7 @@ end
 
 #Z=I: estimating Kc + prior
 function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;
-    Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,Prior=diagm(ones(m)),
+    Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,Prior=cov(Y,dims=2)*5,
     tdata::Bool=false,LogP::Bool=false,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     
