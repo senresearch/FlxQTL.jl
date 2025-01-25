@@ -177,7 +177,7 @@ eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
 
 #2d-scan
 #no loco
- LOD2d,est2d=FlxQTL.gene2Scan(1,T,Tc,λ,λc,y,XX,Z1);
+ LOD2d,est2d=FlxQTL.gene2Scan(1,T,Tc,λ,λc,y,XX;Z=Z1);
 @test sum(LOD2d.<0.0)==0
 @test est2d.τ2 >0.0
 @test isposdef(est2d.Σ)
@@ -191,7 +191,7 @@ LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,y,XX)
 @test est2d0.loglik <=0.0
 
 #loco
- LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Tc,Λg,λc,y,XX,Z1,true);
+ LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Tc,Λg,λc,y,XX,true;Z=Z1);
 @test sum(LOD2d1.<0.0)==0
 for j=1:2
        println(@test est2d1[j].τ2 >0.0)
@@ -199,13 +199,13 @@ for j=1:2
        println(@test est2d1[j].loglik<=0.0)
 end
 #new function including getKc
-LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,y,XX,Z1)
+LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,y,XX;Z=Z1)
 @test sum(LOD2d0.<0.0)==0
 @test isposdef(est2d0.τ2>0.0)
 @test isposdef(est2d0.Σ)
 @test est2d0.loglik <=0.0
 
-LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Λg,y,XX,Z1,true)
+LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Λg,y,XX,true;Z=Z1)
 @test sum(LOD2d1.<0.0)==0
 for j=1:2
        println(@test est2d1[j].τ2 >0.0)
@@ -224,7 +224,7 @@ end
 
 
 #permutation
-maxLODs, H1par_perm, cutoff= FlxQTL.permTest(4,1,K,K0.Kc,y,XX,Z;pval=[0.05,0.01]);
+maxLODs, H1par_perm, cutoff= FlxQTL.permTest(4,1,K,K0.Kc,y,XX;Z=Z,pval=[0.05,0.01]);
 @test sum(maxLODs.<0.0)==0
 for j=1:2
 println(@test isless(0.0,cutoff[j]))
