@@ -81,9 +81,9 @@ end
 """
 
     gene2Scan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},Y::Array{Float64,2},
-             XX::Markers,LOCO::Bool=false;ρ=0.001,Xnul::Array{Float64,2}=ones(1,size(Y,2)), Z::Array{Float64,2}=diagm(ones(m)),
+             XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;ρ=0.001,Xnul::Array{Float64,2}=ones(1,size(Y,2)), 
              df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-4,tol0=1e-3,tol::Float64=1e-4)
-    gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;Z::Array{Float64,2}=diagm(ones(m)),
+    gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;
                Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,
                itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
     gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;Xnul::Array{Float64,2}=ones(1,size(Y,2)),
@@ -92,7 +92,7 @@ end
 
 
 Implement 2d-genome scan with/without LOCO (Leave One Chromosome Out). Note that the second `gene2Scan` includes [`getKc`](@ref) for 
-    precomputing `Kc`-- no need of precomputing and doing eigen-decomposition to `Kc` separately.  The last `gene2Scan()` is based on a conventional MLMM:
+    precomputing `Kc`-- no need of precomputing and doing eigen-decomposition to `Kc` separately.  The last `gene2Scan` is run by a conventional MLMM (no Z, i.e. Z=I):
 ```math
 vec(Y) \\sim MVN((Z \\otimes X)vec(B) (or XBZ') , K \\otimes \\Sigma_1 +I \\otimes \\Sigma_2),
 ```
@@ -111,13 +111,13 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 - `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y0[1,:]` (a vector) -> `Y[[1],:]` (a matrix) .
 - `XX` : A type of [`Markers`](@ref).
+- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
+        To use the identity matrix just as the conventional MLMM, simply type `diagm(ones(m))`.
 - `LOCO` : Boolean. Default is `false` (no LOCO). Runs genome scan using LOCO (Leave One Chromosome Out).
 
 ## Keyword Arguments
 
 - `Xnul` :  A matrix of covariates. Default is intercepts (1's).  Unless adding covariates, just leave as it is.  See [`geneScan`](@ref).
-- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
-        Default is an identity matrix for the dimension of m traits x q phenotypic covariates.
 - `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``. 
            A large scaled covariance matrix (a weakly informative prior) is default.
 - `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
@@ -129,7 +129,8 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 !!! Note
 
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`. It works in most cases. If not,
-    can reduce both `tol0` and `tol` to `1e-4` or further.
+    can reduce both `tol0` and `tol` to `1e-4` or further.  2D scan is usually computationally heavy and takes much time especially for  
+    large data with high-dimensional traits, i.e. large `m` and `n`.  This will be worse when the conventional LMM  is chosen.
 
 
 # Output
@@ -139,7 +140,7 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
 
 """
 function gene2Scan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1},
-        Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;m=length(λc),Z::Array{Float64,2}=diagm(ones(m)),
+        Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;m=length(λc),
         ρ=0.001,Xnul::Array{Float64,2}=ones(1,size(Y,2)), 
         df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,
         kmin::Int64=1,itol=1e-4,tol0=1e-3,tol::Float64=1e-4)
@@ -255,8 +256,8 @@ end
 
 
 #new version adding estimating Kc inside
-function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;m=size(Y,1),
-    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,kmin::Int64=1,Z::Array{Float64,2}=diagm(ones(m)),
+function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{Float64,2},LOCO::Bool=false;m=size(Y,1),
+    Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,kmin::Int64=1,
    itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     p=Int(size(XX.X,1)/cross);q=size(Z,2);

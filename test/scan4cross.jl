@@ -113,7 +113,7 @@ lod4,b4,es4=FlxQTL.geneScan(4,T2,λ2,y,X0,true)
 #
 #2d-scan
 #no loco
- lod2d,es2d=FlxQTL.gene2Scan(4,T2,Tc,λ2,λc,y,X1;Z=Z);
+ lod2d,es2d=FlxQTL.gene2Scan(4,T2,Tc,λ2,λc,y,X1,Z);
 @test sum(lod2d.<0.0)==0
 @test es2d.τ2 >0.0
 @test isposdef(es2d.Σ)
@@ -127,7 +127,7 @@ lod2d0,es2d0=FlxQTL.gene2Scan(4,T2,λ2,y,X1)
 @test es2d0.loglik <=0.0
 
 
-lod2d,es2d=FlxQTL.gene2Scan(4,T2,λ2,y,X1;Z=Z);
+lod2d,es2d=FlxQTL.gene2Scan(4,T2,λ2,y,X1,Z);
 @test sum(lod2d.<0.0)==0
 @test es2d.τ2 >0.0
 @test isposdef(es2d.Σ)

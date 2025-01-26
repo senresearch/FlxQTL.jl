@@ -18,7 +18,7 @@ module flxMLMM
 using Random
 using LinearAlgebra, Distributed, DelimitedFiles
 import StatsBase: sample, shuffle
-import Statistics: mean, var, quantile
+import Statistics: mean, var, quantile,cov
 
 using ..MLM
 
