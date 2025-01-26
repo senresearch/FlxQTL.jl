@@ -124,6 +124,20 @@ end
 # Y,X,Z,Σ : transformed matrices
 # See also: K2eig, K2Eig
 
+function transZ!(Z::Array{Float64,2},Tc::Array{Float64,2},Z0::Array{Float64,2})
+
+    mul!(Z,Tc,Z0)
+end
+
+# rotate Σ₀ or Ψ₀ (prior parameter for Σ)
+function transPD(Tc::Array{Float64,2},Σ₀::Array{Float64,2})
+
+    Σ=Symmetric(BLAS.symm('R','U',Σ₀,Tc)*Tc')
+
+    return convert(Array{Float64,2},Σ)
+end
+
+
 #rotate by row (trait(or site)-wise)
 function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ_0::Array{Float64,2},both::Bool=false)
 
@@ -131,13 +145,27 @@ function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ_0::Array{Float64
     if (both)
 #          Z=Tc*Z0
 #          Σ=Symmetric((Tc*Σ_0)*Tc')
-          mul!(Z,Tc,Z0)
-          Σ=Symmetric(BLAS.symm('R','U',Σ_0,Tc)*Tc')
-         return Z,convert(Array{Float64,2},Σ)
+          transZ!(Z,Tc,Z0)
+          Σ= transPD(Tc,Σ_0)
+         return Z,Σ
      else
-         return  mul!(Z,Tc,Z0)
+         return  transZ!(Z,Tc,Z0)
     end
 end
+
+function transForm(Tc::Array{Float64,2},Z0::Array{Float64,2},Σ₀::Array{Float64,2},Ψ₀::Array{Float64,2})
+
+    if (isposdef(Ψ₀))
+    Z, Σ = transForm(Tc,Z0,Σ₀,true)
+    Ψ = transPD(Tc,Ψ₀)
+    else 
+        println("Error! Plug in a postivie definite Prior!")
+    end
+
+    return Z, Σ, Ψ
+end
+      
+ 
 
 
 # rotate by column (individual-wise)
@@ -168,9 +196,77 @@ function transForm(Tg::Array{Float64,2},X0,cross::Int64)
     
 end
 
+##########
+#pre-estimate Kc using prior
 
 
+struct InitKc
+    Kc::Matrix{Float64} 
+    B::Matrix{Float64}
+    Σ::Matrix{Float64}
+    τ2::Float64
+ end
+ 
 
+
+ """
+
+    getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
+           Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+           itol=1e-2,tol::Float64=1e-3,ρ=0.001)
+
+Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental covariates under `H0: no QTL`.
+
+# Argument
+
+- `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
+        i.e. `Y0[1,:]` (a vector) ->`Y[[1],:]` (a matrix) .
+
+## Keyword Arguments
+
+- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
+        An identity matrix, ``I_m``, is default. 
+- `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
+- `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
+           A large scaled covariance matrix (a weakly informative prior) is default.
+- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
+- `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
+- `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
+- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
+
+# Output
+
+- `InitKc` :  A type of struct of arrays, including pre-estimated `Kc`,`and null estimates of B`, `Σ`,`τ2`used as initial values inside 
+     `gene1Scan`, one of [`geneScan`](@ref) functions, or [`gene2Scan`](@ref).
+
+# Examples
+
+```
+julia> K0 = getKc(Y)  
+julia> K0.Kc  # for Kc
+julia> K0.B # for B under H0
+
+```
+
+
+"""
+ function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
+     Prior::Matrix{Float64}=cov(Y,dims=2)*5,
+     Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
+     
+     if(Z!=diagm(ones(m)))
+         init0=initial(Xnul,Y,Z,false)
+      else #Z0=I
+         init0=initial(Xnul,Y,false)
+      end
+ 
+     est0= nul1Scan(init0,1,Y,Xnul,Z,m,df_prior,Prior;ρ=ρ,itol=itol,tol=tol)
+       τ² =mean(Diagonal(est0.Σ))
+     return InitKc(est0.Vc, est0.B, est0.Σ, τ²)
+ 
+ end
+ 
+###########
 
 
 ##initialize parameters(B,τ2 (or Vc),Σ) (H0:no qtl case)
@@ -187,13 +283,6 @@ Vc::Array{Float64,2}
 Σ::Array{Float64,2}
 end
 
-#initialize parameters after computing Kc
-struct Init1
-B::Array{Float64,2}
-τ2::Float64
-Σ1::Array{Float64,2} #trait-wise transformed
-Kc::Array{Float64,2}
-end
 
 # including MLMM
 function initial(Xnul,Y0,Z0,incl_τ2::Bool=true)
@@ -242,14 +331,23 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Z1,Σt;ρ=0.001,itol=1e-3,tol
     return nulpar
 end
 
-function nulScan(init::Init1,kmin,λg,λc,Y1,Xnul_t,Z1;ρ=0.001,itol=1e-3,tol=1e-4)
-    
-            B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,init.Σ1,λg,λc;tol=itol)
-            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
-        
-    return nulpar
-    
+#including prior
+function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Z1,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
+ 
+return nulpar
 end
+#Z=I:including prior
+function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
+ 
+return nulpar
+end
+
 
 #Z=I
 function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e-4)
@@ -260,19 +358,25 @@ function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e
     return nulpar
 end
 
-#new version to estimate Kc
-function nulScan1(init::Union{Init1,Init0},kmin,λg,Y1,Xnul_t,Z;ρ=0.001,itol=1e-3,tol=1e-4)
+
+
+#estimate Kc with prior
+function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
        
-       if (typeof(init)==Init1)   
-           B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Kc,init.Σ1,λg;tol=itol)
-           nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
-        else #typeof(Init)==Init0)
-           B0,Kc_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z,init.B,init.Vc,init.Σ,λg;tol=itol)
-           nulpar=NestrvAG(kmin,Y1,Xnul_t,Z,B0,Kc_0,Σ1,λg;tol=tol,ρ=ρ)
-        end
-       return nulpar
+      n=size(Y,2); λg=ones(n)
+
+    if (Z!=diagm(ones(m)))   
+        B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,Z,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
+        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+        
+       else #Z=I
+        B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
+        nulpar=NestrvAG(kmin,Y,Xnul,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+     end
+    return nulpar
 end
 
+###########
 
 #MVLMM :Z=I
 function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
@@ -283,6 +387,14 @@ function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
        return nulpar
 end
 
+#including prior
+function nulScan(init::Init0,kmin,λg,Y1,Xnul_t,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+
+        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
+        nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+
+       return nulpar
+end
 
 
 ##rearrange Bs estimated under H1 into 3-d array

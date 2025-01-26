@@ -18,11 +18,11 @@ module flxMLMM
 using Random
 using LinearAlgebra, Distributed, DelimitedFiles
 import StatsBase: sample, shuffle
-import Statistics: mean, var, quantile
+import Statistics: mean, var, quantile,cov
 
 using ..MLM
 
-using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result
+using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result,updateΣ
 
 using ..Util: mat2array,array2mat, Markers, newMarkers,lod2logP
 
