@@ -5,7 +5,8 @@
 
 
 A module designed for fitting a Multivariate Linear Mixed Model
-run by Nesterov's Accelerated Gradient  with restarting scheme incorporated with Expectation Conditional Maximization.
+run by Nesterov's Accelerated Gradient with restarting scheme incorporated with Expectation Conditional Maximization to 
+estimate MLEs.  REML is not supported.
 
 The model:
 
@@ -16,7 +17,7 @@ module flxMLMM
 
 #  __precompile__(true)
 using Random
-using LinearAlgebra, Distributed, DelimitedFiles
+using LinearAlgebra, Distributed
 import StatsBase: sample, shuffle
 import Statistics: mean, var, quantile,cov
 

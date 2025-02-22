@@ -183,12 +183,12 @@ function transForm(Tg::Array{Float64,2},X0,cross::Int64)
     if (cross==1)
           X=BLAS.gemm('N','T',X0,Tg)
 
-        else #cross>1 size(X0)= (p,cross,n)
-          p=size(X0,1); n=size(X0,3)
-            X=zeros(p,cross,n)
+        else #cross>1 size(X0)= (cross,n,p)
+          p=size(X0,3); n=size(X0,2)
+            X=zeros(cross,n,p)
        @fastmath @inbounds @views for j=1:cross
 #             X[:,j,:] = X0[:,j,:]*Tg'
-             X[:,j,:]= BLAS.gemm('N','T',X0[:,j,:],Tg)
+             X[j,:,:]= BLAS.gemm('N','T',X0[j,:,:],Tg)
                      end
     end
     

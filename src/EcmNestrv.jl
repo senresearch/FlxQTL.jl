@@ -2,7 +2,7 @@
 
     EcmNestrv
 
-A module for base algorithms using ECM (Expectation-Conditional Maxization) with Speed restarting Nesterov's accelerated gradient method 
+A module for base algorithms using the ECM (Expectation-Conditional Maxization) with the Speed restarting Nesterov's accelerated gradient method 
 to fit a flexible multivariate linear mixed model (flxMLMM).
 
 """
@@ -49,7 +49,7 @@ export  symSq, fixX, fixZ
 
 function fixZ(Z::Array{Float64,2},Σ::Array{Float64,2})
 
-                return Symmetric(BLAS.gemm('T','N',Z,Σ\Z))\Z'
+  return Symmetric(BLAS.gemm('T','N',Z,Σ\Z))\Z'
 end
 
 

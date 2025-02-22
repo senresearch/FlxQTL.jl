@@ -1,8 +1,8 @@
 
 ## marker1Scan : CPU 1D-genome scanning under H1 only (with/without loco)
-function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1,ν₀,Ψ;ρ=0.001,tol0=1e-3,tol1=1e-4,nchr=0)
+function marker1Scan(nmar,q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1,ν₀,Ψ;ρ=0.001,tol0=1e-3,tol1=1e-4,nchr=0)
 
-        nmar=size(X1,1);
+        # nmar=size(X1,1);
     if (cross==1) ## scanning genotypes
         B0=hcat(Nullpar.B,zeros(Float64,q));
 
@@ -20,7 +20,7 @@ function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1,ν₀,
             B0=hcat(Nullpar.B,zeros(Float64,q,cross-1))
 
           lod=@distributed (vcat) for j=1:nmar
-                XX= vcat(Xnul_t, @view X1[j,2:end,:])
+                XX= vcat(Xnul_t, @view X1[2:end,:,j])
                 B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc,ν₀,Ψ;tol=tol0)
                   lod0= (loglik0-Nullpar.loglik)/log(10)
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol1)
@@ -33,9 +33,9 @@ function marker1Scan(q,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,Z1,ν₀,
 end
 
 #Z=I
-function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,ν₀,Ψ;ρ=0.001,tol0=1e-3,tol1=1e-4,nchr=0)
+function marker1Scan(nmar,m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,ν₀,Ψ;ρ=0.001,tol0=1e-3,tol1=1e-4,nchr=0)
 
-        nmar=size(X1,1);
+        # nmar=size(X1,1);
     if (cross==1) ## scanning genotypes
         B0=hcat(Nullpar.B,zeros(Float64,m));
 #      f= open(homedir()*"/GIT/fmulti-lmm/result/test_ecmlmm.txt","w")
@@ -57,7 +57,7 @@ function marker1Scan(m,kmin,cross,Nullpar::Approx,λg,λc,Y1,Xnul_t,X1,ν₀,Ψ;
         B0=hcat(Nullpar.B,zeros(Float64,m,cross-1))
 
           lod=@distributed (vcat) for j=1:nmar
-                XX=vcat(Xnul_t, @view X1[j,2:end,:])
+                XX=vcat(Xnul_t, @view X1[2:end,:,j])
                 B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,B0,Nullpar.τ2,Nullpar.Σ,λg,λc,ν₀,Ψ;tol=tol0)
                  lod0= (loglik0-Nullpar.loglik)/log(10)
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,τ2,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol1)
@@ -72,9 +72,9 @@ end
 
 
 ##MVLMM
-function marker1Scan(m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1,ν₀,Ψ;ρ=0.001,tol0=1e-3,tol1=1e-4)
+function marker1Scan(nmar,m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1,ν₀,Ψ;ρ=0.001,tol0=1e-3,tol1=1e-4)
 
-        nmar=size(X1,1);
+        # nmar=size(X1,1);
     if (cross==1)
         B0=hcat(Nullpar.B,zeros(m))
 
@@ -91,7 +91,7 @@ function marker1Scan(m,kmin,cross,Nullpar::Result,λg,Y1,Xnul_t,X1,ν₀,Ψ;ρ=0
         B0=hcat(Nullpar.B,zeros(m,cross-1))
 
         lod=@distributed (vcat) for j=1:nmar
-                XX= vcat(Xnul_t,@view X1[j,2:end,:])
+                XX= vcat(Xnul_t,@view X1[2:end,:,j])
             B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg,ν₀,Ψ;tol=tol0)
                  lod0= (loglik0-Nullpar.loglik)/log(10)
                 est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg,ν₀,Ψ;tol=tol1,ρ=ρ)
@@ -203,17 +203,17 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
         Chr=unique(XX.chr);nChr=length(Chr);est0=[];H1par=[]
 
            for i=1:nChr
-                maridx=findall(XX.chr.==Chr[i])
+                maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 #                 Xnul_t=Xnul*Tg[:,:,i]';
    @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul, Tg[:,:,i])
                  if (cross!=1)
-   @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+   @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[:,:,maridx],cross)
                    else
   @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                   est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Z1,Σ1,df_prior,Ψ;ρ=ρ,itol=itol,tol=tol)
-                lods,H1par1=marker1Scan(q,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,Z1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
+                lods,H1par1=marker1Scan(nmar,q,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,Z1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
                 LODs[maridx]=lods
                 H1par=[H1par;H1par1]
                 est0=[est0;est00];
@@ -231,7 +231,7 @@ function geneScan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1}
                  end
 
                   est0=nulScan(init,1,Λg,λc,Y1,Xnul_t,Z1,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ)
-                LODs,H1par=marker1Scan(q,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+                LODs,H1par=marker1Scan(p,q,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
              # rearrange B into 3-d array
           B = arrngB(H1par,size(Xnul,1),q,p,cross)
     end
@@ -288,17 +288,17 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
         Chr=unique(XX.chr);nChr=length(Chr);est0=[];H1par=[]
 
            for i=1:nChr
-                maridx=findall(XX.chr.==Chr[i])
+                maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 #                 Xnul_t=Xnul*Tg[:,:,i]';
    @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,Tg[:,:,i])
                  if (cross!=1)
-      @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+      @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[:,:,maridx],cross)
                    else
       @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                 est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Σ1,df_prior,Ψ;ρ=ρ,itol=itol,tol=tol)
-                lods,H1par1=marker1Scan(m,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
+                lods,H1par1=marker1Scan(nmar,m,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
                 LODs[maridx]=lods
                 H1par=[H1par;H1par1]
                 est0=[est0;est00];
@@ -316,7 +316,7 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Array{Float64,2}},Tc::
                  end
 
                   est0=nulScan(init,1,Λg,λc,Y1,Xnul_t,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ)
-            LODs,H1par=marker1Scan(m,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+            LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
              # rearrange B into 3-d array
           B = arrngB(H1par,size(Xnul,1),m,p,cross)
     end
@@ -359,17 +359,17 @@ function geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool
         LODs=zeros(p); Chr=unique(XX.chr);nChr=length(Chr);est0=[];H1par=[]
 
        for i=1:nChr
-                maridx=findall(XX.chr.==Chr[i])
+                maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 #                 Xnul_t=Xnul*Tg[:,:,i]';
               @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                 if (cross!=1)
-          @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,X0[maridx,:,:],cross)
+          @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,X0[:,:,maridx],cross)
                    else
            @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
                     est00=nulScan(init,1,Λg[:,i],Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
-                lods, H1par1=marker1Scan(m,1,cross,est00,Λg[:,i],Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
+                lods, H1par1=marker1Scan(nmar,m,1,cross,est00,Λg[:,i],Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
                 LODs[maridx].=lods
                 H1par=[H1par;H1par1]
                 est0=[est0;est00];
@@ -387,7 +387,7 @@ function geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool
 
 
                   est0=nulScan(init,1,Λg,Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
-            LODs,H1par=marker1Scan(m,1,cross,est0,Λg,Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
+            LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
              B = arrngB(H1par,size(Xnul,1),m,p,cross)
      end
@@ -441,17 +441,17 @@ function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{
       Chr=unique(XX.chr);nChr=length(Chr);est0=[];H1par=[]
 
          for i=1:nChr
-              maridx=findall(XX.chr.==Chr[i])
+              maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 #                 Xnul_t=Xnul*Tg[:,:,i]';
  @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul, Tg[:,:,i])
                if (cross!=1)
- @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+ @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[:,:,maridx],cross)
                  else
 @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                end
               #parameter estimation under the null
                 est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Z1,Σ1,df_prior,Ψ;ρ=ρ,itol=itol,tol=tol)
-              lods,H1par1=marker1Scan(q,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,Z1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
+              lods,H1par1=marker1Scan(nmar,q,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,Z1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
               LODs[maridx]=lods
               H1par=[H1par;H1par1]
               est0=[est0;est00];
@@ -469,7 +469,7 @@ function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{
                end
 
                 est0=nulScan(init,1,Λg,λc,Y1,Xnul_t,Z1,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ)
-              LODs,H1par=marker1Scan(q,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+              LODs,H1par=marker1Scan(p,q,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,Z1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
         B = arrngB(H1par,size(Xnul,1),q,p,cross)
   end
@@ -521,17 +521,17 @@ function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Boo
       Chr=unique(XX.chr);nChr=length(Chr);est0=[];H1par=[]
 
          for i=1:nChr
-              maridx=findall(XX.chr.==Chr[i])
+              maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 #                 Xnul_t=Xnul*Tg[:,:,i]';
  @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul, Tg[:,:,i])
                if (cross!=1)
- @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+ @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[:,:,maridx],cross)
                  else
 @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                end
               #parameter estimation under the null
                 est00=nulScan(init,1,Λg[:,i],λc,Y2,Xnul_t,Σ1,df_prior,Ψ;ρ=ρ,itol=itol,tol=tol)
-              lods,H1par1=marker1Scan(m,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
+              lods,H1par1=marker1Scan(nmar,m,1,cross,est00,Λg[:,i],λc,Y2,Xnul_t,X1,df_prior,Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
               LODs[maridx]=lods
               H1par=[H1par;H1par1]
               est0=[est0;est00];
@@ -549,7 +549,7 @@ function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Boo
                end
 
                 est0=nulScan(init,1,Λg,λc,Y1,Xnul_t,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ)
-              LODs,H1par=marker1Scan(m,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+              LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,λc,Y1,Xnul_t,X1,df_prior,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
         B = arrngB(H1par,size(Xnul,1),m,p,cross)
   end

@@ -2,7 +2,8 @@
 
     FlxQTL
 
-flexible Multivariate Linear Mixed Model based QTL analysis tools for structured multiple traits.
+flexible QTL analysis tools for structured multiple traits fitting a Multivariate Linear Mixed Model or a Multivariate 
+    Linear Model.
 
 """
 module FlxQTL
@@ -11,11 +12,14 @@ module FlxQTL
  __precompile__(true)
 
 
-include("MLM.jl")
-include("Miscellanea.jl")
-include("GRM.jl")
+
 include("EcmNestrv.jl")
+include("Miscellanea.jl")
+include("MLM.jl")
+include("flxMLM.jl")
+include("GRM.jl")
 include("flxMLMM.jl")
+
 
 using .MLM:mGLM, Estimat
 export mGLM, Estimat
