@@ -24,6 +24,9 @@ include("flxMLMM.jl")
 using .MLM:mGLM, Estimat
 export mGLM, Estimat
 
+using .flxMLM: mlm1Scan, mlm2Scan
+export mlm1Scan, mlm2Scan
+
 using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
 export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco

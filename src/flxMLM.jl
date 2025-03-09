@@ -12,10 +12,14 @@ The model:
 module flxMLM
 
 using LinearAlgebra, Distributed
+import StatsBase: sample
+import Statistics: mean, var, quantile,cov
 
 using ..MLM
 using ..Util:lod2logP
 
 include("geneScan.jl")
     
+
+
 end

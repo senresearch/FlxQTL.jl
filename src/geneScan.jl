@@ -37,7 +37,7 @@ function marker1Scan(nmar,cross,nulpar::Estimat,Y,Xnul,X,reml)
 end
 
 
-function marker2Scan!(LODs,H1par,mindex::Array{Int64,1},cross,nulpar::Estimat,Y,Xnul,X,Z,reml)
+function marker2Scan!(LODs,mindex::Array{Int64,1},cross,nulpar::Estimat,Y,Xnul,X,Z,reml)
       M=length(mindex)
     if(cross!=1)
         for j=1:M-1
@@ -84,7 +84,7 @@ end
 
 function mat2Array(cross::Int64,p,X)
    #size(X)=(n,p)
-
+ 
    X0=zeros(n,cross,p)
    @inbounds @views for j = 1:p
     X0[:,:,j] = X[:,cross*j-(cross-1):cross*j]
@@ -108,7 +108,7 @@ function getB(H1par,p0::Int64,q,p,cross)
    return B
 end
 
-
+##########
 
 function mlm1Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Matrix{Float64},reml::Bool=false;LogP::Bool=false,
     Xnul::Matrix{Float64}=ones(size(Y,1),1))
@@ -173,11 +173,10 @@ function mlm1Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,reml::Bool=false;L
        
 end
 
+#######
 
 
-
-function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Matrix{Float64},reml::Bool=false;LogP::Bool=false,
-    Xnul::Matrix{Float64}=ones(size(Y,1),1))
+function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Matrix{Float64},reml::Bool=false;Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
     # size(X)=(n,p), size(Z)=(q,m)
     p=Int(size(XX.X,2)/cross); q=size(Z,1)
@@ -199,7 +198,9 @@ function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Matrix{Float64}
         end
     end
      
-    return LODs, est0
+    
+        return LODs, est0
+    
     
 end
 
@@ -207,8 +208,8 @@ end
 function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,reml::Bool=false;Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
 # size(X)=(n,p), size(Z)=(q,m)
-    p=Int(size(XX.X,2)/cross); q=size(Z,1)
-    LODs=zeros(p,p);  Chr=unique(XX.chr); nChr=length(Chr);
+    p=Int(size(XX.X,2)/cross); 
+    LODs=zeros(p,p);  Chr=unique(XX.chr);
 
 #nul scan
     est0=mGLM(Y,Xnul,reml)
@@ -230,6 +231,9 @@ function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,reml::Bool=false;X
 
 end
 
+#########
+
 function mlmTperm()
+
 
 end

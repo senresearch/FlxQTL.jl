@@ -18,7 +18,7 @@ module flxMLMM
 #  __precompile__(true)
 using Random
 using LinearAlgebra, Distributed
-import StatsBase: sample, shuffle
+import StatsBase: sample
 import Statistics: mean, var, quantile,cov
 
 using ..MLM
