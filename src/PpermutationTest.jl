@@ -71,13 +71,13 @@ end
 
 
 ## finding distribution of max lod's for a multivariate model by permutation for 4waycross/intercross
-function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
+function permutation(nperm::Int64,cross::Int64,p::Int64,Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
         Z::Array{Float64,2},Nullpar::Approx,λg::Array{Float64,1},λc::Array{Float64,1},Xnul_t::Array{Float64,2},ν₀,Ψ,
         ;tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
 #     n=size(Y,2); p=size(X,1);
     q=size(Z,2);
-    kmin=1; lod=zeros(nperm);H1par=[]
+    lod=zeros(nperm);H1par=[]
 
     init=Init(Nullpar.B,Nullpar.τ2,Nullpar.Σ)
     
@@ -85,11 +85,11 @@ function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Arra
         ### permuting a phenotype matrix by individuals
         Y2=permutY(Y,init.τ2,init.Σ,λg,λc);
         #initial parameter values for permutations are from genome scanning under the null hypothesis.
-        perm_est0=nulScan(init,kmin,λg,λc,Y2,Xnul_t,Z,Nullpar.Σ,ν₀,Ψ;ρ=ρ,itol=tol0,tol=tol)
-        LODs,H1par0=marker1Scan(q,kmin,cross,perm_est0,λg,λc,Y2,Xnul_t,X,Z,ν₀,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
-               
-          lod[l]= maximum(LODs);  H1par=[H1par; H1par0]
-            if (mod(l,50)==0)
+        perm_est0=nulScan(init,1,λg,λc,Y2,Xnul_t,Z,Nullpar.Σ,ν₀,Ψ;ρ=ρ,itol=tol0,tol=tol)
+        LODs,H1par0=marker1Scan(p,q,1,cross,perm_est0,λg,λc,Y2,Xnul_t,X,Z,ν₀,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+         lod[l]= maximum(LODs);  H1par=[H1par; H1par0]
+
+            if (mod(l,100)==0)
               println("Scan for $(l)th permutation is done.")
             end
         end
@@ -99,11 +99,11 @@ end
 
 
 #MVLMM
-function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
+function permutation(nperm::Int64,cross::Int64,p::Int64,Y::Array{Float64,2},XX::Union{Array{Float64,2},Array{Float64,3}},
         Nullpar::Result,λg::Array{Float64,1},Xnul_t,ν₀,Ψ;tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
      m=size(Y,1);
-    kmin=1;lod=zeros(nperm);H1par=[]
+    lod=zeros(nperm);H1par=[]
    
     init=Init0(Nullpar.B,Nullpar.Vc,Nullpar.Σ)
     
@@ -112,11 +112,11 @@ function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Arra
         Y2=permutY(Y,Nullpar.Vc,Nullpar.Σ,λg);
 
         #initial parameter values for permutations are from genome scanning under the null hypothesis.
-         perm_est0=nulScan(init,kmin,λg,Y2,Xnul_t,ν₀,Ψ;itol=tol0,tol=tol,ρ=ρ)
-        LODs,H1par0=marker1Scan(m,kmin,cross,perm_est0,λg,Y2,Xnul_t,X,ν₀,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
+         perm_est0=nulScan(init,1,λg,Y2,Xnul_t,ν₀,Ψ;itol=tol0,tol=tol,ρ=ρ)
+        LODs,H1par0=marker1Scan(p,m,1,cross,perm_est0,λg,Y2,Xnul_t,X,ν₀,Ψ;tol0=tol0,tol1=tol,ρ=ρ)
     
          lod[l]= maximum(LODs);  H1par=[H1par; H1par0]
-             if (mod(l,50)==0)
+             if (mod(l,100)==0)
               println("Scan for $(l)th permutation is done.")
              end
         end
@@ -124,6 +124,79 @@ function permutation(nperm::Int64,cross::Int64,Y::Array{Float64,2},X::Union{Arra
 
     return lod, H1par
 end
+
+#no loco-null scan for permutation
+function Scan0(cross::Int64,Tg,Tc,Λg,λc,Y::Array{Float64,2},
+    XX::Markers,Z::Array{Float64,2};Xnul::Array{Float64,2}=ones(1,size(Y,2)),m=size(Y,1),df_prior=m+1,
+            Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+
+    
+    q=size(Z,2);  p=Int(size(XX.X,1)/cross); 
+
+    ## picking up initial values for parameter estimation under the null hypothesis
+        init=initial(Xnul,Y,Z)
+      if (λc!= ones(m))
+        if (Prior!= diagm(ones(m)))
+            Z1, Σ1, Ψ =transForm(Tc,Z,init.Σ,Prior)
+         else # prior =I 
+            Z1,Σ1 =  transForm(Tc,Z,init.Σ,true)
+            Ψ =Prior
+        end
+        
+        Y1= transForm(Tc,Y,init.Σ) # transform Y only by row (Tc)
+
+       else
+        Z1=Z; Σ1 = init.Σ
+        Y1=Y;Ψ = Prior
+     end
+     if (cross!=1)
+        X0=mat2array(cross,XX.X)
+     end
+#          Xnul_t=Xnul*Tg';
+        Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
+             if (cross!=1)
+               Y1,X1=transForm(Tg,Y1,X0,cross)
+               else
+               Y1,X1=transForm(Tg,Y1,XX.X,cross)
+             end
+
+              est0=nulScan(init,1,Λg,λc,Y1,Xnul_t,Z1,Σ1,df_prior,Ψ;itol=itol,tol=tol,ρ=ρ)
+# Output choice
+    return p, est0,Xnul_t,Y1,X1,Z1
+end
+
+##MVLMM
+function Scan0(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers;Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+    m=size(Y,1), df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*5,itol=1e-3,tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
+
+   
+    p=Int(size(XX.X,1)/cross);
+
+    #check the prior
+    if (!isposdef(Prior))
+        println("Error! Plug in a postivie definite Prior!")
+     end
+
+     #initialization
+       init=initial(Xnul,Y,false)
+        if (cross!=1)
+            X0=mat2array(cross,XX.X)
+         end
+    
+#             Xnul_t=Xnul*Tg';
+             Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
+                if (cross!=1)
+                   Y,X=transForm(Tg,Y,X0,cross)
+                   else
+                   Y,X=transForm(Tg,Y,XX.X,cross)
+                 end
+
+                  est0=nulScan(init,1,Λg,Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
+      
+        return p,est0,Xnul_t,Y,X
+
+end
+
 
 
 """
@@ -177,12 +250,12 @@ where `K` is a genetic kinship, ``\\Sigma_1, \\Sigma_2`` are covariance matrices
 function permTest(nperm::Int64,cross,Kg,Kc,Y,XX::Markers;pval=[0.05 0.01],m=size(Y,1),Z=diagm(ones(m)),df_prior=m+1,
         Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul=ones(1,size(Y,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
     #permutation without LOCO
-       Tg,λg,Tc,λc=K2Eig(Kg,Kc)
-       est0,Xnul_t,Y1,X1,Z1 = geneScan(cross,Tg,Tc,λg,λc,Y,XX,Z;tdata=true,Xnul=Xnul,m=m,
-                                       df_prior=df_prior,Prior=Prior,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
-       maxLODs, H1par_perm= permutation(nperm,cross,Y1,X1,Z1,est0,λg,λc,Xnul_t,df_prior,Prior;tol0=tol0,tol=tol,ρ=ρ)
-       maxLODs=convert(Array{Float64,1},maxLODs)
-       cutoff= quantile(maxLODs,1.0.-pval)
+    Tg,λg,Tc,λc=K2Eig(Kg,Kc)
+    p,est0,Xnul_t,Y1,X1,Z1 = Scan0(cross,Tg,Tc,λg,λc,Y,XX,Z;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
+    maxLODs, H1par_perm= permutation(nperm,cross,p,Y1,X1,Z1,est0,λg,λc,Xnul_t,df_prior,Prior;tol0=tol0,tol=tol,ρ=ρ)
+    maxLODs=convert(Array{Float64,1},maxLODs)
+    cutoff= quantile(maxLODs,1.0.-pval)
+
     return maxLODs, H1par_perm, cutoff
 
 end
@@ -193,12 +266,12 @@ end
 function permTest(nperm::Int64,cross,Kg,Y,XX::Markers;pval=[0.05 0.01],m=size(Y,1),df_prior=m+1,
                  Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul=ones(1,size(Y,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
     #permutation without LOCO
-       Tg,λg=K2eig(Kg)
-       est0,Xnul_t,Y1,X1 = geneScan(cross,Tg,λg,Y,XX;tdata=true,m=m,df_prior=df_prior,Prior=Prior,
-                                  Xnul=Xnul,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
-       maxLODs, H1par_perm= permutation(nperm,cross,Y1,X1,est0,λg,Xnul_t,df_prior,Prior;tol0=tol0,tol=tol,ρ=ρ)
-       maxLODs=convert(Array{Float64,1},maxLODs)
-       cutoff= quantile(maxLODs,1.0.-pval)
+     Tg,λg=K2eig(Kg)
+     p,est0,Xnul_t,Y1,X1 = Scan0(cross,Tg,λg,Y,XX;Xnul=Xnul,m=m, df_prior=df_prior,Prior=Prior,itol=itol,tol0=tol0,tol=tol,ρ=ρ)
+     maxLODs, H1par_perm= permutation(nperm,cross,p,Y1,X1,est0,λg,Xnul_t,df_prior,Prior;tol0=tol0,tol=tol,ρ=ρ)
+     maxLODs=convert(Array{Float64,1},maxLODs)
+     cutoff= quantile(maxLODs,1.0.-pval)
+     
     return maxLODs, H1par_perm, cutoff
 
 end
