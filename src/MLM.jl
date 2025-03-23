@@ -74,7 +74,7 @@ function mGLMind(Y::Array{Float64,2},X::Array{Float64,2},n,m,p,reml::Bool=false)
  
     B = zeros(p,m); ESS=zeros(m,m);
     
-    MLE!(B,ESS,pXY,Y,X)
+    MLE!(B,ESS,Y,X)
 
    if(reml) 
         Σ=ESS./(n-p)  
@@ -89,8 +89,8 @@ end
 
 function MLE!(B::Matrix{Float64},ESS::Matrix{Float64},pXY::Matrix{Float64},Y::Matrix{Float64},X::Matrix{Float64},Z::Matrix{Float64},pivZ::Matrix{Float64})
 
-    pXY[:,:]= BLAS.gemm('N','N',fiX(X),Y)
-    B[:,:] = BLAS.gemm('N','T',pXY,pivZ)
+    pXY[:,:]= BLAS.gemm('N','N',fiX(X),Y) #pxm
+    B[:,:] = BLAS.gemm('N','T',pXY,pivZ) 
     dev= Y- BLAS.gemm('N','T',(X*B),Z)
     ESS[:,:]= Symmetric(BLAS.syrk('U','T',1.0,dev))
 
@@ -106,7 +106,7 @@ function MLE!(B::Matrix{Float64},ESS::Matrix{Float64},Y::Matrix{Float64},X::Matr
 end
 
 function MLEs!(B::Matrix{Float64},ESS::Matrix{Float64},Y::Matrix{Float64},X::Matrix{Float64},Z::Matrix{Float64},pivZ::Matrix{Float64},pXY::Matrix{Float64})
-   B[:,:] = BLAS.gemm('N','T',pXY,pivZ)
+   B[:,:] = BLAS.gemm('N','N',pXY,pivZ)
    dev = Y- BLAS.gemm('N','T',(X*B),Z)
    ESS[:,:] = Symmetric(BLAS.syrk('U','T',1.0,dev)) 
 
@@ -196,7 +196,7 @@ function mGLM(Y::Array{Float64,2},X::Array{Float64,2},reml::Bool=false)
 
     #number of individuals; number of covariates
     n,m=size(Y);
-    p=size(X,2)
+    p=size(X,2); ESS=zeros(m,m);
    
   Est0 = mGLMind(Y,X,n,m,p,reml)
   MLEs!(ESS,Y,X,Est0.B0)

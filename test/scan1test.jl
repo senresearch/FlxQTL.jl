@@ -21,7 +21,7 @@ geno=[0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0
  1.0  0.0  0.0  0.0]
 
-y=[3.0  19.7616   24.1761   15.6778;
+y1=[3.0  19.7616   24.1761   15.6778;
 4.0   6.28846   1.77401   3.23889;
 5.0  12.034    12.4605   10.601;
 6.0  20.1253   14.1169   12.9035;
@@ -40,8 +40,8 @@ y=[3.0  19.7616   24.1761   15.6778;
 19.0  13.3412    3.87934   7.89231;
 20.0  12.1524    9.46482  10.8092;
 21.0  16.2286    8.80221   8.11992;
-22.0  14.7742    6.47541  15.525]'
-y=Float64.(y); m=size(y,1)
+22.0  14.7742    6.47541  15.525]
+y=Float64.(y1'); m=size(y,1)
 marname=["X1" ;"X2";"X3";"X4"]
 chr=Any[1;1;2;2]
 pos=[1.4;2.0;3.44;4.25]
@@ -49,6 +49,8 @@ XX=FlxQTL.Markers(marname,chr,pos,geno')
 @test XX.name == marname
 @test XX.chr == chr
 @test size(XX.X)== size(geno')
+# for MLM setup
+XX1=FlxQTL.Markers(marname,chr,pos,geno)
 
 #test shrinkgLoco with kinshipMan, shrinkg
  Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,6,XX)
@@ -256,3 +258,79 @@ end
 A=rand(15,15)
 Aidx= getGenoidx(A,0.25)
 @test length(Aidx)<=size(A,1)
+
+#MLM:mle
+mlod, bm,mest0= FlxQTL.mlm1Scan(1,y1,XX1,Z)
+mlogp,bm,mest0=FlxQTL.mlm1Scan(1,y1,XX1,Z;LogP=true)
+#Z=I
+mlodi, bmi,mest0i= FlxQTL.mlm1Scan(1,y1,XX1)
+mlogpi,bmi,mest0i=FlxQTL.mlm1Scan(1,y1,XX1;LogP=true)
+
+@test sum((mlod.<0.0))==0
+@test sum((mlodi.<0.0))==0
+for j=eachindex(mlod)
+       print(@test isapprox(mlod[j],mlodi[j];atol=0.01))
+       print(@test isapprox(bm[:,:,j],bmi[:,:,j];atol=0.01))
+       print(@test isapprox(mlogp[j],mlogpi[j];atol=0.01))
+end
+@test isposdef(mest0.Σ)
+@test isposdef(mest0i.Σ)
+@test mest0.Σ≈ mest0i.Σ
+
+#MLM;reml
+mlodr, bmr,mest0r= FlxQTL.mlm1Scan(1,y1,XX1,Z,true)
+mlogpr,bmr,mest0r=FlxQTL.mlm1Scan(1,y1,XX1,Z,true;LogP=true)
+#Z=I
+rlodi, bri,rest0i= FlxQTL.mlm1Scan(1,y1,XX1,true)
+rlogpi,bri,rest0i=FlxQTL.mlm1Scan(1,y1,XX1,true;LogP=true)
+@test sum((mlodr.<0.0))==0
+@test sum((rlodi.<0.0))==0
+for j=eachindex(mlodr)
+       println(@test mlodr[j]≈rlodi[j])
+       println(@test mlogpr[j]≈rlogpi[j] )
+       println(@test bmr[:,:,j]≈ bri[:,:,j])
+end
+
+
+@test isposdef(mest0r.Σ)
+@test isposdef(rest0i.Σ)
+@test mest0r.Σ≈rest0i.Σ
+
+#mle
+mlod2,mes02 = mlm2Scan(1,y1,XX1,Z)
+mlod2i,mes02i = mlm2Scan(1,y1,XX1)
+#reml
+rlod2,res02 = mlm2Scan(1,y1,XX1,Z,true)
+rlod2i,res02i = mlm2Scan(1,y1,XX1,true)
+@test sum(mlod2.<0.0)==0
+@test sum(mlod2i.<0.0)==0
+@test mlod2≈ mlod2i
+@test sum(rlod2.<0.0)==0
+@test sum(rlod2i.<0.0)==0
+@test rlod2≈ rlod2i
+@test isposdef(mes02.Σ)
+@test isposdef(mes02i.Σ)
+@test mes02.Σ≈ mes02i.Σ
+@test isposdef(res02.Σ)
+@test isposdef(res02i.Σ)
+@test res02.Σ≈ res02i.Σ
+
+mcut1,mxlod,h1p= mlmTest(1,4,y1,XX1,Z)
+micut1,mxlodi,h1pi= mlmTest(1,4,y1,XX1)
+rcut1,mxr,h1r= mlmTest(1,4,y1,XX1,Z,true)
+ricut1,mxri,h1ri= mlmTest(1,4,y1,XX1,true)
+for j=eachindex(mcut1)
+       println(@test mcut1[j]≈ micut1[j])
+       println(@test rcut1[j]≈ ricut1[j])
+end
+@test sum(mxlod.<0.0)==0
+@test sum(mxlodi.<0.0)==0
+for j=eachindex(mxlod)
+       println(@test mxlod[j]≈ mxlodi[j])
+       println(@test mxr[j]≈ mxri[j])
+end
+
+@test sum(mxr.<0.0)==0
+@test sum(mxri.<0.0)==0
+
+

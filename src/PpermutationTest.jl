@@ -99,7 +99,7 @@ end
 
 
 #MVLMM
-function permutation(nperm::Int64,cross::Int64,p::Int64,Y::Array{Float64,2},XX::Union{Array{Float64,2},Array{Float64,3}},
+function permutation(nperm::Int64,cross::Int64,p::Int64,Y::Array{Float64,2},X::Union{Array{Float64,2},Array{Float64,3}},
         Nullpar::Result,λg::Array{Float64,1},Xnul_t,ν₀,Ψ;tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
      m=size(Y,1);

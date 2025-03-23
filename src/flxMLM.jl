@@ -11,12 +11,11 @@ The model:
 """
 module flxMLM
 
-using LinearAlgebra, Distributed
-import StatsBase: sample
-import Statistics: mean, var, quantile,cov
+using LinearAlgebra, Distributed, Random
+import Statistics: quantile
 
-using ..MLM
-using ..Util:lod2logP
+using ..MLM:mGLM, Estimat
+using ..Util:lod2logP, Markers
 
 include("geneScan.jl")
     
