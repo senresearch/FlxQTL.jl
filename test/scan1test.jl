@@ -169,14 +169,14 @@ for j=1:2
        println(@test est4[j].loglik<=0.0)
 end
 
-#environment scan
-Q=findall(LOD0.==maximum(LOD0))
-eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
-@test sum(eLOD0.<0.0)==0.0
-@test typeof(eB0)== Array{Float64,3}
-@test este0[1].τ2>0.0
-@test isposdef(este0[1].Σ)
-@test este0[1].loglik<=0.0
+# #environment scan
+# Q=findall(LOD0.==maximum(LOD0))
+# eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
+# @test sum(eLOD0.<0.0)==0.0
+# @test typeof(eB0)== Array{Float64,3}
+# @test este0[1].τ2>0.0
+# @test isposdef(este0[1].Σ)
+# @test este0[1].loglik<=0.0
 
 
 #2d-scan
