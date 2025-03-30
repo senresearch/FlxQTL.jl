@@ -139,25 +139,30 @@ lod0,b0,es00=FlxQTL.geneScan(4,T3,Tc,Λ3,λc,y,X1,Z,true);
 @test sum((lod0.< 0.0))==0.0
 lod4,b4,es04=FlxQTL.gene1Scan(4,T3,Λ3,y,X1,true);
 @test sum(lod4.<0.0)==0.0
- i=1
- @test isposdef(es04[i].Σ)
- @test es04[i].τ2>0.0
+ for i=axes(Λ3,2)
+    print( @test isposdef(es04[i].Σ))
+    print(@test es04[i].τ2>0.0)
+    print(@test es00[i].τ2 >0.0)
+     print(@test es01[i].τ2>0.0)
+     print(@test isposdef(es00[i].Σ))
+    print(@test isposdef(es01[i].Σ))
+ end
 @test typeof(b4)==Array{Float64,3}
 @test typeof(b0)==Array{Float64,3}
 @test typeof(b1)==Array{Float64,3}
 
-println(@test es00[i].τ2 >0.0)
-println(@test es01[i].τ2>0.0)
-println(@test isposdef(es00[i].Σ))
-println(@test isposdef(es01[i].Σ))
+
+
 
 #MVLMM
 lod4,b4,es4=FlxQTL.geneScan(4,T3,Λ3,y,X1,true)
 @test sum(lod4.<0.0)==0
 @test typeof(b4)== Array{Float64,3}
-@test isposdef(es4[i].Vc)
-@test isposdef(es4[i].Σ)
-@test es4[i].loglik<=0.0
+for i=axes(Λ3,2)
+    print(@test isposdef(es4[i].Vc))
+    print(@test isposdef(es4[i].Σ))
+    print(@test es4[i].loglik<=0.0)
+end
 
 #
 #2d-scan
@@ -184,3 +189,19 @@ lod2d,es2d=FlxQTL.gene2Scan(4,T2,λ2,y,X1,Z);
 
 #loco
 Lod2d,Es2d=FlxQTL.gene2Scan(4,T3,Tc,Λ3,λc,y,X1,Z,true);
+@test sum(lod2d.<0.0)==0
+
+
+#MVLMM
+lod2d0,es2d0=FlxQTL.gene2Scan(4,T3,Λ3,y,X1,true)
+@test sum(lod2d0.<0.0)==0
+ for j=axes(Λ3,2)
+    print(@test Es2d[j].τ2 >0.0)
+    print(@test isposdef(Es2d[j].Σ))
+    print(@test Es2d[j].loglik <=0.0)
+    print(@test isposdef(es2d0[j].Vc))
+    print(@test isposdef(es2d0[j].Σ))
+    print(@test es2d0[j].loglik <=0.0)
+ end
+
+

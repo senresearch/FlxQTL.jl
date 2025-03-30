@@ -142,7 +142,7 @@ end
 
     kinshipLin(mat,cross)
 
-Calculates a kinship (or climatic relatedness, [`kinshipGs`](@ref)) matrix by linear kernel.
+Calculates a kinship matrix by linear kernel.
 
 # Arguments
 

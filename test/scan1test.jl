@@ -1,5 +1,7 @@
 
 #test for cross=1 (genotype data)
+# geno=readdlm("genotype.csv",',');
+# y1=readdlm("traits.csv",',')
 geno=[0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0
  1.0  1.0  0.0  1.0
@@ -53,12 +55,12 @@ XX=FlxQTL.Markers(marname,chr,pos,geno')
 XX1=FlxQTL.Markers(marname,chr,pos,geno)
 
 #test shrinkgLoco with kinshipMan, shrinkg
- Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,6,XX)
+ Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,15,XX)
 for j=1:2
       println(@test isposdef(Kg[:,:,j])== true)
 end
 
-K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,6,XX.X)
+K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,15,XX.X)
 @test isposdef(K)
 #precompute Kc
 K1= getKc(y)
@@ -116,7 +118,7 @@ LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,y,XX)
 @test isposdef(est3.Σ)
 @test est3.loglik <=0.0
 
-#environment scan
+environment scan
 Q=findall(LOD2.==maximum(LOD2))
 Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
  -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
@@ -241,7 +243,7 @@ end
 
 #######testing kinships
 
-@test isposdef(FlxQTL.kinshipGs(geno,std(geno)))
+# @test isposdef(FlxQTL.kinshipGs(geno,std(geno)))
 
 
 K0=FlxQTL.kinshipLoco(FlxQTL.kinshipCtr,XX)
