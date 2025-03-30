@@ -219,7 +219,7 @@ where `K` is a genetic kinship, ``\\Sigma_1, \\Sigma_2`` are covariance matrices
 - `cross` : An integer indicating the number of alleles or genotypes. Ex. `2` for RIF, `4` for four-way cross, `8` for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
 - `Kg` : A n x n genetic kinship matrix. Should be symmetric positive definite.
-- `Kc` : A m x m climatic relatedness matrix. Should be symmetric positive definite.
+- `Kc` : A m x m precomputed covariance matrix of `Kc` under the null model of no QTL. Should be symmetric positive definite.
 - `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y[1,:]`  (a vector) -> `Y[[1],:]`  (a matrix) .
 - `XX` : A type of [`Markers`](@ref).

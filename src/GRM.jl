@@ -107,35 +107,35 @@ end
 
 
 
-"""
+# """
 
-     kinshipGs(climate::Array{Float64,2},ρ::Float64)
+#      kinshipGs(climate::Array{Float64,2},ρ::Float64)
 
-Computes a kinship matrix using the Gaussian Kernel.
+# Computes a non-linear kinship matrix using the Gaussian Kernel.
 
-# Arguments
+# # Arguments
 
-- `climate` : A matrix of genotype, or climate information data. size(climate)=(r,m), such that `r` genotype markers (or days/years of climate factors,
-            i.e. precipitations, temperatures, etc.), and `m` individuals (or environments/sites)
-- `ρ` : A free parameter determining the width of the kernel. Could be attained empirically.
+# - `climate` : A matrix of genotype, or climate information data. size(climate)=(r,m), such that `r` genotype markers (or days/years of climate factors,
+#             i.e. precipitations, temperatures, etc.), and `m` individuals (or environments/sites)
+# - `ρ` : A free parameter determining the width of the kernel. Could be attained empirically.
 
-# Output
+# # Output
 
-Returns a m x m symmetric (positive definite) matrix containing 1's on the diagonal.
+# Returns a m x m symmetric (positive definite) matrix containing 1's on the diagonal.
 
-"""
-function kinshipGs(climate::Array{Float64,2},ρ::Float64)
- env=axes(climate,2);
- Kc=zeros(env,env);
+# """
+# function kinshipGs(climate::Array{Float64,2},ρ::Float64)
+#  env=axes(climate,2);
+#  Kc=zeros(env,env);
 
-    @views for c=env, r=c:length(env)
-            Kc[r,c]=exp(-mean(abs.(climate[:,c]-climate[:,r]).^2)/ρ)
-            Kc[c,r]=Kc[r,c]
-    end
+#     @views for c=env, r=c:length(env)
+#             Kc[r,c]=exp(-mean(abs.(climate[:,c]-climate[:,r]).^2)/ρ)
+#             Kc[c,r]=Kc[r,c]
+#     end
 
-    return Kc
+#     return Kc
 
-end
+# end
 
 
 """
@@ -202,7 +202,7 @@ end
 
 
 Calculates a kinship by a standardized (or normalized) genotype matrix (linear kernel), i.e. genotypes subtracted by marker mean and divided by marker standard deviation.
-Can also do with climatic information data. See [`kinshipGs`](@ref).
+
 
 # Argument
 

@@ -105,9 +105,9 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
           This value is related to degree of freedom when doing genome scan.
 - `Tg` : A n x n matrix of eigenvectors from [`K2eig`](@ref), or [`K2Eig`](@ref).
        Returns 3d-array of eigenvectors as many as Chromosomes if `LOCO` is true.
-- `Tc` : A m x m matrix of eigenvectors from climatic relatedness matrix.
+- `Tc` : A m x m matrix of eigenvectors from the precomputed covariance matrix of `Kc` under the null model of no QTL.
 - `Λg` : A n x 1 vector of eigenvalues from kinship. Returns a matrix of eigenvalues if `LOCO` is true.
-- `λc` : A m x 1 vector of eigenvalues from climatic relatedness matrix. Use `ones(m)` for no climatic information added.
+- `λc` : A m x 1 vector of eigenvalues from `Kc`. 
 - `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y0[1,:]` (a vector) -> `Y[[1],:]` (a matrix) .
 - `XX` : A type of [`Markers`](@ref).

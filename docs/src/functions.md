@@ -19,7 +19,7 @@ Modules = [GRM]
 ## Flexible Multivariate Linear Models (flxMLM)
 
 ```@autodocs
-Modules = [FlxMLM, MLM]
+Modules = [flxMLM, MLM]
 ```
 
 

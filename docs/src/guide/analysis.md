@@ -71,7 +71,7 @@ m,q = size(Z) # check the dimension
 
 ## Computing a genetic relatedness matrix (GRM) and pre-computing a covariance structure for a random matrix (Kc)
 
-The submodule `GRM` contains functions for computing kinship matrices, `kinshipMan`, `kinship4way`, `kinshipGs`, `kinshipLin`, `kinshipCtr`, and computing 
+The submodule `GRM` contains functions for computing kinship matrices, `kinshipMan`, `kinship4way`, `kinshipLin`, `kinshipCtr`, and computing 
 3D array of kinship matrices for LOCO (Leave One Chromosome Out) with a shrinkage method for nonpositive definiteness, 
 `shrinkg`, `shrinkgLoco`, `kinshipLoco`.  
 Note that the shrinkage option is only used for `kinshipMan`, `kinship4way`.

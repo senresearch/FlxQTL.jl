@@ -27,8 +27,8 @@ export mGLM, Estimat
 using .flxMLM: mlm1Scan, mlm2Scan, mlmTest
 export mlm1Scan, mlm2Scan, mlmTest
 
-using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
-export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
+using .GRM:kinshipMan,kinship4way,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
+export kinshipMan,kinship4way,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
 using .flxMLMM: geneScan,gene1Scan,gene2Scan,envScan,permTest,K2eig, K2Eig,getKc 
