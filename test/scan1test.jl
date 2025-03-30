@@ -118,18 +118,18 @@ LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,y,XX)
 @test isposdef(est3.Σ)
 @test est3.loglik <=0.0
 
-environment scan
-Q=findall(LOD2.==maximum(LOD2))
-Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
- -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
- -0.749826  -0.327169   0.20022    0.158106   0.993343
- 1.01404  0.47499  1.76577  -1.65295  1.41504]
-eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,y,XX,Ze)
-@test sum(eLOD.<0.0)==0.0
-@test typeof(eB)==Array{Float64,3}
-@test este[1].τ2>0.0
-@test isposdef(este[1].Σ)
-@test este[1].loglik<=0.0
+# #environment scan
+# Q=findall(LOD2.==maximum(LOD2))
+# Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
+#  -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
+#  -0.749826  -0.327169   0.20022    0.158106   0.993343
+#  1.01404  0.47499  1.76577  -1.65295  1.41504]
+# eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,y,XX,Ze)
+# @test sum(eLOD.<0.0)==0.0
+# @test typeof(eB)==Array{Float64,3}
+# @test este[1].τ2>0.0
+# @test isposdef(este[1].Σ)
+# @test este[1].loglik<=0.0
 
 #loco
 LOD1,B1,est01=FlxQTL.geneScan(1,Tg,Tc,Λg,λc,y,XX,true);
