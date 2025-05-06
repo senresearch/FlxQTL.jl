@@ -4,7 +4,7 @@ include("transformation.jl")
 include("PgeneScan1D.jl")
 include("PgeneScan2D.jl")
 include("PpermutationTest.jl")
-include("envScan.jl")
+# include("envScan.jl")
 
 
 # include("QTLselection.jl")

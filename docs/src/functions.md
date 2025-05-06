@@ -16,10 +16,10 @@ Modules = [FlxQTL, flxMLMM, EcmNestrv]
 Modules = [GRM]
 ```
 
-## Multivariate Linear Models (MLM)
+## Flexible Multivariate Linear Models (flxMLM)
 
 ```@autodocs
-Modules = [MLM]
+Modules = [flxMLM, MLM]
 ```
 
 

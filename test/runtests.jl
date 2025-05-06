@@ -1,4 +1,5 @@
 using FlxQTL
+using DelimitedFiles
 using Test
 
 @testset "FlxQTL.jl" begin

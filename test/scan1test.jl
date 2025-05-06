@@ -1,5 +1,7 @@
 
 #test for cross=1 (genotype data)
+# geno=readdlm("genotype.csv",',');
+# y1=readdlm("traits.csv",',')
 geno=[0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0
  1.0  1.0  0.0  1.0
@@ -21,7 +23,7 @@ geno=[0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0
  1.0  0.0  0.0  0.0]
 
-y=[3.0  19.7616   24.1761   15.6778;
+y1=[3.0  19.7616   24.1761   15.6778;
 4.0   6.28846   1.77401   3.23889;
 5.0  12.034    12.4605   10.601;
 6.0  20.1253   14.1169   12.9035;
@@ -40,8 +42,8 @@ y=[3.0  19.7616   24.1761   15.6778;
 19.0  13.3412    3.87934   7.89231;
 20.0  12.1524    9.46482  10.8092;
 21.0  16.2286    8.80221   8.11992;
-22.0  14.7742    6.47541  15.525]'
-y=Float64.(y); m=size(y,1)
+22.0  14.7742    6.47541  15.525]
+y=Float64.(y1'); m=size(y,1)
 marname=["X1" ;"X2";"X3";"X4"]
 chr=Any[1;1;2;2]
 pos=[1.4;2.0;3.44;4.25]
@@ -49,14 +51,16 @@ XX=FlxQTL.Markers(marname,chr,pos,geno')
 @test XX.name == marname
 @test XX.chr == chr
 @test size(XX.X)== size(geno')
+# for MLM setup
+XX1=FlxQTL.Markers(marname,chr,pos,geno)
 
 #test shrinkgLoco with kinshipMan, shrinkg
- Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,6,XX)
+ Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,15,XX)
 for j=1:2
       println(@test isposdef(Kg[:,:,j])== true)
 end
 
-K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,6,XX.X)
+K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,15,XX.X)
 @test isposdef(K)
 #precompute Kc
 K1= getKc(y)
@@ -114,18 +118,18 @@ LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,y,XX)
 @test isposdef(est3.Σ)
 @test est3.loglik <=0.0
 
-#environment scan
-Q=findall(LOD2.==maximum(LOD2))
-Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
- -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
- -0.749826  -0.327169   0.20022    0.158106   0.993343
- 1.01404  0.47499  1.76577  -1.65295  1.41504]
-eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,y,XX,Ze)
-@test sum(eLOD.<0.0)==0.0
-@test typeof(eB)==Array{Float64,3}
-@test este[1].τ2>0.0
-@test isposdef(este[1].Σ)
-@test este[1].loglik<=0.0
+# #environment scan
+# Q=findall(LOD2.==maximum(LOD2))
+# Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
+#  -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
+#  -0.749826  -0.327169   0.20022    0.158106   0.993343
+#  1.01404  0.47499  1.76577  -1.65295  1.41504]
+# eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,y,XX,Ze)
+# @test sum(eLOD.<0.0)==0.0
+# @test typeof(eB)==Array{Float64,3}
+# @test este[1].τ2>0.0
+# @test isposdef(este[1].Σ)
+# @test este[1].loglik<=0.0
 
 #loco
 LOD1,B1,est01=FlxQTL.geneScan(1,Tg,Tc,Λg,λc,y,XX,true);
@@ -165,14 +169,14 @@ for j=1:2
        println(@test est4[j].loglik<=0.0)
 end
 
-#environment scan
-Q=findall(LOD0.==maximum(LOD0))
-eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
-@test sum(eLOD0.<0.0)==0.0
-@test typeof(eB0)== Array{Float64,3}
-@test este0[1].τ2>0.0
-@test isposdef(este0[1].Σ)
-@test este0[1].loglik<=0.0
+# #environment scan
+# Q=findall(LOD0.==maximum(LOD0))
+# eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
+# @test sum(eLOD0.<0.0)==0.0
+# @test typeof(eB0)== Array{Float64,3}
+# @test este0[1].τ2>0.0
+# @test isposdef(este0[1].Σ)
+# @test este0[1].loglik<=0.0
 
 
 #2d-scan
@@ -239,7 +243,7 @@ end
 
 #######testing kinships
 
-@test isposdef(FlxQTL.kinshipGs(geno,std(geno)))
+# @test isposdef(FlxQTL.kinshipGs(geno,std(geno)))
 
 
 K0=FlxQTL.kinshipLoco(FlxQTL.kinshipCtr,XX)
@@ -256,3 +260,79 @@ end
 A=rand(15,15)
 Aidx= getGenoidx(A,0.25)
 @test length(Aidx)<=size(A,1)
+
+#MLM:mle
+mlod, bm,mest0= FlxQTL.mlm1Scan(1,y1,XX1,Z)
+mlogp,bm,mest0=FlxQTL.mlm1Scan(1,y1,XX1,Z;LogP=true)
+#Z=I
+mlodi, bmi,mest0i= FlxQTL.mlm1Scan(1,y1,XX1)
+mlogpi,bmi,mest0i=FlxQTL.mlm1Scan(1,y1,XX1;LogP=true)
+
+@test sum((mlod.<0.0))==0
+@test sum((mlodi.<0.0))==0
+for j=eachindex(mlod)
+       print(@test isapprox(mlod[j],mlodi[j];atol=0.01))
+       print(@test isapprox(bm[:,:,j],bmi[:,:,j];atol=0.01))
+       print(@test isapprox(mlogp[j],mlogpi[j];atol=0.01))
+end
+@test isposdef(mest0.Σ)
+@test isposdef(mest0i.Σ)
+@test mest0.Σ≈ mest0i.Σ
+
+#MLM;reml
+mlodr, bmr,mest0r= FlxQTL.mlm1Scan(1,y1,XX1,Z,true)
+mlogpr,bmr,mest0r=FlxQTL.mlm1Scan(1,y1,XX1,Z,true;LogP=true)
+#Z=I
+rlodi, bri,rest0i= FlxQTL.mlm1Scan(1,y1,XX1,true)
+rlogpi,bri,rest0i=FlxQTL.mlm1Scan(1,y1,XX1,true;LogP=true)
+@test sum((mlodr.<0.0))==0
+@test sum((rlodi.<0.0))==0
+for j=eachindex(mlodr)
+       println(@test mlodr[j]≈rlodi[j])
+       println(@test mlogpr[j]≈rlogpi[j] )
+       println(@test bmr[:,:,j]≈ bri[:,:,j])
+end
+
+
+@test isposdef(mest0r.Σ)
+@test isposdef(rest0i.Σ)
+@test mest0r.Σ≈rest0i.Σ
+
+#mle
+mlod2,mes02 = mlm2Scan(1,y1,XX1,Z)
+mlod2i,mes02i = mlm2Scan(1,y1,XX1)
+#reml
+rlod2,res02 = mlm2Scan(1,y1,XX1,Z,true)
+rlod2i,res02i = mlm2Scan(1,y1,XX1,true)
+@test sum(mlod2.<0.0)==0
+@test sum(mlod2i.<0.0)==0
+@test mlod2≈ mlod2i
+@test sum(rlod2.<0.0)==0
+@test sum(rlod2i.<0.0)==0
+@test rlod2≈ rlod2i
+@test isposdef(mes02.Σ)
+@test isposdef(mes02i.Σ)
+@test mes02.Σ≈ mes02i.Σ
+@test isposdef(res02.Σ)
+@test isposdef(res02i.Σ)
+@test res02.Σ≈ res02i.Σ
+
+mcut1,mxlod,h1p= mlmTest(1,4,y1,XX1,Z)
+micut1,mxlodi,h1pi= mlmTest(1,4,y1,XX1)
+rcut1,mxr,h1r= mlmTest(1,4,y1,XX1,Z,true)
+ricut1,mxri,h1ri= mlmTest(1,4,y1,XX1,true)
+for j=eachindex(mcut1)
+       println(@test mcut1[j]≈ micut1[j])
+       println(@test rcut1[j]≈ ricut1[j])
+end
+@test sum(mxlod.<0.0)==0
+@test sum(mxlodi.<0.0)==0
+for j=eachindex(mxlod)
+       println(@test mxlod[j]≈ mxlodi[j])
+       println(@test mxr[j]≈ mxri[j])
+end
+
+@test sum(mxr.<0.0)==0
+@test sum(mxri.<0.0)==0
+
+

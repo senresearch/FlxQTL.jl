@@ -14,68 +14,113 @@ module MLM
 
 
 using LinearAlgebra
+using ..EcmNestrv:symSq, fixZ
 
-# export  EstI, EstZ, Estimat
 
-struct EstZ
-     pX::Array{Float64,2}
-     Σ::Array{Float64,2}
-     B::Array{Float64,2}
-     loglik::Float64
+#compute Σ⁻¹Z(Z'Σ⁻¹Z)⁻¹
+function pinvZ(Z::Matrix{Float64},Σ::Matrix{Float64})
+             
+    return  Σ\fixZ(Z,Σ)'
+
+end
+
+#compute (X'X)⁻¹X'
+function fiX(X::Matrix{Float64})
+
+    return symSq(X,'T')\X'
+    
 end
 
 
-# mGLMind :: fitting a multivariate linear model (initial computation)
-# Synopsis: EstZ = mGLMInd(Y,X,Z,true)
-
-# Input:
-# Y: response variables (or phenotypes) 
-# X: row  covariate fixed effects(independent variables or genotypes)
-# Z: column covariate fixed effects (or basis functions or contrasts)
-# reml:restricted mle (the default is mle )
-# Output:
-# EstZ.pX : computing inv(X'X)X'
-# EstZ.Σ : parameter estimation of Σ
-# EstZ.B : parameter estimation of B (or β)
-
-# Example:
-# See also mGLM
+struct Estz
+     B0::Array{Float64,2}
+     Σ::Array{Float64,2}
+end
 
 
-
-
-function mGLMind(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},reml::Bool=false)
+function mGLMind(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},n,m,p,q,reml::Bool=false)
 
     #number of individuals; number of covariates
-    n,m=size(Y);
-    p=size(X,2)
-     q=size(Z,2)
-
-    F=qr(X)
+    # n,m=size(Y);p=size(X,2); q=size(Z,2)
+    
+    B = zeros(p,q); ESS=zeros(m,m);B0=zeros(p,m)
+    # F=qr(X)
   
-    Xquad=Symmetric(F.R'*F.R)  # Force the inverse of  (X'X =R'R) to be symmetric explicitly
-    pX= Xquad\X'  #  inv(R'R)*X'
-   
-    pZ=Symmetric(BLAS.syrk('U','T',1.0,Z))\Z' # inv(Z'Z)*Z'
-    B=BLAS.gemm('N','T',(pX*Y),pZ)
+    # Xquad=Symmetric(F.R'*F.R)  # Force the inverse of  (X'X =R'R) to be symmetric explicitly
+    # pX= Xquad\X'  #  inv(R'R)*X'
     
+    pivZ = fiX(Z) # inv(Z'Z)*Z'
+   
+    # pZ=Symmetric(BLAS.syrk('U','T',1.0,Z))\Z' # inv(Z'Z)*Z'
+    # B=BLAS.gemm('N','T',(pX*Y),pivZ)
+        
     # mle for B and Σ=I 
-    Ŷ=BLAS.gemm('N','T',(X*B),Z)  # Yhat= XBZ'
-    ESS=Symmetric(BLAS.syrk('U','T',1.0,(Y-Ŷ)))
-if (reml) 
-    Σ=ESS/(n-p)  
-else
-   Σ=ESS/n
-end
-   
-     loglik=-0.5*(n*(m*log(2π)+logdet(Σ))+tr(ESS))
-    if (reml)
-        loglik += 0.5*p*q*log(2π)
-    end
-    
-    return EstZ(pX,Σ,B,loglik)
+    # Ŷ=BLAS.gemm('N','T',(X*B),Z)  # Yhat= XBZ'
+    # ESS=Symmetric(BLAS.syrk('U','T',1.0,(Y-Ŷ)))
+    MLE!(B,ESS,B0,Y,X,Z,pivZ)
+
+   if(reml) 
+        Σ=ESS./(n-p)  
+    else
+        Σ=ESS./n
+   end
+        
+    return Estz(B0,Σ)
 
 end
+
+#Z=I
+function mGLMind(Y::Array{Float64,2},X::Array{Float64,2},n,m,p,reml::Bool=false)
+ 
+    B = zeros(p,m); ESS=zeros(m,m);
+    
+    MLE!(B,ESS,Y,X)
+
+   if(reml) 
+        Σ=ESS./(n-p)  
+    else
+        Σ=ESS./n
+   end
+        
+    return Estz(B,Σ)
+
+end
+
+
+function MLE!(B::Matrix{Float64},ESS::Matrix{Float64},pXY::Matrix{Float64},Y::Matrix{Float64},X::Matrix{Float64},Z::Matrix{Float64},pivZ::Matrix{Float64})
+
+    pXY[:,:]= BLAS.gemm('N','N',fiX(X),Y) #pxm
+    B[:,:] = BLAS.gemm('N','T',pXY,pivZ) 
+    dev= Y- BLAS.gemm('N','T',(X*B),Z)
+    ESS[:,:]= Symmetric(BLAS.syrk('U','T',1.0,dev))
+
+end
+
+#Z=I
+function MLE!(B::Matrix{Float64},ESS::Matrix{Float64},Y::Matrix{Float64},X::Matrix{Float64})
+
+    B[:,:]= BLAS.gemm('N','N',fiX(X),Y)
+    dev= Y- BLAS.gemm('N','N',X,B)
+    ESS[:,:]= Symmetric(BLAS.syrk('U','T',1.0,dev))
+
+end
+
+function MLEs!(B::Matrix{Float64},ESS::Matrix{Float64},Y::Matrix{Float64},X::Matrix{Float64},Z::Matrix{Float64},pivZ::Matrix{Float64},pXY::Matrix{Float64})
+   B[:,:] = BLAS.gemm('N','N',pXY,pivZ)
+   dev = Y- BLAS.gemm('N','T',(X*B),Z)
+   ESS[:,:] = Symmetric(BLAS.syrk('U','T',1.0,dev)) 
+
+end
+
+
+#Z=I
+function MLEs!(ESS::Matrix{Float64},Y::Matrix{Float64},X::Matrix{Float64},pXY::Matrix{Float64})
+#    B[:,:] = BLAS.gemm('N','T',pXY,pivZ)
+   dev = Y- BLAS.gemm('N','N',X,pXY)
+   ESS[:,:] = Symmetric(BLAS.syrk('U','T',1.0,dev)) 
+
+end
+
 
 
 """
@@ -108,46 +153,39 @@ function mGLM(Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},reml::
     p=size(X,2)
     #number of secondary (e.g. environment factors, grouping, etc.) variables in Z: rank(Z)=q
     q=size(Z,2)
-    
-    estInd=mGLMind(Y,X,Z,reml)
+    B = zeros(p,q); ESS=zeros(m,m);
+    # estInd=mGLMind(Y,X,Z,reml)
 #     Σ_0=estInd.Σ
 #     pX=estInd.pX
     
 
      #transformed by Σ^(-1/2)    
-    sqrtsig=sqrt(estInd.Σ)
+    # sqrtsig=sqrt(estInd.Σ)
  
-    Y_t=(sqrtsig\Y')'
-    Z_t=sqrtsig\Z
+    # Y_t=(sqrtsig\Y')'
+    # Z_t=sqrtsig\Z
+    Est0= mGLMind(Y,X,Z,n,m,p,q,reml)
+    pivZ= pinvZ(Z,Est0.Σ)
+    MLEs!(B,ESS,Y,X,Z,pivZ,Est0.B0)
+    # pZ_t=Symmetric(BLAS.syrk('U','T',1.0,Z_t))\Z_t' # (Z'Σ^(-1)Z)^(-1)Z'Σ^(-1/2)
+    # B=BLAS.gemm('N','T',(estInd.pX*Y_t),pZ_t) 
+    # Ŷ_t= BLAS.gemm('N','T',(X*B),Z_t)
+    # ESS_t= Symmetric(BLAS.syrk('U','T',1.0,(Y_t-Ŷ_t)))# (Y_tran-Yhat_tran)'(Y_tran-Yhat_tran)
     
-#     pZ= convert(Array{Float64,2},Symmetric(BLAS.gemm('T','N',Z,Σ\Z))\(Σ\Z)')
-  
-    pZ_t=Symmetric(BLAS.syrk('U','T',1.0,Z_t))\Z_t' # (Z'Σ^(-1)Z)^(-1)Z'Σ^(-1/2)
-    
-    B=BLAS.gemm('N','T',(estInd.pX*Y_t),pZ_t) 
-    
-    Ŷ_t= BLAS.gemm('N','T',(X*B),Z_t)
-   
-    ESS_t= Symmetric(BLAS.syrk('U','T',1.0,(Y_t-Ŷ_t)))# (Y_tran-Yhat_tran)'(Y_tran-Yhat_tran)
-    
-    if (reml)
-        Σ_t = ESS_t/(n-p)
-    else
-        Σ_t = ESS_t/n
+    if(reml)
+        Σ = ESS/(n-p)
+     else
+        Σ = ESS/n
     end
     
     ## estimate loglikelihood 
     
-    lg_mult=-0.5*(n*(m*log(2π)+logdet(Σ_t))+tr(ESS_t))
-    if (reml)
-        lg_mult += 0.5*p*q*log(2π)
+    loglik=-0.5*(n*(m*log(2π)+logdet(Σ))+tr(ESS))
+    if(reml)
+        loglik += 0.5*p*q*log(2π)
     end
     
-    ## Variance-Covariance matrix
-    # Σ=A_mul_Bt(Σ_0,Σ_tran)
-    # Σ_s=(Σ+Σ')/2
-
-    return Estimat(B,estInd.Σ,lg_mult)
+    return Estimat(B,Σ,loglik)
             
 end
 
@@ -158,32 +196,22 @@ function mGLM(Y::Array{Float64,2},X::Array{Float64,2},reml::Bool=false)
 
     #number of individuals; number of covariates
     n,m=size(Y);
-    p=size(X,2)
+    p=size(X,2); ESS=zeros(m,m);
    
-
-    F=qr(X)
-  
-    Xquad=Symmetric(F.R'*F.R)  # Force the inverse of  (X'X =R'R) to be symmetric explicitly
-    pX= Xquad\X'  #  inv(R'R)*X'
-   
-    B=BLAS.gemm('N','N',pX,Y)
-#     println("This is mGLM. $(B)")
-
-    # mle for B and Σ=I 
-    Ŷ=BLAS.gemm('N','N',X,B)  # Yhat= XB
-    ESS=Symmetric(BLAS.syrk('U','T',1.0,(Y-Ŷ)))
-if (reml) 
-    Σ=ESS/(n-p)  
-else
-   Σ=ESS/n
-end
+  Est0 = mGLMind(Y,X,n,m,p,reml)
+  MLEs!(ESS,Y,X,Est0.B0)
+   if(reml) 
+      Σ=ESS/(n-p)  
+     else
+      Σ=ESS/n
+    end
     
     loglik=-0.5*(n*(m*log(2π)+logdet(Σ))+tr(ESS))
-    if (reml)
+    if(reml)
         loglik += 0.5*p*m*log(2π)
     end
     
-    return Estimat(B,Σ,loglik)
+    return Estimat(Est0.B0,Σ,loglik)
 end
 
 """
@@ -197,7 +225,6 @@ The results are `B`(fixed effects), `Σ` (m x m covariance matrix), `loglik`(a v
 struct Estimat
     B::Array{Float64,2}
     Σ::Array{Float64,2}
-#    Σ_t::Array{Float64,2}
     loglik::Float64
 end
     

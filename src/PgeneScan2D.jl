@@ -13,7 +13,7 @@ function marker2Scan!(LODs,mindex::Array{Int64,1},q,kmin,cross,Nullpar::Approx,�
 
               for j=1:M-1
                lod=@distributed (vcat) for l=j+1:M
-                      XX=@views vcat(Xnul_t,X1[j,2:end,:],X1[l,2:end,:])
+                      XX=@views vcat(Xnul_t,X1[2:end,:,j],X1[2:end,:,l])
                       B0,τ2,Σ,loglik0 =ecmLMM(Y1,XX,Z1,B0,Nullpar.τ2,Nullpar.Σ,λg,λc,ν₀,Ψ;tol=tol0)
                        lod0=(loglik0-Nullpar.loglik)/log(10)
                       est1=ecmNestrvAG(lod0,kmin,Y1,XX,Z1,B0,τ2,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol1)
@@ -49,7 +49,7 @@ function marker2Scan!(LODs,mindex::Array{Int64,1},m,kmin,cross,Nullpar::Result,�
 
                for j=1:M-1
                lod=@distributed (vcat) for l=j+1:M
-                           XX=@views vcat(Xnul_t,X1[j,2:end,:],X1[l,2:end,:])
+                           XX=@views vcat(Xnul_t,X1[2:end,:,j],X1[2:end,:,l])
                            B0,Vc,Σ,loglik0 = ecmLMM(Y1,XX,B0,Nullpar.Vc,Nullpar.Σ,λg,ν₀,Ψ;tol=tol0)
                             lod0=(loglik0-Nullpar.loglik)/log(10)
                            est1=ecmNestrvAG(lod0,kmin,Y1,XX,B0,Vc,Σ,λg,ν₀,Ψ;tol=tol1,ρ=ρ)
@@ -105,9 +105,9 @@ random and error terms, respectively.  `Z` can be replaced with an identity matr
           This value is related to degree of freedom when doing genome scan.
 - `Tg` : A n x n matrix of eigenvectors from [`K2eig`](@ref), or [`K2Eig`](@ref).
        Returns 3d-array of eigenvectors as many as Chromosomes if `LOCO` is true.
-- `Tc` : A m x m matrix of eigenvectors from climatic relatedness matrix.
+- `Tc` : A m x m matrix of eigenvectors from the precomputed covariance matrix of `Kc` under the null model of no QTL.
 - `Λg` : A n x 1 vector of eigenvalues from kinship. Returns a matrix of eigenvalues if `LOCO` is true.
-- `λc` : A m x 1 vector of eigenvalues from climatic relatedness matrix. Use `ones(m)` for no climatic information added.
+- `λc` : A m x 1 vector of eigenvalues from `Kc`. 
 - `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y0[1,:]` (a vector) -> `Y[[1],:]` (a matrix) .
 - `XX` : A type of [`Markers`](@ref).
@@ -172,7 +172,7 @@ function gene2Scan(cross::Int64,Tg,Tc::Array{Float64,2},Λg,λc::Array{Float64,1
 #                 Xnul_t=Xnul*Tg[:,:,i]';
        @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,Tg[:,:,i])
                 if (cross!=1)
-       @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+       @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[:,:,maridx],cross)
                    else
        @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end
@@ -223,7 +223,7 @@ function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Boo
 #                 Xnul_t=Xnul*Tg[:,:,i]';
              @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                 if (cross!=1)
-                   Y,X=transForm(Tg[:,:,i],Y,X0[maridx,:,:],cross)
+                   Y,X=transForm(Tg[:,:,i],Y,X0[:,:,maridx],cross)
                    else
                    Y,X=transForm(Tg[:,:,i],Y,XX.X[maridx,:],cross)
                  end
@@ -285,7 +285,7 @@ function gene2Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,Z::Array{
                 maridx=findall(XX.chr.==Chr[i]);
                 @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul, Tg[:,:,i])
                  if (cross!=1) #individual-wise tranformation 
-             @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[maridx,:,:],cross)
+             @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,X0[:,:,maridx],cross)
                    else
              @fastmath @inbounds Y2,X1=transForm(Tg[:,:,i],Y1,XX.X[maridx,:],cross)
                  end

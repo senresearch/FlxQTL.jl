@@ -2,7 +2,8 @@
 
     FlxQTL
 
-flexible Multivariate Linear Mixed Model based QTL analysis tools for structured multiple traits.
+flexible QTL analysis tools for structured multiple traits fitting a Multivariate Linear Mixed Model or a Multivariate 
+    Linear Model.
 
 """
 module FlxQTL
@@ -11,22 +12,28 @@ module FlxQTL
  __precompile__(true)
 
 
-include("MLM.jl")
-include("Miscellanea.jl")
-include("GRM.jl")
+
 include("EcmNestrv.jl")
+include("Miscellanea.jl")
+include("MLM.jl")
+include("flxMLM.jl")
+include("GRM.jl")
 include("flxMLMM.jl")
+
 
 using .MLM:mGLM, Estimat
 export mGLM, Estimat
 
-using .GRM:kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
-export kinshipMan,kinship4way,kinshipGs,kinshipLin,kinshipCtr,kinshipStd
+using .flxMLM: mlm1Scan, mlm2Scan, mlmTest
+export mlm1Scan, mlm2Scan, mlmTest
+
+using .GRM:kinshipMan,kinship4way,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
+export kinshipMan,kinship4way,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
-using .flxMLMM: geneScan,gene1Scan,gene2Scan,envScan,permTest,K2eig, K2Eig,getKc 
+using .flxMLMM: geneScan,gene1Scan,gene2Scan,permTest,K2eig, K2Eig,getKc #,envScan
 #selectQTL
-export geneScan,gene2Scan,envScan,permTest,K2eig, K2Eig, gene1Scan,getKc 
+export geneScan,gene2Scan,permTest,K2eig, K2Eig, gene1Scan,getKc #,envScan
 
 using .Util:setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
 export setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber

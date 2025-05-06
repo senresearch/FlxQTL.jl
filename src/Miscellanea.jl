@@ -117,7 +117,7 @@ end
 
      mat2array(cross::Int64,X0)
 
-Returns a matrix of genotype probabilities to 3-d array. size(X0)=(p1,n) --> (p,cross,n), where `p1` = ` cross*p` for `p` markers, 
+Returns a matrix of genotype probabilities to 3-d array. size(X0)=(p1,n) --> (cross,n,p), where `p1` = ` cross*p` for `p` markers, 
 `cross` alleles or genotypes, and `n` individuals.
 
 # Argument
@@ -130,9 +130,9 @@ See [`array2mat`](@ref).
 """
 function mat2array(cross::Int64,X0)
 n=size(X0,2); p=Int(size(X0,1)/cross)
-X=zeros(p,cross,n); 
+X=zeros(cross,n,p); 
 @inbounds @views for j=1:p
- X[j,:,:]=  X0[cross*j-(cross-1):cross*j,:]
+ X[:,:,j]=  X0[cross*j-(cross-1):cross*j,:]
           end
 return X
 end
@@ -142,21 +142,22 @@ end
 
      array2mat(cross::Int64,X0::Array{Float64,3})
 
-Returns a 3-d array to a matrix of genotype probabilities. size(X0)=(p,cross,n) --> (p1,n), where `p1` = ` cross*p` for `p` markers, 
+Returns a 3-d array to a matrix of genotype probabilities. size(X0)=(cross,n,p) --> (p1,n), where `p1` = ` cross*p` for `p` markers, 
 `cross` alleles or genotypes, and `n` individuals.
 See [`mat2array`](@ref).
 
 """
 function array2mat(cross::Int64,X0::Array{Float64,3})
-p=size(X0,1); n=size(X0,3)
+p=size(X0,3); n=size(X0,2)
 X=zeros(p*cross,n)
 @inbounds @views for j=1:p
-    X[cross*j-(cross-1):cross*j,:]= X0[j,:,:]
+    X[cross*j-(cross-1):cross*j,:]= X0[:,:,j]
         end
 return X
 end
 
 
+#### Need to change for the right dimension
 ### changing a 3d-array to a matrix with covariates or a row of intercepts
 ## adding covariates to build up a matrix of qtl for forward selection 
 # default of Xnul = 1's (before transformation). 
