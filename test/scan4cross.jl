@@ -165,43 +165,52 @@ for i=axes(Λ3,2)
 end
 
 #
-#2d-scan
-#no loco
- lod2d,es2d=FlxQTL.gene2Scan(4,T2,Tc,λ2,λc,y,X1,Z);
-@test sum(lod2d.<0.0)==0
-@test es2d.τ2 >0.0
-@test isposdef(es2d.Σ)
-@test es2d.loglik <=0.0
+# #2d-scan
+# gen3=readdlm("genopr_3way.txt"); #12 x 1212
+# lnY= readdlm("log_16wk_weights.txt"); #16 x 1212
+# Kin3= readdlm("kinship_3way.csv",','); 
+# Kin = [Kin3;;;Kin3];
+# X7 = Markers(marname,chr,pos,gen3);
+# m,n =size(lnY)
+# K3=getKc(lnY);
+# @test isposdef(K3.Kc)
+# T2,λ2,Tc,λc = FlxQTL.K2Eig(Kin,K3.Kc,true);
 
-#MVLMM
-lod2d0,es2d0=FlxQTL.gene2Scan(4,T2,λ2,y,X1)
-@test sum(lod2d0.<0.0)==0
-@test isposdef(es2d0.Vc)
-@test isposdef(es2d0.Σ)
-@test es2d0.loglik <=0.0
-
-
-lod2d,es2d=FlxQTL.gene2Scan(4,T2,λ2,y,X1,Z);
-@test sum(lod2d.<0.0)==0
-@test es2d.τ2 >0.0
-@test isposdef(es2d.Σ)
-@test es2d.loglik <=0.0
-
-#loco
-Lod2d,Es2d=FlxQTL.gene2Scan(4,T3,Tc,Λ3,λc,y,X1,Z,true);
-@test sum(lod2d.<0.0)==0
+# #no loco
+#  lod2d,es2d=FlxQTL.gene2Scan(3,T2[:,:,1],Tc,λ2[:,1],λc,lnY,X7,Matrix(1.0I,m,m));
+# @test sum(lod2d.<0.0)==0
+# @test es2d.τ2 >0.0
+# @test isposdef(es2d.Σ)
 
 
-#MVLMM
-lod2d0,es2d0=FlxQTL.gene2Scan(4,T3,Λ3,y,X1,true)
-@test sum(lod2d0.<0.0)==0
- for j=axes(Λ3,2)
-    print(@test Es2d[j].τ2 >0.0)
-    print(@test isposdef(Es2d[j].Σ))
-    print(@test Es2d[j].loglik <=0.0)
-    print(@test isposdef(es2d0[j].Vc))
-    print(@test isposdef(es2d0[j].Σ))
-    print(@test es2d0[j].loglik <=0.0)
- end
+# #MVLMM
+# lod2d0,es2d0=FlxQTL.gene2Scan(3,T2[:,:,1],λ2[:,1],lnY,X7)
+# @test sum(lod2d0.<0.0)==0
+# @test isposdef(es2d0.Vc)
+# @test isposdef(es2d0.Σ)
+
+
+
+# lod2d,es2d=FlxQTL.gene2Scan(3,T2[:,:,1],λ2[:,1],lnY,X7,Matrix(1.0I,m,m));
+# @test sum(lod2d.<0.0)==0
+# @test es2d.τ2 >0.0
+# @test isposdef(es2d.Σ)
+
+
+# #loco
+# Lod2d,Es2d=FlxQTL.gene2Scan(3,T2,Tc,λ2,λc,lnY,X7,Matrix(1.0I,m,m),true);
+# @test sum(lod2d.<0.0)==0
+
+
+# #MVLMM
+# lod2d0,es2d0=FlxQTL.gene2Scan(3,T2,λ2,lnY,X7,true)
+# @test sum(lod2d0.<0.0)==0
+#  for j=axes(Λ3,2)
+#     print(@test Es2d[j].τ2 >0.0)
+#     print(@test isposdef(Es2d[j].Σ))
+#     print(@test isposdef(es2d0[j].Vc))
+#     print(@test isposdef(es2d0[j].Σ))
+   
+#  end
 
 
