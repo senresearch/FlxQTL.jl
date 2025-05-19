@@ -150,8 +150,8 @@ where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
 function mlm1Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Matrix{Float64},reml::Bool=false;LogP::Bool=false,
     Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
-    # size(X)=(n,p), size(Z)=(q,m)
-    p=Int(size(XX.X,2)/cross); q=size(Z,1)
+    # size(X)=(n,p), size(Z)=(m,q)
+    p=Int(size(XX.X,2)/cross); q=size(Z,2)
     LODs = zeros(p); H1par=[]
     
 
@@ -244,8 +244,8 @@ where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
 """
 function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Matrix{Float64},reml::Bool=false;Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
-    # size(X)=(n,p), size(Z)=(q,m)
-    p=Int(size(XX.X,2)/cross); q=size(Z,1)
+    # size(X)=(n,p), size(Z)=(m,q)
+    p=Int(size(XX.X,2)/cross); q=size(Z,2)
     LODs=zeros(p,p);  Chr=unique(XX.chr); nChr=length(Chr);
  
     #nul scan
@@ -273,7 +273,7 @@ end
 #Z=I
 function mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,reml::Bool=false;Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
-# size(X)=(n,p), size(Z)=(q,m)
+# size(X)=(n,p), size(Z)=(m,q)
     p=Int(size(XX.X,2)/cross); 
     LODs=zeros(p,p);  Chr=unique(XX.chr);
 
