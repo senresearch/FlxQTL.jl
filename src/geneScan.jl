@@ -357,7 +357,7 @@ function mlmTest(nperm::Int64,cross::Int64,Y::Matrix{Float64},XX::Markers,Z::Mat
 
      cutoff = quantile(maxlod,1.0.-pval)
       
-     return cutoff, maxlod, H1par
+     return  maxlod, H1par, cutoff
     
 end
 
@@ -375,7 +375,7 @@ function mlmTest(nperm::Int64,cross::Int64,Y::Matrix{Float64},XX::Markers,reml::
      end
      mlmpermutation!(maxlod,H1par,nperm,cross,n,p,Y,X,reml;Xnul=Xnul)
      cutoff = quantile(maxlod,1.0.-pval) 
-     return cutoff, maxlod, H1par
+     return  maxlod, H1par, cutoff
     
 end
 
