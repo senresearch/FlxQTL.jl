@@ -24,6 +24,7 @@ import Statistics: mean, var, quantile,cov
 using ..MLM
 
 using ..EcmNestrv:ecmLMM,ecmNestrvAG,NestrvAG,Approx,Result,updateΣ
+# using ..EcmNestrv
 
 using ..Util: mat2array,array2mat, Markers, newMarkers,lod2logP
 

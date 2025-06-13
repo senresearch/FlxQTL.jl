@@ -381,11 +381,11 @@ end
 
 
 function mlmpermutation!(maxlod,H1par,nperm,cross,n,p,Y,X,Z,reml;Xnul=Xnul)
-
+         Y1=similar(Y)
     for l=1: nperm
-        Y1= Y[shuffle(1:n),:]
+        Y1[:,:]= Y[shuffle(1:n),:]
         est0=mGLM(Y1,Xnul,Z,reml)
-        LODs,H1par[l] = marker1Scan(p,cross,est0,Y,Xnul,X,Z,reml)
+        LODs,H1par[l] = marker1Scan(p,cross,est0,Y1,Xnul,X,Z,reml)
         maxlod[l]= maximum(LODs); 
         if (mod(l,100)==0)
             println("Scan for $(l)th permutation is done.")
@@ -396,11 +396,11 @@ end
 
 #Z=I
 function mlmpermutation!(maxlod,H1par,nperm,cross,n,p,Y,X,reml;Xnul=Xnul)
-
+     Y1=similar(Y)
     for l=1: nperm
-        Y1= Y[shuffle(1:n),:]
+        Y1[:,:]= Y[shuffle(1:n),:]
         est0=mGLM(Y1,Xnul,reml)
-        LODs,H1par[l] = marker1Scan(p,cross,est0,Y,Xnul,X,reml)
+        LODs,H1par[l] = marker1Scan(p,cross,est0,Y1,Xnul,X,reml)
         maxlod[l]= maximum(LODs); 
         if (mod(l,100)==0)
             println("Scan for $(l)th permutation is done.")
