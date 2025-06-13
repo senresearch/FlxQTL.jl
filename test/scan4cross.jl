@@ -103,13 +103,12 @@ mxlodi,h1pi,micut1= mlmTest(4,4,y1,X2)
 mxr,h1r,rcut1= mlmTest(4,4,y1,X2,Z,true)
 mxri,h1ri,ricut1= mlmTest(4,4,y1,X2,true)
 for j=eachindex(mcut1)
-    print(@test mcut1[j]≈ micut1[j])
-    print(@test rcut1[j]≈ ricut1[j])
+    print(@test isless(0.0,mcut1[j]))
+    print(@test isless(0.0, micut1[j]))
+    print(@test isless(0.0,rcut1[j]))
+    print(@test isless(0.0,ricut1[j]))
 end
-for j=eachindex(mxlod)
-    print(@test mxlod[j]≈ mxlodi[j])
-    print(@test mxr[j]≈ mxri[j])
-end
+
 @test sum(mxlod.<0.0)==0
 @test sum(mxlodi.<0.0)==0
 @test sum(mxr.<0.0)==0

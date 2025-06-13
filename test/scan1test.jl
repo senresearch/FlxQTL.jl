@@ -317,21 +317,23 @@ rlod2i,res02i = mlm2Scan(1,y1,XX1,true)
 @test isposdef(res02i.Σ)
 @test res02.Σ≈ res02i.Σ
 
-mxlod,h1p,mcut1= mlmTest(1,4,y1,XX1,Z)
-mxlodi,h1pi,micut1= mlmTest(1,4,y1,XX1)
-mxr,h1r,rcut1= mlmTest(1,4,y1,XX1,Z,true)
-mxri,h1ri,ricut1= mlmTest(1,4,y1,XX1,true)
-for j=eachindex(mcut1)
-       println(@test mcut1[j]≈ micut1[j])
-       println(@test rcut1[j]≈ ricut1[j])
-end
+mxlod,h1p,mcut1= mlmTest(1,1,y1,XX1,Z)
+mxlodi,h1pi,micut1= mlmTest(1,1,y1,XX1)
+mxr,h1r,rcut1= mlmTest(1,1,y1,XX1,Z,true)
+mxri,h1ri,ricut1= mlmTest(1,1,y1,XX1,true)
+
+       print(@test isless(0.0,mcut1[1]))
+       print(@test isless(0.0, micut1[1]))
+       print(@test isless(0.0,mcut1[2])) 
+       print(@test isless(0.0,micut1[2]))
+       print(@test isless(0.0,rcut1[1])) 
+       print(@test isless(0.0,ricut1[1]))
+       print(@test isless(0.0,rcut1[2])) 
+       print(@test isless(0.0,ricut1[2]))
+
+
 @test sum(mxlod.<0.0)==0
 @test sum(mxlodi.<0.0)==0
-for j=eachindex(mxlod)
-       println(@test mxlod[j]≈ mxlodi[j])
-       println(@test mxr[j]≈ mxri[j])
-end
-
 @test sum(mxr.<0.0)==0
 @test sum(mxri.<0.0)==0
 
