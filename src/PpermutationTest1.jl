@@ -175,7 +175,7 @@ end
 
 
 #MVLMM
-function locoPermutation(cross::Int64,p::Int64,Y::Array{Array{Float64,2},1},X::Union{Array{Float64,2},Array{Float64,3}},chr::Arry{Any,1},
+function locoPermutation(cross::Int64,p::Int64,Y::Array{Array{Float64,2},1},X::Union{Array{Float64,2},Array{Float64,3}},chr::Array{Any,1},
         Nullpar,Λg::Array{Float64,2},Xnul_t::Array{Array{Float64,2},1},ν₀,Ψ;tol0=1e-3,tol::Float64=1e-4,ρ=0.001)
 
     m,n=size(Y[1]);Chr=unique(chr);nChr=length(Chr);
@@ -292,12 +292,12 @@ function permutationTest(nperm::Int64,cross,Kg,Y,XX::Markers;pval=[0.05 0.01],m=
                  Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul=ones(1,size(Y,2)),itol=1e-4,tol0=1e-3,tol=1e-4,ρ=0.001)
     #permutation without LOCO
       p=Int(size(XX.X,1)/cross); maxLODs = zeros(nperm);H1par=[]
-     Tg,Λg=K2eig(Kg)
+     Tg,Λg=K2eig(Kg,true)
      
       est0,Xnul_t,Y2,X1= scan0loco(cross,Tg,Λg,Y,XX;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
     
     for l= 1:nperm
-    maxlod, H1par_perm=locoPermutation(cross,p,Y2,X1,XX.chr,est0,Λg,Xnul_t,df_prior;tol0=tol0,tol=tol,ρ=ρ)
+    maxlod, H1par_perm=locoPermutation(cross,p,Y2,X1,XX.chr,est0,Λg,Xnul_t,df_prior,Prior;tol0=tol0,tol=tol,ρ=ρ)
     maxLODs[l]=maxlod; H1par=[H1par;H1par_perm]
              if (mod(l,100)==0)
               println("Scan for $(l)th permutation is done.")

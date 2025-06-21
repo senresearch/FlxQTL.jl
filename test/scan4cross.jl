@@ -130,6 +130,19 @@ for l=1:2
 println(@test isless(0.0,cutoff2[l]))
 end
 
+#permutation-loco
+mxlods,h1par1,cuts1=permutationTest(4,4,K4,K1.Kc,y,X1;Z=Z);
+@test sum(mxlods.<0.0)==0
+for l=1:2
+    println(@test isless(0.0,cuts1[l]))
+end
+
+mxlods0,h1par00,cuts00 = permutationTest(4,4,K4,y,X1)
+@test sum(mxlods0.<0.0)==0
+for l=1:2
+    println(@test isless(0.0,cuts00[l]))
+end
+
 
 #loco
 lod1,b1,es01=FlxQTL.geneScan(4,T3,Tc,Λ3,λc,y,X1,true);

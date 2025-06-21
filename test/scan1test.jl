@@ -227,7 +227,7 @@ for j=1:2
 end
 
 
-#permutation
+#permutation 
 maxLODs, H1par_perm, cutoff= FlxQTL.permTest(4,1,K,K0.Kc,y,XX;Z=Z,pval=[0.05,0.01]);
 @test sum(maxLODs.<0.0)==0
 for j=1:2
@@ -239,6 +239,20 @@ maxLODs0, H1par_perm0, cutoff0= FlxQTL.permTest(4,1,K,y,XX;pval=[0.05 0.01])
 @test sum(maxLODs0.<0.0)==0
 for j=1:2
 println(@test isless(0.0,cutoff[j]))
+end
+
+#permutation: loco
+
+mlods,h1par,cuts = permutationTest(4,1,Kg,K0.Kc,y,XX;Z=Z)
+@test sum(mlods.<0.0)==0
+for j=1:2
+       println(@test isless(0.0,cuts[j]))
+end
+
+mlods0,h1par0,cuts0 = permutationTest(4,1,Kg,y,XX)
+@test sum(mlods0.<0.0)==0
+for j=1:2
+       println(@test isless(0.0,cuts0[j]))
 end
 
 #######testing kinships
