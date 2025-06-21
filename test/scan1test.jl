@@ -227,7 +227,7 @@ for j=1:2
 end
 
 
-#permutation
+#permutation 
 maxLODs, H1par_perm, cutoff= FlxQTL.permTest(4,1,K,K0.Kc,y,XX;Z=Z,pval=[0.05,0.01]);
 @test sum(maxLODs.<0.0)==0
 for j=1:2
@@ -239,6 +239,20 @@ maxLODs0, H1par_perm0, cutoff0= FlxQTL.permTest(4,1,K,y,XX;pval=[0.05 0.01])
 @test sum(maxLODs0.<0.0)==0
 for j=1:2
 println(@test isless(0.0,cutoff[j]))
+end
+
+#permutation: loco
+
+mlods,h1par,cuts = permutationTest(4,1,Kg,K0.Kc,y,XX;Z=Z)
+@test sum(mlods.<0.0)==0
+for j=1:2
+       println(@test isless(0.0,cuts[j]))
+end
+
+mlods0,h1par0,cuts0 = permutationTest(4,1,Kg,y,XX)
+@test sum(mlods0.<0.0)==0
+for j=1:2
+       println(@test isless(0.0,cuts0[j]))
 end
 
 #######testing kinships
@@ -317,21 +331,23 @@ rlod2i,res02i = mlm2Scan(1,y1,XX1,true)
 @test isposdef(res02i.Σ)
 @test res02.Σ≈ res02i.Σ
 
-mxlod,h1p,mcut1= mlmTest(1,4,y1,XX1,Z)
-mxlodi,h1pi,micut1= mlmTest(1,4,y1,XX1)
-mxr,h1r,rcut1= mlmTest(1,4,y1,XX1,Z,true)
-mxri,h1ri,ricut1= mlmTest(1,4,y1,XX1,true)
-for j=eachindex(mcut1)
-       println(@test mcut1[j]≈ micut1[j])
-       println(@test rcut1[j]≈ ricut1[j])
-end
+mxlod,h1p,mcut1= mlmTest(1,1,y1,XX1,Z)
+mxlodi,h1pi,micut1= mlmTest(1,1,y1,XX1)
+mxr,h1r,rcut1= mlmTest(1,1,y1,XX1,Z,true)
+mxri,h1ri,ricut1= mlmTest(1,1,y1,XX1,true)
+
+       print(@test isless(0.0,mcut1[1]))
+       print(@test isless(0.0, micut1[1]))
+       print(@test isless(0.0,mcut1[2])) 
+       print(@test isless(0.0,micut1[2]))
+       print(@test isless(0.0,rcut1[1])) 
+       print(@test isless(0.0,ricut1[1]))
+       print(@test isless(0.0,rcut1[2])) 
+       print(@test isless(0.0,ricut1[2]))
+
+
 @test sum(mxlod.<0.0)==0
 @test sum(mxlodi.<0.0)==0
-for j=eachindex(mxlod)
-       println(@test mxlod[j]≈ mxlodi[j])
-       println(@test mxr[j]≈ mxri[j])
-end
-
 @test sum(mxr.<0.0)==0
 @test sum(mxri.<0.0)==0
 

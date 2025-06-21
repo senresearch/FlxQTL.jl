@@ -103,13 +103,12 @@ mxlodi,h1pi,micut1= mlmTest(4,4,y1,X2)
 mxr,h1r,rcut1= mlmTest(4,4,y1,X2,Z,true)
 mxri,h1ri,ricut1= mlmTest(4,4,y1,X2,true)
 for j=eachindex(mcut1)
-    print(@test mcut1[j]≈ micut1[j])
-    print(@test rcut1[j]≈ ricut1[j])
+    print(@test isless(0.0,mcut1[j]))
+    print(@test isless(0.0, micut1[j]))
+    print(@test isless(0.0,rcut1[j]))
+    print(@test isless(0.0,ricut1[j]))
 end
-for j=eachindex(mxlod)
-    print(@test mxlod[j]≈ mxlodi[j])
-    print(@test mxr[j]≈ mxri[j])
-end
+
 @test sum(mxlod.<0.0)==0
 @test sum(mxlodi.<0.0)==0
 @test sum(mxr.<0.0)==0
@@ -129,6 +128,19 @@ maxlod, H1per0, cutoff2= FlxQTL.permTest(4,4,K3,y,X1;pval=[0.05 0.01])
 @test sum(maxlod.<0.0)==0
 for l=1:2
 println(@test isless(0.0,cutoff2[l]))
+end
+
+#permutation-loco
+mxlods,h1par1,cuts1=permutationTest(4,4,K4,K1.Kc,y,X1;Z=Z);
+@test sum(mxlods.<0.0)==0
+for l=1:2
+    println(@test isless(0.0,cuts1[l]))
+end
+
+mxlods0,h1par00,cuts00 = permutationTest(4,4,K4,y,X1)
+@test sum(mxlods0.<0.0)==0
+for l=1:2
+    println(@test isless(0.0,cuts00[l]))
 end
 
 

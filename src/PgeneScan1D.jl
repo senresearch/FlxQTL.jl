@@ -363,13 +363,13 @@ function geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool
 #                 Xnul_t=Xnul*Tg[:,:,i]';
               @fastmath @inbounds Xnul_t=BLAS.gemm('N','T',Xnul,@view Tg[:,:,i])
                 if (cross!=1)
-          @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,X0[:,:,maridx],cross)
+          @fastmath @inbounds Y1,X=transForm(Tg[:,:,i],Y,X0[:,:,maridx],cross)
                    else
-           @fastmath @inbounds Y,X=transForm(Tg[:,:,i],Y,XX.X[maridx,:],cross)
+           @fastmath @inbounds Y1,X=transForm(Tg[:,:,i],Y,XX.X[maridx,:],cross)
                  end
                 #parameter estimation under the null
-                    est00=nulScan(init,1,Λg[:,i],Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
-                lods, H1par1=marker1Scan(nmar,m,1,cross,est00,Λg[:,i],Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
+                    est00=nulScan(init,1,Λg[:,i],Y1,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
+                lods, H1par1=marker1Scan(nmar,m,1,cross,est00,Λg[:,i],Y1,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
                 LODs[maridx].=lods
                 H1par=[H1par;H1par1]
                 est0=[est0;est00];
@@ -380,20 +380,20 @@ function geneScan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool
 #             Xnul_t=Xnul*Tg';
              Xnul_t= BLAS.gemm('N','T',Xnul,Tg)
                 if (cross!=1)
-                   Y,X=transForm(Tg,Y,X0,cross)
+                   Y1,X=transForm(Tg,Y,X0,cross)
                    else
-                   Y,X=transForm(Tg,Y,XX.X,cross)
+                   Y1,X=transForm(Tg,Y,XX.X,cross)
                  end
 
 
-                  est0=nulScan(init,1,Λg,Y,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
-            LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,Y,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
+                  est0=nulScan(init,1,Λg,Y1,Xnul_t,df_prior,Prior;itol=itol,tol=tol,ρ=ρ)
+            LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,Y1,Xnul_t,X,df_prior,Prior;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
              B = arrngB(H1par,size(Xnul,1),m,p,cross)
      end
 
     if (tdata) # should use with no LOCO
-        return est0,Xnul_t,Y,X
+        return est0,Xnul_t,Y1,X
     elseif (LogP) # transform LOD to -log10(p-value)
           if(LOCO)
                 df= prod(size(B[:,:,1]))-prod(size(est0[1].B))
