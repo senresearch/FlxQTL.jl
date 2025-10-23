@@ -267,7 +267,7 @@ end
         sortBycM(Chr::Any,XX::Markers,cross::Int64,cM::Int64=2)
 
 Returns marker indices in Chromosome `Chr` and the corresponding genotype probabilities keeping only markers positioned in every `cM` centimorgans 
-for 2-d genome scan to avoid singularity.
+for any genome scan to avoid singularity.
 
 # Arguments
 
@@ -312,7 +312,8 @@ end
     
     newMarkers(XX::Markers,cross::Int64,cM::Int64=2)
     
-Returns a struct of Markers by keeping only markers positioned in every `cM` centimorgans for 2-d genome scan to avoid singularity.
+Returns a struct of Markers by keeping only markers positioned in every `cM` centimorgans 
+    for any genome scan to avoid singularity.
     
 # Arguments
     
@@ -323,7 +324,7 @@ Returns a struct of Markers by keeping only markers positioned in every `cM` cen
 """
 function newMarkers(XX::Markers,cross::Int64,cM::Int64=2)
 
-chr=XX.chr;Chr=unique(XX.chr); nchr=length(Chr)
+Chr=unique(XX.chr); nchr=length(Chr)
 
     maridx,genopr= sortBycM(Chr[1],XX,cross,cM)
 

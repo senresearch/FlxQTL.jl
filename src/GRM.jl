@@ -24,8 +24,8 @@ import ..Util: Markers
 
       kinshipMan(genematrix::Array{Float64,2})
 
-Calculates a kinship matrix using a manhattan distance. Missing values need to be either omitted or imputed.
-This function is for recombinant inbred line (RIL) (AA/BB), not for 4-way cross genotype data.  See [`kinship4way`](@ref).
+Calculates a kinship matrix using a manhattan distance method. Missing values need to be either omitted or imputed.
+This function is designed for recombinant inbred line (RIL) (AA/BB), not for 4-way cross genotype data.  See [`kinship4way`](@ref).
 
 # Argument
 
@@ -64,8 +64,8 @@ end
 
      kinship4way(genmat::Array{Float64,2})
 
-Computes a kinship for four-way cross data counting different alleles between two markers: ex. AB-AB=0; AB-AC=1; AB-CD=2,``\\dots``
-Note: In [R/qtl](https://cran.r-project.org/web/packages/qtl/qtl.pdf), genotypes are labeled as 1=AC; 2=BC; 3=AD; 4=BD by the function, `read.cross`.
+Computes a kinship for four-way cross data counting the occurrence of different alleles between two markers: ex. AB-AB=0; AB-AC=1; AB-CD=2,``\\dots``
+Note: In [R/qtl](https://cran.r-project.org/web/packages/qtl/qtl.pdf), genotypes are labeled as 1=AC; 2=BC; 3=AD; 4=BD by the function, `read.cross()`.
 
 
 # Argument
@@ -107,64 +107,33 @@ end
 
 
 
-# """
-
-#      kinshipGs(climate::Array{Float64,2},ρ::Float64)
-
-# Computes a non-linear kinship matrix using the Gaussian Kernel.
-
-# # Arguments
-
-# - `climate` : A matrix of genotype, or climate information data. size(climate)=(r,m), such that `r` genotype markers (or days/years of climate factors,
-#             i.e. precipitations, temperatures, etc.), and `m` individuals (or environments/sites)
-# - `ρ` : A free parameter determining the width of the kernel. Could be attained empirically.
-
-# # Output
-
-# Returns a m x m symmetric (positive definite) matrix containing 1's on the diagonal.
-
-# """
-# function kinshipGs(climate::Array{Float64,2},ρ::Float64)
-#  env=axes(climate,2);
-#  Kc=zeros(env,env);
-
-#     @views for c=env, r=c:length(env)
-#             Kc[r,c]=exp(-mean(abs.(climate[:,c]-climate[:,r]).^2)/ρ)
-#             Kc[c,r]=Kc[r,c]
-#     end
-
-#     return Kc
-
-# end
-
-
 """
 
-    kinshipLin(mat,cross)
+     kinshipGK(G::Array{Float64,2},ρ::Float64)
 
-Calculates a kinship matrix by linear kernel.
+Computes a non-linear kinship matrix using a Gaussian Kernel.
 
 # Arguments
 
-- `mat` : A matrix of genotype (or allele) probabilities usually extracted from [R/qtl](https://rqtl.org/tutorials/rqtltour.pdf),
-        [R/qtl2](https://kbroman.org/qtl2/assets/vignettes/user_guide.html), or the counterpart packages. size(mat)= (p,n) for p genetic markers x n individuals.
-- `cross` : A scalar indicating instances of alleles or genotypes in a genetic marker. ex. 1 for genotypes (labeled as 0,1,2), 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+- `G` : A matrix of genotype. size(G)=(r,c), such that `r` genotype markers and `c` individuals (or lines).
+- `ρ` : A free parameter determining the width of the kernel. Could be attained empirically.
 
 # Output
 
-Returns a n x n symmetric (positive definite) matrix containing 1's on the diagonal.
-
-See also [`kinshipCtr`](@ref), [`kinshipStd`](@ref) for genetype data.
-
+Returns a c x c symmetric (positive definite) matrix containing 1's on the diagonal.
 
 """
-function kinshipLin(mat,cross)
-r=size(mat,1)/cross; n=size(mat,2)
-     K=Symmetric(BLAS.syrk('U','T',1.0,mat))/r
-   @views for j=1:n
-        K[j,j]=1.0
-          end
-    return convert(Array{Float64,2},K)
+function kinshipGK(G::Array{Float64,2},ρ::Float64)
+ env=axes(G,2);
+ Kc=zeros(env,env);
+
+    @views for c=env, r=c:length(env)
+            Kc[r,c]=exp(-mean(abs.(G[:,c]-G[:,r]).^2)/ρ)
+            Kc[c,r]=Kc[r,c]
+    end
+
+    return Kc
+
 end
 
 
@@ -173,7 +142,7 @@ end
 
      kinshipCtr(genmat::Array{Float64,2})
 
-Calculates a kinship by a centered genotype matrix (linear kernel), i.e. genotypes subtracted by marker mean.
+Calculates a kinship with a centered genotype matrix (linear kernel), where a marker mean is subtracted from its genotypes.
 
 # Argument
 
@@ -191,6 +160,7 @@ function kinshipCtr(genmat::Array{Float64,2})
     # K=(1-ρ)*transpose(cgene)*cgene/n+ρ*Matrix(1.0I,n,n)
      #K=cgene'*cgene/p
      K=Symmetric(BLAS.syrk('U','T',1.0,cgene))/p
+ 
     return convert(Array{Float64,2},K)
 
 end
@@ -201,7 +171,8 @@ end
      kinshipStd(genmat::Array{Float64,2})
 
 
-Calculates a kinship by a standardized (or normalized) genotype matrix (linear kernel), i.e. genotypes subtracted by marker mean and divided by marker standard deviation.
+Produces a kinship with a standardized (or normalized) genotype matrix (linear kernel), i.e., centered genetypes divided 
+by the standard deviation of a marker. 
 
 
 # Argument
@@ -219,11 +190,42 @@ function kinshipStd(genmat::Array{Float64,2})
     sgene=(genmat.-mean(genmat,dims=2))./std(genmat,dims=2)
    #(1-ρ)*transpose(sgene)*sgene/n+ρ*Matrix(1.0I,n,n)
      K=Symmetric(BLAS.syrk('U','T',1.0,sgene))/p
-
+        
     return convert(Array{Float64,2},K)
 end
 
 
+"""
+
+    kinshipLin(mat,cross)
+
+Calculates a kinship matrix by linear kernel for genotype (or allele) probabilities.  This is a general form of 
+    [`kinshipCtr`](@ref), [`kinshipStd`](@ref) for genetype data, i.e. `XX'`.  
+
+# Arguments
+
+- `mat` : A matrix of genotype (or allele) probabilities usually extracted from [R/qtl](https://rqtl.org/tutorials/rqtltour.pdf),
+        [R/qtl2](https://kbroman.org/qtl2/assets/vignettes/user_guide.html), or the counterpart packages. size(mat)= (p,n) for p genetic markers x n individuals.
+- `cross` (>1) : An integer indicating the occurrence or combination of alleles or genotypes in a genetic marker. 
+                ex. 1 for genotypes (labeled as 0,1,2), 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+            
+
+# Output
+
+Returns a n x n symmetric (positive definite) matrix containing 1's on the diagonal.
+
+"""
+function kinshipLin(mat,cross)
+r=size(mat,1)/cross; 
+
+     K=Symmetric(BLAS.syrk('U','T',1.0,mat))/r
+     if (cross!=1)
+        @views[K[j,j]=1.0 for j= axes(K,1)] # for efficient computation
+     end
+
+
+    return convert(Array{Float64,2},K)
+end
 
 
 """
@@ -231,13 +233,13 @@ end
      shrinkg(f,nb::Int64,geno)
 
 Estimates a full-rank positive definite kinship matrix by shrinkage intensity estimation (bootstrap).  Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
-This function runs faster by CPU parallelization.  Add workers/processes using `addprocs()` function before running for speedup.
+This function runs fast by CPU parallelization.  Add workers/processes using an `addprocs()` function before running it for speedup.
 
 # Arguments
 
 - `f `: A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
 - `nb` : An integer indicating the number of bootstrap. It does not have to be a large number.
-- `geno` : A matrix of genotypes. See [`kinshipMan`](@ref), [`kinship4way`](@ref) for dimension.
+- `geno` : A matrix of genotypes. size(geno) = (p,n) for `p` markers x `n` individuals.
 
 # Example
 
@@ -318,10 +320,10 @@ end
        shrinkgLoco(kin,nb,g::Markers)
 
 
-Generates 3-d array of full-rank positive definite kinship matrices by shrinkage intensity estimation (bootstrap) using a LOCO (Leave One Chromosome Out) scheme.
+Generates a 3-d array of full-rank positive definite kinship matrices by shrinkage intensity estimation (bootstrap) using a LOCO (Leave One Chromosome Out) scheme.
+Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref).
 
-
-# Argument
+# Arguments
 
 - `kin` :  A function of computing a kinship. Can only use with [`kinshipMan`](@ref), [`kinship4way`](@ref)
 - `nb` : An integer indicating the number of bootstrap.
@@ -357,26 +359,29 @@ end
 
 """
 
-     kinshipLoco(kin,g::Markers,cross::Int64=1)
+     kinshipLoco(kin,g::Markers,cross::Int64=1,ρ=0.01)
 
-Generates a 3-d array of symmetric positive definite kinship matrices using LOCO (Leave One Chromosome Out) witout shrinkage intensity estimation.
-When a kinship is not positive definite, a tweak like a weighted average of kinship and Identity is used to correct minuscule negative eigenvalues.
+Generates a 3-d array of symmetric positive definite kinship matrices using LOCO (Leave One Chromosome Out) witout shrinkage intensity estimation.  
+This is designed for linear kernel based kinship functions. See Arguments.
+
 
 # Arguments
 
 - `kin` :  A function of computing a kinship. Can only use with [`kinshipCtr`](@ref), [`kinshipStd`](@ref) for genotypes, and with [`kinshipLin`](@ref)
           for genotype (or allele) probabilities.
 - `g`   : A struct of arrays, type  [`Markers`](@ref).
-- `cross` :  A scalar indicating instances of alleles or genotypes in a genetic marker.
-             ex. 1 for genotypes (0,1,2) as default, 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+- `cross` :  A scalar indicating the occurrence or combination of alleles or genotypes in a genetic marker.  Simply, it coincides with the number of columns per marker in genotype 
+            (or allele) probability data; for instance, 1 for genotypes (0,1,2) as default, 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+- `ρ`  :  A real number to correct a non-positive definite kinship.  Default is 0.01.  When a kinship is not corrected to be positive definite with 
+          the default value, slight increase of `ρ ` can adjust to minuscule negative eigenvalues.
 
 # Output
 
-Returns 3-d array of n x n symmetric positive definite matrices as many as Chromosomes.
-Refer to [`shrinkgLoco`](@ref).
+Returns a 3-d array of n x n symmetric positive definite matrices as many as Chromosomes.
+Refer to [`shrinkgLoco`](@ref) for comparison.
 
 """
-function kinshipLoco(kin,g::Markers,cross::Int64=1)
+function kinshipLoco(kin,g::Markers,cross::Int64=1,ρ=0.01)
 
     Chr=unique(g.chr);  nChr=length(Chr); ind=size(g.X,2)
     K_loco=zeros(ind,ind,nChr);
@@ -386,7 +391,7 @@ function kinshipLoco(kin,g::Markers,cross::Int64=1)
 
         @views for l=1:nChr
                      if(!isposdef(K[l]))
-                        K_loco[:,:,l]=K[l]+0.01I
+                        K_loco[:,:,l]=K[l]+ρ*I
                         println("Kinship dropping chromosome $(Chr[l]) is corrected to be positive definite")
 
                        else
@@ -401,8 +406,8 @@ function kinshipLoco(kin,g::Markers,cross::Int64=1)
 
             @views for l=1:nChr
                     if(!isposdef(K[l]))
-                        K_loco[:,:,l]=K[l]+0.01I
-                        println("Kinship dropping chromosome $(Chr[l]) is corrected to be positive definite")
+                        K_loco[:,:,l]=K[l]+ρ*I
+                        println("Kinship dropping chromosome $(Chr[l]) is corrected to be positive definite:isposdef(K_loco[:,:,l])")
                       else
                         K_loco[:,:,l]=K[l]
                         println("Positive definiteness dropping chromosome $(Chr[l]) is ", isposdef(K_loco[:,:,l]),".")

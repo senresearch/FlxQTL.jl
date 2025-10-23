@@ -1,7 +1,6 @@
 
 #test for cross=1 (genotype data)
-# geno=readdlm("genotype.csv",',');
-# y1=readdlm("traits.csv",',')
+
 geno=[0.0  0.0  0.0  0.0
  1.0  1.0  1.0  1.0
  1.0  1.0  0.0  1.0
@@ -62,203 +61,9 @@ end
 
 K= FlxQTL.shrinkg(FlxQTL.GRM.kinshipMan,15,XX.X)
 @test isposdef(K)
-#precompute Kc
-K1= getKc(y)
-Z1=hcat(ones(m),vcat(-ones(2),ones(2)));
-K0=getKc(y;Z=Z1)
-@test isposdef(K1.Kc)
-@test isposdef(K0.Kc)
-@test isposdef(K1.Σ)
-@test isposdef(K0.Σ)
-@test K0.τ2 > 0.0
-@test K1.τ2 >0.0
-
-
-#eigen decomposition
-Tg,Λg,Tc,λc = FlxQTL.K2Eig(Kg,K1.Kc,true)
-T,λ =FlxQTL.K2eig(K)
-T1,λ1=K2eig(K0.Kc)
-@test typeof(Tg)==Array{Float64,3}
-@test typeof(T)==Array{Float64,2}
-@test typeof(Λg)==Array{Float64,2}
-@test typeof(λ)==Array{Float64,1}
-@test typeof(λc)== Array{Float64,1}
-@test typeof(λ1)==Array{Float64,1}
-@test typeof(T1)==Array{Float64,2}
-
-#test Z=I vs no Z & loco vs no loco
-Z=Matrix(1.0I,m,m)
-
-
-#no loco
-LOD2,B2,est2=FlxQTL.geneScan(1,T,Tc,λ,λc,y,XX,Z);
-@test sum((LOD2.< 0.0))==0
-LOD,B,est=FlxQTL.geneScan(1,T,Tc,λ,λc,y,XX);
-@test sum((LOD.< 0.0))==0
-LOD_1,B_2,est_2=FlxQTL.geneScan(1,T,Matrix(1.0I,m,m),λ,ones(m),y,XX,Z); 
-@test sum((LOD_1.< 0.0))==0
-lod2,b2,est02=gene1Scan(1,T,λ,y,XX,Z);
-@test sum(lod2.<0.0)==0
-@test est02.τ2 >0.0
-@test typeof(b2)==Array{Float64,3}
-@test typeof(B_2)==Array{Float64,3}
-@test typeof(B2)==Array{Float64,3}
-@test typeof(B)==Array{Float64,3}
-@test est.τ2 >0.0 
-@test est2.τ2 >0.0 
-@test isposdef(est.Σ)
-@test isposdef(est2.Σ)
-
-
-#MVLMM
-LOD3,B3,est3=FlxQTL.geneScan(1,T,λ,y,XX)
-@test sum((LOD3.< 0.0))==0
-@test typeof(B3)== Array{Float64,3}
-@test isposdef(est3.Vc)
-@test isposdef(est3.Σ)
-@test est3.loglik <=0.0
-
-# #environment scan
-# Q=findall(LOD2.==maximum(LOD2))
-# Ze=[ -1.80723   -1.33892   -0.625303  -0.164235   0.490013
-#  -1.48507   -1.18942   -1.1961    -0.417583  -0.125115
-#  -0.749826  -0.327169   0.20022    0.158106   0.993343
-#  1.01404  0.47499  1.76577  -1.65295  1.41504]
-# eLOD,eB,este =FlxQTL.envScan(Q,1,T,Tc,λ,λc,y,XX,Ze)
-# @test sum(eLOD.<0.0)==0.0
-# @test typeof(eB)==Array{Float64,3}
-# @test este[1].τ2>0.0
-# @test isposdef(este[1].Σ)
-# @test este[1].loglik<=0.0
-
-#loco
-LOD1,B1,est01=FlxQTL.geneScan(1,Tg,Tc,Λg,λc,y,XX,true);
-@test sum((LOD1.< 0.0))==0.0
-LOD0,B0,est00=FlxQTL.flxMLMM.geneScan(1,Tg,Tc,Λg,λc,y,XX,Z,true);
-@test sum((LOD0.< 0.0))==0.0
-lod1,b1,est1 =FlxQTL.gene1Scan(1,Tg,Λg,y,XX,Z1,true);
-lod11,b11,est11 =FlxQTL.gene1Scan(1,Tg,Λg,y,XX,true);
-@test sum(lod1.<0.0)==0.0
-@test sum(lod11.<0.0)==0.0
-@test typeof(b1)==Array{Float64,3}
-@test typeof(b11)==Array{Float64,3}
-for j=1:2
-       println(@test isposdef(est1[j].Σ)==true)
-       println(@test isposdef(est1[j].τ2>0.0))
-end
-
-for j=1:2
-       println(@test isposdef(est11[j].Σ)==true)
-       println(@test  est11[j].τ2>0.0)
-end
-@test typeof(B0)==Array{Float64,3}
-@test typeof(B1)==Array{Float64,3}
-for j=1:2
-       println(@test est00[j].τ2 >0.0)
-       println(@test est01[j].τ2 >0.0 )
-       println(@test isposdef(est00[j].Σ))
-       println(@test isposdef(est01[j].Σ))
-end
-#MVLMM
-LOD4,B4,est4=FlxQTL.geneScan(1,Tg,Λg,y,XX,true)
-@test sum(LOD4.<0.0)==0
-@test typeof(B4)==Array{Float64,3}
-for j=1:2
-       println(@test isposdef(est4[j].Vc)==true)
-       println(@test isposdef(est4[j].Σ)==true )
-       println(@test est4[j].loglik<=0.0)
-end
-
-# #environment scan
-# Q=findall(LOD0.==maximum(LOD0))
-# eLOD0,eB0,este0 =FlxQTL.envScan(Q,1,Tg,Tc,Λg,λc,y,XX,Ze,true)
-# @test sum(eLOD0.<0.0)==0.0
-# @test typeof(eB0)== Array{Float64,3}
-# @test este0[1].τ2>0.0
-# @test isposdef(este0[1].Σ)
-# @test este0[1].loglik<=0.0
-
-
-#2d-scan
-#no loco
- LOD2d,est2d=FlxQTL.gene2Scan(1,T,Tc,λ,λc,y,XX,Z1);
-@test sum(LOD2d.<0.0)==0
-@test est2d.τ2 >0.0
-@test isposdef(est2d.Σ)
-@test est2d.loglik <=0.0
-
-#MVLMM
-LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,y,XX)
-@test sum(LOD2d0.<0.0)==0
-@test isposdef(est2d0.Vc)
-@test isposdef(est2d0.Σ)
-@test est2d0.loglik <=0.0
-
-#loco
- LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Tc,Λg,λc,y,XX,Z1,true);
-@test sum(LOD2d1.<0.0)==0
-for j=1:2
-       println(@test est2d1[j].τ2 >0.0)
-       println(@test isposdef(est2d1[j].Σ)==true )
-       println(@test est2d1[j].loglik<=0.0)
-end
-#new function including getKc
-LOD2d0,est2d0=FlxQTL.gene2Scan(1,T,λ,y,XX,Z1)
-@test sum(LOD2d0.<0.0)==0
-@test isposdef(est2d0.τ2>0.0)
-@test isposdef(est2d0.Σ)
-@test est2d0.loglik <=0.0
-
-LOD2d1,est2d1=FlxQTL.gene2Scan(1,Tg,Λg,y,XX,Z1,true)
-@test sum(LOD2d1.<0.0)==0
-for j=1:2
-       println(@test est2d1[j].τ2 >0.0)
-       println(@test isposdef(est2d1[j].Σ)==true )
-       println(@test est2d1[j].loglik<=0.0)
-end
-
-#MVLMM
- LOD2d2,est2d2=FlxQTL.gene2Scan(1,Tg,Λg,y,XX,true);
-@test sum(LOD2d2.<0.0)==0
-for j=1:2
-       println(@test isposdef(est2d2[j].Vc)==true)
-       println(@test isposdef(est2d2[j].Σ)==true )
-       println(@test est2d2[j].loglik<=0.0)
-end
-
-
-#permutation 
-maxLODs, H1par_perm, cutoff= FlxQTL.permTest(4,1,K,K0.Kc,y,XX;Z=Z,pval=[0.05,0.01]);
-@test sum(maxLODs.<0.0)==0
-for j=1:2
-println(@test isless(0.0,cutoff[j]))
-end
-
-
-maxLODs0, H1par_perm0, cutoff0= FlxQTL.permTest(4,1,K,y,XX;pval=[0.05 0.01])
-@test sum(maxLODs0.<0.0)==0
-for j=1:2
-println(@test isless(0.0,cutoff[j]))
-end
-
-#permutation: loco
-
-mlods,h1par,cuts = permutationTest(4,1,Kg,K0.Kc,y,XX;Z=Z)
-@test sum(mlods.<0.0)==0
-for j=1:2
-       println(@test isless(0.0,cuts[j]))
-end
-
-mlods0,h1par0,cuts0 = permutationTest(4,1,Kg,y,XX)
-@test sum(mlods0.<0.0)==0
-for j=1:2
-       println(@test isless(0.0,cuts0[j]))
-end
-
 #######testing kinships
 
-# @test isposdef(FlxQTL.kinshipGs(geno,std(geno)))
-
+@test isposdef(FlxQTL.kinshipGK(geno,std(geno)))
 
 K0=FlxQTL.kinshipLoco(FlxQTL.kinshipCtr,XX)
 for j=1:2
@@ -274,6 +79,10 @@ end
 A=rand(15,15)
 Aidx= getGenoidx(A,0.25)
 @test length(Aidx)<=size(A,1)
+
+
+Z=Matrix(1.0I,m,m)
+Z1=hcat(ones(m),vcat(-ones(2),ones(2)));
 
 #MLM:mle
 mlod, bm,mest0= FlxQTL.mlm1Scan(1,y1,XX1,Z)
@@ -350,5 +159,6 @@ mxri,h1ri,ricut1= mlmTest(1,1,y1,XX1,true)
 @test sum(mxlodi.<0.0)==0
 @test sum(mxr.<0.0)==0
 @test sum(mxri.<0.0)==0
+
 
 

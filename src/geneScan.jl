@@ -117,21 +117,21 @@ end
               Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
 Implement 1d-genome scan.  The second `mlm1Scan()` is for `Z=I` case; 
-one can also run the first by inserting an identity matrix (I) into `Z`.
+one can also run the first by inserting an identity matrix (`Matrix(1.0I,m,m)`) into `Z`.
 ```math
- vec(Y) \\sim MVN (  (Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I),
+ vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),
  ```
-where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
+where size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 
 # Arguments
 
-- `cross` : An integer indicating the number of alleles or genotypes. Ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
+- `cross` : An integer indicating the occurrence of alleles or genotypes. ex. 2 for RIF, 4 for four-way cross, 8 for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
-- `Y` : A n x m matrix of response variables, i.e. n individuals (or lines) by m traits (or environments). For univariate phenotypes, use square brackets in arguement.
+- `Y` : A n x m matrix of response variables, i.e. n individuals (or lines) by m traits (or environments). For univariate phenotypes, use square brackets in the arguement.
         i.e. `Y0[:,1]` (a vector) ->`Y[:,[1]]` (a matrix) .
 - `XX` : A type of [`Markers`](@ref). Be cautious when combining genotype infomation into the struct of `Markers`; `size(X) = (n,p)`.
-- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
-      If nothing to insert in `Z`, just exclude it or insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates.
+- `Z` :  An optional m x q matrix of low-dimensional phenotypic (or trait) covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
+        If the data does not assume any particular trait relation, just use `Z = I`.  
 - `reml`: Boolean.  Default is fitting the model via mle. Resitricted MLE is implemented if `true`.
 
 ## Keyword Arguments
@@ -214,11 +214,11 @@ end
      mlm2Scan(cross::Int64,Y::Matrix{Float64},XX::Markers,reml::Bool=false;Xnul::Matrix{Float64}=ones(size(Y,1),1))
 
 Implement 2d-genome scan.  The second `mlm2Scan()` is for `Z=I` case; 
-one can also run the first by inserting an identity matrix (I) into `Z`.
+one can also run the first by inserting an identity matrix (`Matrix(1.0I,m,m)`) into `Z`.
 ```math
- vec(Y) \\sim MVN (  (Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I),
+ vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),
  ```
-where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
+where size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 
 # Arguments
 
@@ -228,7 +228,7 @@ where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
         i.e. `Y0[:,1]` (a vector) ->`Y[:,[1]]` (a matrix) .
 - `XX` : A type of [`Markers`](@ref).  Be cautious when combining genotype infomation into the struct of `Markers`; `size(X) = (n,p)`.
 - `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
-      If nothing to insert in `Z`, just exclude it or insert an identity matrix, `Matrix(1.0I,m,m)`.  m traits x q phenotypic covariates.
+       If the data does not assume any particular trait relation, just use `Z = I`.  
 - `reml`: Boolean.  Default is fitting the model via mle. Resitricted MLE is implemented if `true`.
 
 ## Keyword Arguments
@@ -307,17 +307,17 @@ end
               Xnul::Matrix{Float64}=ones(size(Y,1),1),pval=[0.05 0.01])
             
 Implement permutation test to get thresholds at the levels of type 1 error, `α`.  The second `mlmTest()` is for `Z=I` case; 
-one can also run the first by inserting an identity matrix (I) into `Z`.
+one can also run the first by inserting an identity matrix (`Matrix(1.0I,m,m)`) into `Z`.
 ```math
- vec(Y) \\sim MVN (  (Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I),
+ vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),
  ```
-where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
+where size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 
 
 # Arguments
 
 - `nperm` : An integer indicating the number of permutation to be implemented.
-- `cross` : An integer indicating the number of alleles or genotypes. Ex. `2` for RIF, `4` for four-way cross, `8` for HS mouse (allele probabilities), etc.
+- `cross` : An integer indicating the incidence of alleles or genotypes per marker. Ex. `2` for RIF, `4` for four-way cross, `8` for HS mouse (allele probabilities), etc.
           This value is related to degree of freedom when doing genome scan.
 - `Y` : A n x m matrix of response variables, i.e. n individuals (or lines) by m traits (or environments). For univariate phenotypes, use square brackets in arguement.
         i.e. `Y[:,1]`  (a vector) -> `Y[:,[1]]`  (a matrix) .
@@ -329,7 +329,7 @@ where size(Y)=(n,m), size(X)=(n,p), size(Z)=(m,q).
 - `pval` : A vector of p-values to get their quantiles. Default is `[0.05  0.01]` (without comma).
 - `Xnul` : A matrix of covariates. Default is intercepts (1's).  Unless plugging in particular covariates, just leave as it is.
 - `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
-        Default is an identity matrix for the dimension of m traits x q phenotypic covariates.
+         If the data does not assume any particular trait relation, just use `Z = I`.  
 
 # Output
 

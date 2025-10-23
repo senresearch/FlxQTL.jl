@@ -2,7 +2,7 @@
 
     FlxQTL
 
-flexible QTL analysis tools for structured multiple traits fitting a Multivariate Linear Mixed Model or a Multivariate 
+Flexible QTL analysis tools for structured multiple traits fitting a Multivariate Linear Mixed Model or a Multivariate 
     Linear Model.
 
 """
@@ -27,13 +27,13 @@ export mGLM, Estimat
 using .flxMLM: mlm1Scan, mlm2Scan, mlmTest
 export mlm1Scan, mlm2Scan, mlmTest
 
-using .GRM:kinshipMan,kinship4way,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
-export kinshipMan,kinship4way,kinshipLin,kinshipCtr,kinshipStd
+using .GRM:kinshipMan,kinship4way,kinshipGK,kinshipLin,kinshipCtr,kinshipStd,shrinkg,shrinkgLoco,kinshipLoco
+export kinshipMan,kinship4way,kinshipGK,kinshipLin,kinshipCtr,kinshipStd
 export shrinkg,shrinkgLoco,kinshipLoco
 
-using .flxMLMM: geneScan,gene1Scan,gene2Scan,permTest,permutationTest,K2eig, K2Eig,getKc #,envScan
+using .flxMLMM: geneScan,gene2Scan,permTest,mlmmTest,K2eig,permutationTest #,envScan, gene1Scan,getKc, K2Eig
 #selectQTL
-export geneScan,gene2Scan,permTest,permutationTest,K2eig, K2Eig, gene1Scan,getKc #,envScan
+export geneScan,gene2Scan,permTest,mlmmTest,K2eig,permutationTest #,envScan, gene1Scan ,getKc,K2Eig
 
 using .Util:setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber
 export setSeed, Markers, newMarkers, mat2vec,mat2array,array2mat, getGenoidx,getFinoidx,lod2logP,ordrMarkers,sortBycM,Y_huber

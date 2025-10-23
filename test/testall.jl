@@ -5,3 +5,4 @@ addprocs(4)
 FlxQTL.Util.setSeed(1023);
 include("scan1test.jl")
 include("scan4cross.jl")
+include("scantest1.jl")
