@@ -3,7 +3,7 @@
 geno=readdlm("../data/Arabidopsis_genotypes_2d.csv",',';skipstart=1)[1:4,:];
 y=readdlm("../data/Arabidopsis_fitness.csv",',';skipstart=1); # 400 x 6
 K = readdlm("./kinship_genotypes.txt");
-Kg=[K;;;K];
+Kg=cat(K,K,dims=3);
  m=size(y,2)
 marname=["X1" ;"X2";"X3";"X4"]
 chr=Any[1;1;2;2]

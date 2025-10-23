@@ -146,7 +146,7 @@ end
 gen3=readdlm("genopr_3way.txt")[:,1:400]; #12 x 1212
 lnY= readdlm("log_16wk_weights.txt")[1:6,1:400]; #16 x 1212
 K3= readdlm("kinship_3way.csv",',')[1:400,1:400]; 
-K4 = [K3;;;K3];
+K4 = cat(K3,K3,dims=3);
 X7 = Markers(marname,chr,pos,gen3);
 m,n =size(lnY)
 
