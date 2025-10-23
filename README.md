@@ -10,7 +10,7 @@
 QTL analysis tool that supports incorporating information from trait
 covariates such as time or different environments.  The package
 supports computation of one-dimensional and two-dimensional
-multivariate genome scans, visualization of genome scans, support for
+multivariate genome scans, permutation tests, visualization of genome scans, support for
 LOCO (leave-one-chromosome-out), computation of kinship matrices, and
 support for distributed computing.
 
