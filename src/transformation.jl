@@ -1,53 +1,36 @@
-# export  K2eig, K2Eig, transForm
 
-# K2eig , K2Eig : functions to decompose kinship (genetic :Kg, climate:Kc) matrices into
-#corresponding eigenvectors(orthogonal matrices) and eigen values. K2Eig is a function that returns eigenvectors&values for two kinship matrices
-#  See a shrinkgLoco kinship.jl
-# Synopsis: (T,λ)=K2eig(K); (T,λ)=K2eig(Kc,true), (Tg,Tc,λg,λc)=K2Eig(Kg,Kc),(Tg,Tc,λg,λc)=K2Eig(Kg,Kc,true)
-#Input:
-# Kg (or K) : a 2-d or 3-d(LOCO=true) array genetic kinship matrix. dim(Kg)=(n,n) or dim(Kg)=(n,n,nChr)
-# Kc(or K) : a environment related matrix using climate factors. dim(Kc)=(m,m)
-# LOCO : boolean. dafault is false, i.e. no LOCO scheme used. When true, it compute 3-d array of orthogonal matrices
-#Output:
-# Tg (or T) : an orthogonal matrix (or 3-d array) by eigen decomposition to Kg
-# Tc : an orthogonal matrix by eigen decompostion to Kc
-# λg (or λ) : an eigenvalue vector from Kg
-# λc : an eigenvalue vector from Kc
 
 """
 
        K2eig(K,LOCO::Bool=false)
 
-Returns eigenvectors and eigenvalues of a (genetic, climatic) relatedness, or 3-d array of these of a genetic relatedness if `LOCO` is `true`.
+Returns eigenvectors and eigenvalues of genetic relatedness, or 3-d array of these of a genetic relatedness if `LOCO` is `true`.
 
 # Arguments
 
-- `K` : A matrix of (genetic or climatic) relatedness (Default).  3-d array of genetic relatedness (`LOCO` sets to be true.)
+- `K` : A matrix of genetic relatedness (Default).  3-d array of genetic relatedness (`LOCO` sets to be true.)
 - `LOCO` : Boolean. Default is `false` (no LOCO). (Leave One Chromosome Out).
 
 # Output
 
-- `T` : A matrix of eigenvectors, or 3-d array of eigenvectors if `LOCO` sets to be `true`.
-- `λ` : A vector of eigenvalues, or matrix of eigenvalues if `LOCO` sets to be `true`.
-
-
-See also [`K2Eig`](@ref).
+- `T` : A matrix of eigenvectors, or a 3-d array of eigenvectors if `LOCO` sets to be `true`.
+- `λ` : A vector of eigenvalues, or a matrix of eigenvalues if `LOCO` sets to be `true`.
 
 # Examples
 
-For a (climatic) relatedness, or genetic relatedness for `LOCO =false`,
+For a null variance component, or genetic relatedness for `LOCO =false`,
 ```
  T, λ = K2eig(K)
 
 ```
 produces a matrix of `T` and a vector of `λ`.
 
-For a genetic kinship calculated under `LOCO` (3-d array of kinship),
+For a genetic kinship calculated under `LOCO` (a 3-d array of kinship matrices),
 ```
  T, λ = K2eig(K,true)
 
 ```
-produces a 3-d array of `T` and a matrix of `λ`.
+produces a 3-d array of matrices `T` and a matrix of `λ`.
 
 """
 function K2eig(K,LOCO::Bool=false)
@@ -69,60 +52,51 @@ function K2eig(K,LOCO::Bool=false)
 end
 
 
-"""
+# """
 
-      K2Eig(Kg,Kc::Array{Float64,2},LOCO::Bool=false)
-
-
-Returns a two pairs of eigenvectors and eigenvalues for genetic and climatic relatedness matrices.
-
-# Arguments
-
-- `Kg` : A matrix of a genetic kinship, or 3-d array of that if `LOCO` sets to be `true`.
-- `Kc` : A matrix of a climatic relatedness.
-- `LOCO` : Boolean. Default is `false` (no LOCO). (Leave One Chromosome Out). `LOCO` is only connected to the genetic kinship (`Kg`).
-
-# Output
-
-- `Tg` : A matrix of eigenvectors for `Kg`, or 3-d array of eigenvectors if `LOCO` sets to be `true`.
-- `λg` : A vector of eigenvalues for `Kg`, or matrix of eigenvalues if `LOCO` sets to be `true`.
-- `Tc` : A matrix of eigenvectors for `Kc`.
-- `λc` : A vector of eigenvalues for `Kc`
-
-See [`K2eig`](@ref).
-
-# Examples
-
-For a genetic kinship calculated under `LOCO` (3-d array of kinship),
-
-```
- Tg,λg,Tc,λc = K2Eig(Kg,Kc,true)
-
-```
-produces a 3-d array of `Tg`, matrices of `λg`, `Tc`, and a vector of `λc`.
-
-"""
-function K2Eig(Kg,Kc::Array{Float64,2},LOCO::Bool=false)
-    Tc, λc=K2eig(Kc)
-    if (LOCO)
-        Tg, λg =K2eig(Kg,true)
-        else #no loco
-        Tg, λg=K2eig(Kg)
-    end
-    return Tg,λg,Tc,λc
-end
+#       K2Eig(Kg,Vc::Array{Float64,2},LOCO::Bool=false)
 
 
+# Returns two pairs of eigenvectors and eigenvalues for genetic relatedness matrices.
+
+# # Arguments
+
+# - `Kg` : A matrix of a genetic kinship, or 3-d array of that if `LOCO` sets to be `true`.
+# - `Vc` : A matrix of a variance component preestimated by the null model of no QTL.
+# - `LOCO` : Boolean. Default is `false` (no LOCO). (Leave One Chromosome Out). `LOCO` is only connected to the genetic kinship (`Kg`).
+
+# # Output
+
+# - `Tg` : A matrix of eigenvectors for `Kg`, or 3-d array of eigenvectors if `LOCO` sets to be `true`.
+# - `λg` : A vector of eigenvalues for `Kg`, or matrix of eigenvalues if `LOCO` sets to be `true`.
+# - `Tc` : A matrix of eigenvectors for `Vc`.
+# - `λc` : A vector of eigenvalues for `Vc`
+
+# See [`K2eig`](@ref).
+
+# # Examples
+
+# For a genetic kinship calculated under `LOCO` (a 3-d array of kinship matrices),
+
+# ```
+#  Tg,λg,Tc,λc = K2Eig(Kg,Vc,true)
+
+# ```
+# produces a 3-d array of matrices `Tg`, matrices of `λg`, `Tc`, respectively, and a vector of `λc`.
+
+# """
+# function K2Eig(Kg,Vc::Array{Float64,2},LOCO::Bool=false)
+#     Tc, λc=K2eig(Vc)
+#     if (LOCO)
+#         Tg, λg =K2eig(Kg,true)
+#         else #no loco
+#         Tg, λg=K2eig(Kg)
+#     end
+#     return Tg,λg,Tc,λc
+# end
 
 
-# transForm: a function to rotate data to columnwise and rowwise
-# Input:
-# Tg, Tc : orthogonal matrices for rotating data column-wise(individual wise) and row-wise(variable wise), respectively
-# Y0 (m x n), X0(p x n), Z0 (m x q) : raw data : phenotypes, genotypes, row-covariates, respectively
-# Σ_0 : an initial variance-covariance matrix obtained from the multivarLm module.
-#Output:
-# Y,X,Z,Σ : transformed matrices
-# See also: K2eig, K2Eig
+
 
 function transZ!(Z::Array{Float64,2},Tc::Array{Float64,2},Z0::Array{Float64,2})
 
@@ -196,81 +170,15 @@ function transForm(Tg::Array{Float64,2},X0,cross::Int64)
     
 end
 
-##########
-#pre-estimate Kc using prior
-
 
 struct InitKc
     Kc::Matrix{Float64} 
     B::Matrix{Float64}
     Σ::Matrix{Float64}
     τ2::Float64
+    loglik::Float64
  end
  
-
-
- """
-
-    getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
-           Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul::Array{Float64,2}=ones(1,size(Y,2)),
-           itol=1e-2,tol::Float64=1e-3,ρ=0.001)
-
-Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental covariates under `H0: no QTL`.
-
-# Argument
-
-- `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
-        i.e. `Y0[1,:]` (a vector) ->`Y[[1],:]` (a matrix) .
-
-## Keyword Arguments
-
-- `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
-        An identity matrix, ``I_m``, is default. 
-- `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
-- `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
-           A large scaled covariance matrix (a weakly informative prior) is default.
-- `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
-- `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
-- `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
-- `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
-
-# Output
-
-- `InitKc` :  A type of struct of arrays, including pre-estimated `Kc`,`and null estimates of B`, `Σ`,`τ2`used as initial values inside 
-     `gene1Scan`, one of [`geneScan`](@ref) functions, or [`gene2Scan`](@ref).
-
-# Examples
-
-```
-julia> K0 = getKc(Y)  
-julia> K0.Kc  # for Kc
-julia> K0.B # for B under H0
-
-```
-
-
-"""
- function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
-     Prior::Matrix{Float64}=cov(Y,dims=2)*5,
-     Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
-     
-     if(Z!=diagm(ones(m)))
-         init0=initial(Xnul,Y,Z,false)
-      else #Z0=I
-         init0=initial(Xnul,Y,false)
-      end
- 
-     est0= nul1Scan(init0,1,Y,Xnul,Z,m,df_prior,Prior;ρ=ρ,itol=itol,tol=tol)
-       τ² =mean(Diagonal(est0.Σ))
-     return InitKc(est0.Vc, est0.B, est0.Σ, τ²)
- 
- end
- 
-###########
-
-
-##initialize parameters(B,τ2 (or Vc),Σ) (H0:no qtl case)
-## Xnul=ones(1,n) or Xnul=vcat(ones(1,n), covariates), where size(covariates,2)=n
 struct Init
 B::Array{Float64,2}
 τ2::Float64
@@ -323,74 +231,67 @@ function initial(Xnul,Y0,incl_τ2::Bool=true)
 end
 
 ## nulScan : scan w/o qtl to obtain null parameter estimates
-function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Z1,Σt;ρ=0.001,itol=1e-3,tol=1e-4)
+function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Z1,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
 
-            B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc;tol=itol)
-            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
+            B0,τ2_0,Σ1,_ =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+            nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
          
     return nulpar
 end
 
 #including prior
-function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Z1,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+function nulScan(init::InitKc,kmin,λg,λc,Y1,Xnul_t,Z1,Σt,ν₀,Ψ,H0_up::Bool;ρ=0.001,itol=1e-3,tol=1e-4)
 
-    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    B0,τ2_0,Σ1,_ =ecmLMM(Y1,Xnul_t,Z1,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
     nulpar=NestrvAG(kmin,Y1,Xnul_t,Z1,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
- 
-return nulpar
+    
+ if (H0_up) # null model update for high dimensional traits
+    return nulpar
+ else
+    return Approx(nulpar.B,nulpar.τ2,nulpar.Σ,init.loglik)
+ end
+
 end
 #Z=I:including prior
-function nulScan(init::Union{Init,InitKc},kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+function nulScan(init::InitKc,kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ,H0_up::Bool;ρ=0.001,itol=1e-3,tol=1e-4)
 
-    B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+    B0,τ2_0,Σ1,_ =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
     nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
  
-return nulpar
+ if (H0_up) # null model update for high dimensional traits
+    return nulpar
+  else
+    return Approx(nulpar.B,nulpar.τ2,nulpar.Σ,init.loglik)
+  end
+
 end
 
 
 #Z=I
-function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt;ρ=0.001,itol=1e-3,tol=1e-4)
+function nulScan(init::Init,kmin,λg,λc,Y1,Xnul_t,Σt,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
 
-            B0,τ2_0,Σ1,loglik0 =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc;tol=itol)
-            nulpar= NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc;ρ=ρ,tol=tol)
+            B0,τ2_0,Σ1,_ =ecmLMM(Y1,Xnul_t,init.B,init.τ2,Σt,λg,λc,ν₀,Ψ;tol=itol)
+            nulpar= NestrvAG(kmin,Y1,Xnul_t,B0,τ2_0,Σ1,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol)
 
     return nulpar
 end
 
 
 
-#estimate Kc with prior
-function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
-       
-      n=size(Y,2); λg=ones(n)
-
-    if (Z!=diagm(ones(m)))   
-        B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,Z,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
-        nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
-        
-       else #Z=I
-        B0,Kc_0,Σ1,loglik0 =ecmLMM(Y,Xnul,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
-        nulpar=NestrvAG(kmin,Y,Xnul,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
-     end
-    return nulpar
-end
-
-###########
 
 #MVLMM :Z=I
-function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
+# function nulScan(init::Init0,kmin,λg,Y1,Xnul_t;ρ=0.001,itol=1e-3,tol=1e-4)
 
-        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg;tol=itol)
-        nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg;tol=tol,ρ=ρ)
+#         B0,Vc_0,Σ1,_ = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg;tol=itol)
+#         nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg;tol=tol,ρ=ρ)
 
-       return nulpar
-end
+#        return nulpar
+# end
 
 #including prior
 function nulScan(init::Init0,kmin,λg,Y1,Xnul_t,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
 
-        B0,Vc_0,Σ1,loglik0 = ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
+        B0,Vc_0,Σ1,_= ecmLMM(Y1,Xnul_t,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
         nulpar=NestrvAG(kmin,Y1,Xnul_t,B0,Vc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
 
        return nulpar
@@ -414,3 +315,75 @@ function arrngB(H1par,p1::Int64,q,p,cross)
         end
     return B
 end
+
+#  """
+
+#     getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
+#            Prior::Matrix{Float64}=cov(Y,dims=2)*5,Xnul::Array{Float64,2}=ones(1,size(Y,2)),
+#            itol=1e-2,tol::Float64=1e-3,ρ=0.001)
+
+# Pre-estimate `Kc` by regressing `Y` on `Xnul`, i.e. estimating environmental covariates under `H0: no QTL`.
+
+# # Argument
+
+# - `Y` : A m x n matrix of response variables, i.e. m traits (or environments) by n individuals (or lines). For univariate phenotypes, use square brackets in arguement.
+#         i.e. `Y0[1,:]` (a vector) ->`Y[[1],:]` (a matrix) .
+
+# ## Keyword Arguments
+
+# - `Z` :  An optional m x q matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.).
+#         An identity matrix, ``I_m``, is default. 
+# - `Xnul` :  A matrix of covariates. Default is intercepts (1's): `Xnul= ones(1,size(Y0))`.  Adding covariates (C) is `Xnul= vcat(ones(1,m),C)` where `size(C)=(c,m)` for `m = size(Y0,1)`.
+# - `Prior`: A positive definite scale matrix, ``\\Psi``, of prior Inverse-Wishart distributon, i.e. ``\\Sigma \\sim W^{-1}_m (\\Psi, \\nu_0)``.  
+#            A large scaled covariance matrix (a weakly informative prior) is default.
+# - `df_prior`: degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
+# - `itol` :  A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
+# - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
+# - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.
+
+# # Output
+
+# - `InitKc` :  A type of struct of arrays, including pre-estimated `Kc`,`and null estimates of B`, `Σ`,`τ2`used as initial values inside 
+#      `gene1Scan`, one of [`geneScan`](@ref) functions, or [`gene2Scan`](@ref).
+
+# # Examples
+
+# ```
+# julia> K0 = getKc(Y)  
+# julia> K0.Kc  # for Kc
+# julia> K0.B # for B under H0
+
+# ```
+
+# """
+#  function getKc(Y::Array{Float64,2};m=size(Y,1),Z=diagm(ones(m)), df_prior=m+1,
+#      Prior::Matrix{Float64}=cov(Y,dims=2)*3,
+#      Xnul::Array{Float64,2}=ones(1,size(Y,2)),itol=1e-2,tol::Float64=1e-3,ρ=0.001)
+     
+#      if(Z!=diagm(ones(m)))
+#          init0=initial(Xnul,Y,Z,false)
+#       else #Z0=I
+#          init0=initial(Xnul,Y,false)
+#       end
+ 
+#      est0= nul1Scan(init0,1,Y,Xnul,Z,m,df_prior,Prior;ρ=ρ,itol=itol,tol=tol)
+#        τ² =mean(Diagonal(est0.Vc)./m)
+#      return InitKc(est0.Vc, est0.B, est0.Σ, τ²,est0.loglik)
+ 
+#  end
+ 
+# ###########
+# #estimate Kc with prior
+# function nul1Scan(init::Init0,kmin,Y,Xnul,Z,m,ν₀,Ψ;ρ=0.001,itol=1e-3,tol=1e-4)
+       
+#       n=size(Y,2); λg=ones(n)
+
+#     if (Z!=diagm(ones(m)))   
+#         B0,Kc_0,Σ1,_ =ecmLMM(Y,Xnul,Z,init.B,init.Vc,init.Σ,λg,ν₀,Ψ;tol=itol)
+#         nulpar=NestrvAG(kmin,Y,Xnul,Z,B0,Kc_0,Σ1,λg,ν₀,Ψ;tol=tol,ρ=ρ)
+        
+#        else #Z=I
+#         nulpar = nulScan(init,kmin,λg,Y,Xnul,ν₀,Ψ;ρ=ρ,itol=itol,tol=tol)
+#      end
+#     return nulpar
+# end

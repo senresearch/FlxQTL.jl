@@ -106,7 +106,7 @@ end
 
 
 
-#full Nesterov's
+#full Nesterov's+debugging code included
 function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{Float64,2},B0::Array{Float64,2},
         τ2_0::Float64,Σ::Array{Float64,2},λg::Array{Float64,1},λc::Array{Float64,1},ν₀,Ψ::Array{Float64,2};ρ=0.001,tol::Float64,numChr=0,nuMarker=0)
 
@@ -123,12 +123,11 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{F
 
         # l=1;
         crit=1.0; j=1;loglik0=0.0;
-           # println("Chr $(numChr) and marker $(nuMarker).")
-#          itrnum=1
+        #    println("Chr $(numChr) and marker $(nuMarker).")
+         itrnum=1
         while (crit >=tol)
 
-            b1, τ1, Σ1, loglik1 = fullECM(Vg,Ve,Bnew,dev,Ghat,Θ,Y,X,Z,symXs,b1,τ1,Σ1,λg,λc,m,n,ν₀,Ψ;numChr=numChr,nuMarker=nuMarker)
-        #,niter=itrnum)
+            b1, τ1, Σ1, loglik1 = fullECM(Vg,Ve,Bnew,dev,Ghat,Θ,Y,X,Z,symXs,b1,τ1,Σ1,λg,λc,m,n,ν₀,Ψ;numChr=numChr,nuMarker=nuMarker,niter=itrnum)
             #some tweak for τ2
                  τ1[1] = max(τ1[1],ρ)
             #Speed restarting Nesterov's Scheme
@@ -136,10 +135,10 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{F
 
             if (norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)<norm(Σ0-Σ00)+norm(τ0-τ00)+norm(b0-b00)) & (j>=kmin)
                 j=1
-#                 itrnum+=1
+                itrnum+=1
             else
                 j=j+1
-#                 itrnum+=1
+                itrnum+=1
             end
 
 #             crit=norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)
@@ -148,6 +147,9 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},Z::Array{F
             b00=b0;b0=b1;b1=b2; τ00=τ0;τ0=τ1;τ1=τ2;Σ00=Σ0;Σ0=Σ1; Σ1=Σ2;loglik0=loglik1;
 
         end
+
+        #  println("Chr $(numChr) and marker $(nuMarker) with total $(itrnum) to be done.")
+         
         return Approx(b1,τ1[1],Σ1,loglik0)
 
 end
@@ -170,12 +172,11 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{
 
         # l=1;
         crit=1.0; j=1;loglik0=0.0;
-           # println("Chr $(numChr) and marker $(nuMarker).")
-#          itrnum=1
+        #    println("Chr $(numChr) and marker $(nuMarker).")
+         itrnum=1
         while (crit >=tol)
 
-            b1, τ1, Σ1, loglik1 = fullECM(Vg,Ve,Bnew,dev,Ghat,Θ,Y,X,symXs,b1,τ1,Σ1,λg,λc,m,n,ν₀,Ψ;numChr=numChr,nuMarker=nuMarker)
-        #,niter=itrnum)
+            b1, τ1, Σ1, loglik1 = fullECM(Vg,Ve,Bnew,dev,Ghat,Θ,Y,X,symXs,b1,τ1,Σ1,λg,λc,m,n,ν₀,Ψ;numChr=numChr,nuMarker=nuMarker,niter=itrnum)
             #some tweak for τ2
                  τ1[1] = max(τ1[1],ρ)
             #Speed restarting Nesterov's Scheme
@@ -183,10 +184,10 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{
 
             if (norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)<norm(Σ0-Σ00)+norm(τ0-τ00)+norm(b0-b00)) & (j>=kmin)
                 j=1
-#                 itrnum+=1
+                itrnum+=1
             else
                 j=j+1
-#                 itrnum+=1
+                itrnum+=1
             end
 
 #             crit=norm(Σ1-Σ0)+norm(τ1-τ0)+norm(b1-b0)
@@ -195,6 +196,7 @@ function NestrvAG(kmin::Int64,Y::Array{Float64,2},X::Array{Float64,2},B0::Array{
             b00=b0;b0=b1;b1=b2; τ00=τ0;τ0=τ1;τ1=τ2;Σ00=Σ0;Σ0=Σ1; Σ1=Σ2;loglik0=loglik1;
 
         end
+       
         return Approx(b1,τ1[1],Σ1,loglik0)
 
 end
@@ -216,10 +218,10 @@ function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Floa
          τ2_0::Float64,Σ::Array{Float64,2},λg::Array{Float64,1},λc::Array{Float64,1},ν₀,Ψ::Array{Float64,2};tol::Float64,ρ=0.001,numChr=0,nuMarker=0)
 
               if (lod0>0.0)
-                result = NestrvAG(kmin,Y,X,Z,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=0,nuMarker=0)
+                result = NestrvAG(kmin,Y,X,Z,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=numChr,nuMarker=nuMarker)
                 else #keep running ecmLMM
                 B0,τ2_0,Σ,loglik=ecmLMM(Y,X,Z,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;tol=tol)
-                 result = NestrvAG(kmin,Y,X,Z,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=0,nuMarker=0)
+                 result = NestrvAG(kmin,Y,X,Z,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=numChr,nuMarker=nuMarker)
               end
                 return result
  end
@@ -229,10 +231,10 @@ function ecmNestrvAG(lod0::Float64,kmin::Int64,Y::Array{Float64,2},X::Array{Floa
          τ2_0::Float64,Σ::Array{Float64,2},λg::Array{Float64,1},λc::Array{Float64,1},ν₀,Ψ::Array{Float64,2};tol::Float64,ρ=0.001,numChr=0,nuMarker=0)
 
               if (lod0>0.0)
-                result = NestrvAG(kmin,Y,X,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=0,nuMarker=0)
+                result = NestrvAG(kmin,Y,X,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=numChr,nuMarker=nuMarker)
                else #keep running ecmLMM
                  B0,τ2_0,Σ,loglik = ecmLMM(Y,X,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;tol=tol)
-                 result = NestrvAG(kmin,Y,X,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=0,nuMarker=0)
+                 result = NestrvAG(kmin,Y,X,B0,τ2_0,Σ,λg,λc,ν₀,Ψ;ρ=ρ,tol=tol,numChr=numChr,nuMarker=nuMarker)
               end
               return result
     
@@ -246,7 +248,7 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,symXs,B,Vc::Array{Float64,2},Σ,λg
           eStep!(Ghat,Θ,Y,X,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,symXs,Ghat,Θ,λg,m)
           Vc_new=mean(Vg,dims=3)[:,:,1]; Σ_new=updateΣ(Ve,Ψ,ν₀,m,n)
-          loglik1=Loglik(dev,Σ_new,Vc_new,λg,m)
+          loglik1=Loglik(dev,Σ_new,Vc_new,λg)
 
     return B_new,Vc_new,Σ_new,loglik1
 
@@ -257,7 +259,7 @@ function fullECM(Vg,Ve,B_new,dev,Ghat,Θ,Y,X,Z,symXs,B::Array{Float64,2},Vc::Arr
           eStep!(Ghat,Θ,Y,X,Z,B,Vc,Σ,λg,m)
           cmStep!(B_new,dev,Vg,Ve,Y,X,Z,symXs,Ghat,Θ,Σ,λg,m)
           Vc_new=mean(Vg,dims=3)[:,:,1]; Σ_new=updateΣ(Ve,Ψ,ν₀,m,n)
-          loglik1=Loglik(dev,Σ_new,Vc_new,λg,m)
+          loglik1=Loglik(dev,Σ_new,Vc_new,λg)
 
     return B_new,Vc_new,Σ_new,loglik1
 

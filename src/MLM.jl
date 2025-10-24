@@ -136,8 +136,8 @@ Fitting multivariate General Linear Models via MLE (or REML) and returns a type 
 - `Y` : A matrix of response variables, i.e. traits. size(Y)=(n,m) for n individuals x m traits
 - `X` : A matrix of independent variables, i.e. genotypes or genotype probabilities including intercept or/and covariates. size(X)=(n,p) for n individuals x p markers 
       including intercept or/and covariates 
-- `Z` : An optional matrix of low-dimensional phenotypic covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.). 
-      If nothing to insert in `Z`, just exclude it or insert `Matrix(1.0I,m,m) `. size(Z)=(m,q) for m traits x q phenotypic covariates.
+- `Z` : An optional matrix of low-dimensional phenotypic or trait covariates, i.e. contrasts, basis functions (fourier, wavelet, polynomials, B-splines, etc.). 
+        size(Z)=(m,q) for m traits x q phenotypic covariates.  If the data does not assume any particular trait relation, just use `Z = Matrix(1.0I,m,m)` or the second functon.  
 - `reml` : Boolean. Default is fitting the model via mle. Resitricted MLE is implemented if `true`. 
 
 
@@ -219,7 +219,7 @@ end
      Estimat(B::Array{Float64,2},Σ::Array{Float64,2},loglik::Float64)
 
 A struct of arrays for results by fitting a multivariate linear model,  `mGLM()`.  
-The results are `B`(fixed effects), `Σ` (m x m covariance matrix), `loglik`(a value of log-likelihood by mle or reml).
+It includes `B`(fixed effects), `Σ` (m x m covariance matrix), `loglik`(a value of log-likelihood by mle or reml).
 
 """
 struct Estimat
