@@ -11,7 +11,7 @@ estimate MLEs.  REML is not supported.
 The general form of Multivariate Linear Mixed model is 
 
 ```math
-vec(Y) \\sim MVN((X' \\otimes Z)vec(B) (or ZBX),  K \\otimes \\V_C +I \\otimes \\Sigma),
+vec(Y) \sim MVN((X' \otimes Z)vec(B) (or ZBX),  K \otimes \V_C +I \otimes \Sigma),
 ```
 where ``Z = I_m``, `K` is a genetic kinship, and ``V_C, \\Sigma`` are variance component and error matrices, respectively.  
 

@@ -283,6 +283,7 @@ The FlxQTL model is defined as
 ```math
 vec(Y)\\sim MVN((X' \\otimes Z)vec(B) (or ZBX), K \\otimes \\Omega +I \\otimes \\Sigma),
 ``` 
+
 where `K` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`` are covariance matrices for random and error terms, respectively.  
 ``V_C`` is pre-estimated under the null model (H0) of no QTL from the conventiona MLMM, which is equivalent to the FlxQTL model for ``\\tau^2 =1``.  
 
@@ -320,7 +321,7 @@ where `K` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma``
 
 !!! Note
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`, or increase `df_prior`, such that 
-   ``m+1 \\le df_prior \\le 2m``.  The easiest setting is `df_prior = Int64(ceil(1.9m))` for numerical stability.   
+   ``m+1 \\le df\\_prior < 2m``.  The easiest setting is `df_prior = Int64(ceil(1.9m))` for numerical stability.   
 
 
 # Output
