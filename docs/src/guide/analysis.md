@@ -71,7 +71,7 @@ m,q = size(Z) # check the dimension
 The submodule `GRM` contains functions for computing kinship matrices, `kinshipMan`, `kinship4way`, `kinshipLin`, `kinshipCtr`, and computing a 
 3D array of kinship matrices for LOCO (Leave One Chromosome Out) with a shrinkage method for nonpositive definiteness, 
 `shrinkg`, `shrinkgLoco`, `kinshipLoco`.  
-Note that the shrinkage option is only used for `kinshipMan`, `kinship4way`.\\
+Note that the shrinkage option is only used for `kinshipMan`, `kinship4way`.
 
 
 For the Arabidopsis genotype data, we will use a genetic relatedness matrix using manhattan distance measure, `kinshipMan` with a shrinkage with 
@@ -92,10 +92,10 @@ K = shrinkg(kinshipMan,10,XX.X)
 
 ## 1D genome scan
 
-The new verson of FlxQTL is operated by penalized log-likelihood function using `Prior` with `df_prior` for a error term, ``\\Sigma``, distributed by Inverse-Wishart distribution for numerial stability.  One can also adjust them in the Keyword arguments.  The default positive definite scale matrix is a large scaled matrix (`Prior = cov(Y,dims=2)*3`).  We rather recommend controlling degrees of freedom (`df_prior`), i.e. ``m+1 (default) \\le  df_prior < 2m ``, or updating the null parameter estimates (`H0_up = true`) for numerical stability when analyzing higher dimenional trait data if any singularity error occurrs.   
+The new verson of FlxQTL is operated by penalized log-likelihood function using `Prior` with `df_prior` for a error term, ``\Sigma``, distributed by Inverse-Wishart distribution for numerial stability.  One can also adjust them in the Keyword arguments.  The default positive definite scale matrix is a large scaled matrix (`Prior = cov(Y,dims=2)*3`).  We rather recommend controlling degrees of freedom (`df_prior`), i.e. ``m+1 (default) \le  df\_prior < 2m ``, or updating the null parameter estimates (`H0_up = true`) for numerical stability when analyzing higher dimenional trait data if any singularity error occurrs.   
 
 !!! Note 
-- Setting `df_prior = Int64(ceil(1.9m))` works most cases. Tolerances (`itol`, `tol0`, `tol`) of base algorithms may be adjusted but are not needed in most cases.
+- Setting `df_prior = Int64(ceil(1.9m))` works most cases. Any tolerance (`itol`, `tol0`, `tol`) of base algorithms may be adjusted but is not needed in most cases.
 
 
 Once all input matrices are ready, we need to proceed the eigen-decomposition to a relatedness matrix. 
@@ -130,7 +130,7 @@ LODs,B,est0 = geneScan(1,Tg,Λg,Ystd,XX,diagm(ones(m)),true); # or equivalently,
 lods,b,Est0 = geneScan(Tg,Λg,Ystd,XX,1,true); # MLMM
 ```
 
-Or one can return ``\\log_{10}P`` instead of LOD scores using `logP = true` in the keyword argument for all the `geneScan()` functions.
+Or one can return ``\log_{10}P`` instead of LOD scores using `logP = true` in the keyword argument for all the `geneScan()` functions.
 
 ```julia
 
@@ -155,7 +155,7 @@ lod,b1,Est00 = geneScan(T,λ,Ystd,1,XX); # MLMM
 
 The function `geneScan()` has three outputs: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`, which 
 is an `Array{Any,1}`.  If you want to see null parameter esitmate in chromosome 1 for LOCO option, for instance, type `est0[1].B`, `est0[1].loglik`, `est0[1].τ2`, 
-`est0[1].Σ`, which is a struct of `Approx`, if `H0_up=true` for higher dimensional trait data (``m\ge 16 \\sim 18``) in the keyword argument.  The default (`false`) returns a struct of `Result` estimated by MLMM for lower dimensional traits.      
+`est0[1].Σ`, which is a struct of `Approx`, if `H0_up=true` for higher dimensional trait data (``m\ge 16\sim 18``) in the keyword argument.  The default (`false`) returns a struct of `Result` estimated by MLMM for lower dimensional traits.      
 In particular, you can extract values from each matrix in `B` (3D array of matrices) to generate an effects plot. To print an effect size matrix for the 
 third marker, type `B[:,:,3]`, where the last dimension is the order of a marker in the genotype (probability) data.
 
