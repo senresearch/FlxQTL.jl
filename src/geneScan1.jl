@@ -83,7 +83,7 @@ The third `geneScan()` is based on a conventional MLMM that estimate all paramet
 The conventional MLMM is defined as
 
 ```math
-vec(Y) \sim MVN((X' \otimes Z)vec(B) (or ZBX),  K \otimes \V_C +I_n \otimes \Sigma),
+vec(Y) \\sim MVN((X' \\otimes Z)vec(B) (or ZBX),  K \\otimes \\V_C +I_n \\otimes \\Sigma),
 ```
 
 where `Z` is identity, `K` is a genetic kinship, and ``V_C, \\Sigma`` are variance component and error matrices, respectively.  
