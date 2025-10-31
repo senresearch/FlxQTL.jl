@@ -119,9 +119,7 @@ end
 Implement 1d-genome scan.  The second `mlm1Scan()` is for `Z=I` case; 
 one can also run the first by inserting an identity matrix (`Matrix(1.0I,m,m)`) into `Z`.
 
-```math
- vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),
- ```
+`` vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),``
  
 where size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 
@@ -218,9 +216,7 @@ end
 Implement 2d-genome scan.  The second `mlm2Scan()` is for `Z=I` case; 
 one can also run the first by inserting an identity matrix (`Matrix(1.0I,m,m)`) into `Z`.
 
-```math
- vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),
- ```
+``vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),``
 
 where size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 
@@ -313,9 +309,7 @@ end
 Implement permutation test to get thresholds at the levels of type 1 error, `α`.  The second `mlmTest()` is for `Z=I` case; 
 one can also run the first by inserting an identity matrix (`Matrix(1.0I,m,m)`) into `Z`.
 
-```math
- vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),
- ```
+``vec(Y) \\sim MVN ((Z \\otimes X)vec(B) (or XBZ'), \\Sigma \\otimes I_n),``
  
 where size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 

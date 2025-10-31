@@ -79,7 +79,7 @@ function getKc(Y::Array{Float64,2},Tg::Matrix{Float64},λg::Vector{Float64},init
 
 Implement 1d-genome scan with/without LOCO (Leave One Chromosome Out).  The first two functions are FlxQTL models with/without `Z` that 
 preestimate a null variance component matrix (``V_C``) under H0 : no QTL, followed by its adjustment by a scalar parameter under H1 : existing QTL.  
-The third `geneScan()` is based on a conventional MLMM that estimate all parameters under `H_0/H_1`.  
+The third `geneScan()` is based on a conventional MLMM that estimate all parameters under `H0/H1`.  
 The FlxQTL model is defined as 
 
 ```math
@@ -87,7 +87,7 @@ vec(Y)\\sim MVN((X' \\otimes Z)vec(B) (or ZBX), K \\otimes \\Omega +I \\otimes \
 ``` 
 
 where `K` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`` are covariance matrices for random and error terms, respectively.  
-``V_C`` is pre-estimated under the null model (`H_0`) of no QTL from the conventional MLMM, which is equivalent to the FlxQTL model for ``\\tau^2 =1``.  
+``V_C`` is pre-estimated under the null model (`H0`) of no QTL from the conventional MLMM, which is equivalent to the FlxQTL model for ``\\tau^2 =1``.  
 
 # Arguments
 

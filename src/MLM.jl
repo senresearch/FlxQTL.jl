@@ -8,9 +8,11 @@ The default fitting method is mle. ( i.e. reml=false)
 The model: 
 ``Y=XBZ'+E``, 
 
-where ``E(Y)=XBZ'`` (or ``E(vec(Y))= (Z \\otimes X)vec(B)`` ),  ``var(vec(E))=\\Sigma \\otimes I,``
+where ``E(Y)=XBZ'`` (or ``E(vec(Y))= (Z \\otimes X)vec(B)`` ),  
 
-size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
+``var(vec(E))=\\Sigma \\otimes I,``
+
+and size(Y)=(n,m), size(X)=(n,p), and size(Z)=(m,q).
 
 """
 module MLM
