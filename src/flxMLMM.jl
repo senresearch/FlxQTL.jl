@@ -6,18 +6,16 @@
 
 A module designed for fitting a Multivariate Linear Mixed Model
 run by the Nesterov's Accelerated Gradient with restarting scheme embedding the Expectation Conditional Maximization to 
-estimate MLEs.  REML is not supported.
-
-The general form of Multivariate Linear Mixed model is 
+estimate MLEs.  REML is not supported.  The FlxQTL model is defined as 
 
 ```math
-vec(Y) \\sim MVN((X' \\otimes Z)vec(B) (or ZBX),  K \\otimes \\V_C +I \\otimes \\Sigma),
-```
-where ``Z = I_m``, `K` is a genetic kinship, and ``V_C, \\Sigma`` are variance component and error matrices, respectively.  
+vec(Y)\\sim MVN((X' \\otimes Z)vec(B) (or ZBX), K \\otimes \\Omega +I \\otimes \\Sigma),
+``` 
 
-The FlxQTL model (flxMLMM) estimates a scalar parameter ``\\tau^2`` under H1 to efficiently estimate the high dimensional variance 
-component, i.e. ``\\Omega \\approx \\tau^2 V_C`` as well as ``Z \\neq I_m`` to estimate much smaller `B` than the former model with `Z = I`.
-dim(Y) = (m traits, n individuals), dim(X) = (p markers, n), dim(Z) = (m, q trait covariates).
+where `K` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`` are covariance matrices for random and error terms, respectively.  
+``V_C`` is pre-estimated under the null model (`H0`) of no QTL from the conventional MLMM, which is equivalent to the FlxQTL model for ``\\tau^2 =1``.  
+``Z \\neq I_m`` estimates much smaller `B` than the former model with `Z = I`, where 
+dim(Y) = (m traits, n individuals), and dim(X) = (p markers, n), dim(Z) = (m, q trait covariates).
 
 """
 module flxMLMM

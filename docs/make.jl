@@ -23,4 +23,5 @@ makedocs(;
 deploydocs(;
     repo="github.com/senresearch/FlxQTL.jl.git",
     devurl="stable",
+    # devbranch = "master",
 )

@@ -79,15 +79,15 @@ function getKc(Y::Array{Float64,2},Tg::Matrix{Float64},λg::Vector{Float64},init
 
 Implement 1d-genome scan with/without LOCO (Leave One Chromosome Out).  The first two functions are FlxQTL models with/without `Z` that 
 preestimate a null variance component matrix (``V_C``) under H0 : no QTL, followed by its adjustment by a scalar parameter under H1 : existing QTL.  
-The third `geneScan()` is based on a conventional MLMM that estimate all parameters under H0/H1.  
-The conventional MLMM is defined as
-```math
-vec(Y) \\sim MVN((X' \\otimes Z)vec(B) (or ZBX),  K \\otimes \\V_C +I_n \\otimes \\Sigma),
-```
-where `Z` is identity, `K` is a genetic kinship, and ``V_C, \\Sigma`` are variance component and error matrices, respectively.  
+The third `geneScan()` is based on a conventional MLMM that estimate all parameters under `H0/H1`.  
+The FlxQTL model is defined as 
 
-The FlxQTL model estimates a scalar parameter ``\\tau^2`` under H1 to efficiently estimate the high dimensional variance 
-component, i.e. ``\\Omega \\approx \\tau^2 V_C``, where ``Z \\neq I``.
+```math
+vec(Y)\\sim MVN((X' \\otimes Z)vec(B) (or ZBX), K \\otimes \\Omega +I \\otimes \\Sigma),
+``` 
+
+where `K` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`` are covariance matrices for random and error terms, respectively.  
+``V_C`` is pre-estimated under the null model (`H0`) of no QTL from the conventional MLMM, which is equivalent to the FlxQTL model for ``\\tau^2 =1``.  
 
 # Arguments
 
@@ -117,14 +117,14 @@ component, i.e. ``\\Omega \\approx \\tau^2 V_C``, where ``Z \\neq I``.
 
 !!! Note
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`, or increase `df_prior`, such that 
-   ``m+1 \\le df_prior \\le 2m``.  The easiest setting is `df_prior = Int64(ceil(1.9m))` for numerical stability.   
+   ``m+1 \\le`` `df_prior` ``< 2m``.  The easiest setting is `df_prior = Int64(ceil(1.9m))` for numerical stability.   
 
 
 # Output
 
 - `LODs` (or `logP`) : LOD scores. Can change to ``- \\log_{10}{P}`` in [`lod2logP`](@ref) if `LogP = true`.
-- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If covariates are added to `Xnul` : `Xnul= [ones(1,size(Y,2)); Covariates]`,
-        ex. For sex covariates in 4-way cross analysis, B[:,2,100], B[:,3:5,100] are effects for sex, the rest genotypes of the 100th QTL, respectively.
+- `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If sex covariates, e.g. size(C)=(1,n), are added to `Xnul` : `Xnul= [ones(1,size(Y,2)); C]` 
+        in 4-way cross analysis, B[:,2,100], B[:,3:5,100] are effects for sex, the rest genotypes of the 100th QTL, respectively.
 - `est0` : A type of `EcmNestrv.Result` including parameter estimates under H0: no QTL for both functions.  Returns `EcmNestrv.Approx` if `H0_up=true` for the FlxQTL model only.
 """
 function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::Union{Matrix{Float64},Vector{Float64}},
