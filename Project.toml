@@ -1,7 +1,7 @@
 name = "FlxQTL"
 uuid = "ede81e08-c6d8-4fe3-94c2-f928d9d678ed"
 authors = ["Hyeonju Kim <hyeonjukm01@gmail.com>"]
-version = "3.0.1"
+version = "3.0.2"
 
 [deps]
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
