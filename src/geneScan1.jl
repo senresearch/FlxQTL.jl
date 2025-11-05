@@ -152,14 +152,16 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
         for i=eachindex(Chr)
               maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 # estimate H0 model by MVLMM and Kc
-  @time λc, T0,init = getKc(Y,Tg[:,:,i],Λg[:,i],init0;Xnul=Xnul,m=m,Z=Z,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+  # @time λc, T0,init = getKc(Y,Tg[:,:,i],Λg[:,i],init0;Xnul=Xnul,m=m,Z=Z,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+        λc, T0,init = getKc(Y,Tg[:,:,i],Λg[:,i],init0;Xnul=Xnul,m=m,Z=Z,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
                if (cross!=1)
  @fastmath @inbounds X1=transForm(Tg[:,:,i],X0[:,:,maridx],cross)
                  else
 @fastmath @inbounds X1=transForm(Tg[:,:,i],XX.X[maridx,:],cross)
                end
               # τ² estimation only for the null to get a better initial value
-            @time est00=nulScan(init,1,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,H0_up;ρ=ρ,itol=itol,tol=tol)
+            # @time est00=nulScan(init,1,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,H0_up;ρ=ρ,itol=itol,tol=tol)
+              est00=nulScan(init,1,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,H0_up;ρ=ρ,itol=itol,tol=tol)
               lods,H1par1=marker1Scan(nmar,q,1,cross,est00,Λg[:,i],λc,T0.Y,T0.Xnul,X1,T0.Z,df_prior,T0.Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
               LODs[maridx]=lods
               H1par=[H1par;H1par1]
@@ -179,7 +181,8 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
                  X1=transForm(Tg,XX.X,cross)
                end
 
-             @time est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,H0_up;itol=itol,tol=tol,ρ=ρ)
+            #  @time est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,H0_up;itol=itol,tol=tol,ρ=ρ)
+              est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,H0_up;itol=itol,tol=tol,ρ=ρ)
               LODs,H1par=marker1Scan(p,q,1,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,T0.Z,df_prior,T0.Ψ;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
       #   B = arrngB(H1par,size(Xnul,1),q,p,cross)
@@ -234,7 +237,8 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
 @fastmath @inbounds X1=transForm(Tg[:,:,i],XX.X[maridx,:],cross)
                end
               # τ² estimation only for the null to get a better initial value
-            @time est00=nulScan(init,1,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Σ,df_prior,T0.Ψ,H0_up;ρ=ρ,itol=itol,tol=tol)
+            # @time est00=nulScan(init,1,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Σ,df_prior,T0.Ψ,H0_up;ρ=ρ,itol=itol,tol=tol)
+              est00=nulScan(init,1,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Σ,df_prior,T0.Ψ,H0_up;ρ=ρ,itol=itol,tol=tol)
               lods,H1par1=marker1Scan(nmar,m,1,cross,est00,Λg[:,i],λc,T0.Y,T0.Xnul,X1,df_prior,T0.Ψ;ρ=ρ,tol0=tol0,tol1=tol,nchr=i)
               LODs[maridx]=lods
               H1par=[H1par;H1par1]
@@ -247,14 +251,16 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
           end
         
       else #no LOCO
-     @time  λc,T0,init = getKc(Y,Tg,Λg,init0;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+    #  @time  λc,T0,init = getKc(Y,Tg,Λg,init0;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+            λc,T0,init = getKc(Y,Tg,Λg,init0;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
                if (cross!=1)
                  X1=transForm(Tg,X0,cross)
                  else
                  X1=transForm(Tg,XX.X,cross)
                end
 
-             @time est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Σ,df_prior,T0.Ψ,H0_up;itol=itol,tol=tol,ρ=ρ)
+            #  @time est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Σ,df_prior,T0.Ψ,H0_up;itol=itol,tol=tol,ρ=ρ)
+               est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Σ,df_prior,T0.Ψ,H0_up;itol=itol,tol=tol,ρ=ρ)
               LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,df_prior,T0.Ψ;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
       #   B = arrngB(H1par,size(Xnul,1),q,p,cross)
