@@ -311,13 +311,13 @@ where `K` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma``
 - `df_prior`: Degrees of freedom, ``\\nu_0`` for Inverse-Wishart distributon.  `m+1` (weakly informative) is default.
 - `LOCO_all` : Boolean. Default is `false`, which implements `geneScan(LOCO=true)` with permuted data but a null variance component (`Vc`) preestimated only once
                with a kinship ([`kinshipLin`](@ref) for genotype (or allele) probabilities, or [`kinshipStd`](@ref) for genotypes) by `LOCO=false` implicitly.  
-               It is recommended setting `true` for high-dimensional traits for better accuracy, i.e. ``m\\le 16 \\sim 18``.
+               It is recommended setting `true` for higher-dimensional traits for faster convergence and decent accuracy, i.e. approximately ``m > 15`` depending on the data.
 - `itol` : A tolerance controlling ECM (Expectation Conditional Maximization) under H0: no QTL. Default is `1e-3`.
 - `tol0` : A tolerance controlling ECM under H1: existence of QTL. Default is `1e-3`.
 - `tol` : A tolerance of controlling Nesterov Acceleration Gradient method under both H0 and H1. Default is `1e-4`.
 - `ρ` : A tunning parameter controlling ``\\tau^2``. Default is `0.001`.  
-- `δ` : A tuning parameter to correct q non-positive definite kinship without LOCO to pre-estimate a null variance component for low- to medium-dimensional
-        traits (``m \\le 16 \\sim 18``) only.  This `no-LOCO` kinship is computed inside the function for efficient computation.
+- `δ` : A tuning parameter to correct a non-positive definite kinship without LOCO to pre-estimate a null variance component for low- to medium-dimensional
+        traits (``m \\le 10 \\sim 15``) only.  This `no-LOCO` kinship is computed inside the function for efficient computation.
 
 !!! Note
 - When some LOD scores return negative values, reduce tolerences for ECM to `tol0 = 1e-4`, or increase `df_prior`, such that 

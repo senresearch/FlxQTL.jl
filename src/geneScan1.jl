@@ -174,7 +174,7 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
           end
         
       else #no LOCO
-     @time  λc,T0,init = getKc(Y,Tg,Λg,init0;Xnul=Xnul,m=m,Z=Z,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+            λc,T0,init = getKc(Y,Tg,Λg,init0;Xnul=Xnul,m=m,Z=Z,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
                if (cross!=1)
                  X1=transForm(Tg,X0,cross)
                  else
@@ -230,7 +230,8 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
         for i=1:nChr
               maridx=findall(XX.chr.==Chr[i]);nmar=length(maridx)
 # estimate H0 model by MVLMM and Kc
-  @time λc, T0,init = getKc(Y,Tg[:,:,i],Λg[:,i],init0;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+  # @time λc, T0,init = getKc(Y,Tg[:,:,i],Λg[:,i],init0;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
+          λc, T0,init = getKc(Y,Tg[:,:,i],Λg[:,i],init0;Xnul=Xnul,m=m,df_prior=df_prior,Prior=Prior,itol=itol,tol=tol,ρ=ρ)
                if (cross!=1)
  @fastmath @inbounds X1=transForm(Tg[:,:,i],X0[:,:,maridx],cross)
                  else
