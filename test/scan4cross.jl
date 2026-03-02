@@ -96,8 +96,8 @@ lod,b,es=FlxQTL.gene1Scan(T2,λ2,y,X1,Z,4;H0_up=true); #inside function (gene1Sc
 
 @test typeof(b)==Array{Float64,3}
 @test typeof(b2) ==Array{Float64,3}
-@test es.τ2>0.0 
-@test es2.τ2 >0.0
+@test isposdef(es.Vc)
+@test isposdef(es2.Vc)
 @test isposdef(es.Σ)
 @test isposdef(es2.Σ)
 
@@ -119,7 +119,7 @@ lod2,b2,es2=FlxQTL.gene1Scan(4,T2,λ2,y,X1;penalize=true,H0_up=true);
 # @test typeof(b)==Array{Float64,3}
 @test typeof(b2) ==Array{Float64,3}
 # @test es.τ2>0.0 
-@test es2.τ2 >0.0
+@test isposdef(es2.Vc)
 # @test isposdef(es.Σ)
 @test isposdef(es2.Σ)
 
@@ -138,8 +138,8 @@ lod0,b0,es00=FlxQTL.gene1Scan(T3,Λ3,y,X1,Z,4,true;H0_up=true);
 @test sum((lod0.< 0.0))==0.0
 
  for i=axes(Λ3,2)
-     print(@test es00[i].τ2 >0.0)
-     print(@test es01[i].τ2>0.0)
+     print(@test isposdef(es00[i].Vc))
+     print(@test isposdef(es01[i].Vc))
      if (!isposdef(es00[i].Σ))
         
         print(@test issymmetric(es00[i].Σ))
@@ -180,7 +180,7 @@ lod1,b1,es01=FlxQTL.gene1Scan(4,T3,Λ3,y,X1,true;penalize=true,H0_up=true);
  for i=axes(Λ3,2)
 
     # print(@test es00[i].τ2 >0.0)
-     print(@test es01[i].τ2>0.0)
+     print(@test isposdef(es01[i].Vc))
     #  print(@test isposdef(es00[i].Σ))
     print(@test isposdef(es01[i].Σ))
  end
@@ -216,7 +216,7 @@ T2,λ2 = FlxQTL.K2eig(K4,true);
 #no loco &  penalization
  lod2d,es2d=FlxQTL.gene2Scan(3,T2[:,:,1],λ2[:,1],lnY,X7;penalize=true,df_prior=Int64(ceil(1.9m)));
 @test sum(lod2d.<0.0)==0
-@test es2d.τ2 >0.0
+@test isposdef(es2d.Vc)
 @test isposdef(es2d.Σ)
 
 
@@ -229,7 +229,7 @@ lod2d0,es2d0=FlxQTL.gene2Scan(T2[:,:,1],λ2[:,1],lnY,X7,3;penalize=true,df_prior
 # no penalization
 lod2d,es2d=FlxQTL.gene2Scan(3,T2[:,:,1],λ2[:,1],lnY,X7);
 @test sum(lod2d.<0.0)==0
-@test es2d.τ2 >0.0
+@test isposdef(es2d.Vc)
 @test isposdef(es2d.Σ)
 
 
@@ -249,7 +249,7 @@ Lod2d,Es2d=FlxQTL.gene2Scan(3,T2,λ2,lnY,X7,true;penalize=true,df_prior=Int64(ce
 lod2d0,es2d0=FlxQTL.gene2Scan(T2,λ2,lnY,X7,3,true;penalize=true,df_prior=Int64(ceil(1.9m)))
 @test sum(lod2d0.<0.0)==0
  for j=axes(λ2,2)
-    print(@test Es2d[j].τ2 >0.0)
+    print(@test isposdef(Es2d[j].Vc))
     print(@test isposdef(Es2d[j].Σ))
     print(@test isposdef(es2d0[j].Vc))
     print(@test isposdef(es2d0[j].Σ))
@@ -266,7 +266,7 @@ lod2d0,es2d0=FlxQTL.gene2Scan(T2,λ2,lnY,X7,3,true;penalize=true,df_prior=Int64(
 lod2d0,es2d0=FlxQTL.gene2Scan(T2,λ2,lnY,X7,3,true)
 @test sum(lod2d0.<0.0)==0
  for j=axes(λ2,2)
-    print(@test Es2d[j].τ2 >0.0)
+    print(@test isposdef(Es2d[j].Vc))
     print(@test isposdef(Es2d[j].Σ))
     print(@test isposdef(es2d0[j].Vc))
     print(@test isposdef(es2d0[j].Σ))
