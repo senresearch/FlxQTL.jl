@@ -104,9 +104,9 @@ function gene2Scan(Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::Union{Matrix
                    X1=transForm(Tg[:,:,i],XX.X[maridx,:],cross)
                  end
 
-                  est=nulScan(init,kmin,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,true;itol=itol,tol=tol,ρ=ρ)
-                marker2Scan!(LODs,maridx,q,kmin,cross,est,Λg[:,i],λc,T0.Y,T0.Xnul,X1,T0.Z;tol0=tol0,tol1=tol,ρ=ρ)
-                est0=[est0;est];
+                est00=nulScan(init,kmin,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,true;itol=itol,tol=tol,ρ=ρ)
+                marker2Scan!(LODs,maridx,q,kmin,cross,est00,Λg[:,i],λc,T0.Y,T0.Xnul,X1,T0.Z;tol0=tol0,tol1=tol,ρ=ρ)
+                est0 =[est0;Result(est00.B,est00.τ2*init.Kc,est00.Σ,est00.loglik)] 
             end
 
      else #no LOCO
@@ -125,6 +125,7 @@ function gene2Scan(Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::Union{Matrix
             maridx=findall(XX.chr.==Chr[i])
             marker2Scan!(LODs,maridx,q,kmin,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,T0.Z;tol0=tol0,tol1=tol,ρ=ρ)
              end
+           est0 = Result(est0.B,est0.τ2*init.Kc,est0.Σ,est0.loglik)
     end
     return LODs,est0
 end

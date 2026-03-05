@@ -257,7 +257,7 @@ function nulScan(init::InitKc,kmin,λg,λc,Y1,Xnul_t,Z1,Σt,H0_up::Bool;ρ=0.001
  if (H0_up) # null model update for high dimensional traits
     return nulpar
  else
-    return Approx(nulpar.B,nulpar.τ2,nulpar.Σ,init.loglik)
+    return Approx(nulpar.B,nulpar.τ2,nulpar.Σ,init.loglik) # replacing loglik only
  end
 
 end
@@ -270,7 +270,7 @@ function nulScan(init::InitKc,kmin,λg,λc,Y1,Xnul_t,Σt,H0_up::Bool;ρ=0.001,it
  if (H0_up) # null model update for high dimensional traits
     return nulpar
   else
-    return Approx(nulpar.B,nulpar.τ2,nulpar.Σ,init.loglik)
+    return Approx(nulpar.B,nulpar.τ2,nulpar.Σ,init.loglik) # replacing loglik only
   end
 
 end

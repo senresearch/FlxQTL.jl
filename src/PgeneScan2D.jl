@@ -107,7 +107,7 @@ function geneScan2(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg:
            
           est00=nulScan(init,kmin,Λg[:,i],λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,df_prior,T0.Ψ,true;ρ=ρ,itol=itol,tol=tol)
           marker2Scan!(LODs,maridx,q,kmin,cross,est00,Λg[:,i],λc,T0.Y,T0.Xnul,X1,T0.Z,df_prior,T0.Ψ;tol0=tol0,tol1=tol,ρ=ρ)
-          est0 =[est0;est00] #low dimensional traits
+          est0 =[est0;Result(est00.B,est00.τ2*init.Kc,est00.Σ,est00.loglik)] 
          end
 
      else #no LOCO
@@ -125,7 +125,9 @@ function geneScan2(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg:
             maridx=findall(XX.chr.==Chr[i])
             marker2Scan!(LODs,maridx,q,kmin,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,T0.Z,df_prior,T0.Ψ;tol0=tol0,tol1=tol,ρ=ρ)
              end
+            est0 = Result(est0.B,est0.τ2*init.Kc,est0.Σ,est0.loglik)
     end
+
     return LODs,est0
 end
 
@@ -243,7 +245,7 @@ where `Kg` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`
 # Output
 
 - `LODs` : A matrix of LOD scores. Can change to ``- \\log_{10}{P}`` using [`lod2logP`](@ref).
-- `H0est` : A type of `EcmNestrv.Approx` including parameter estimates under H0: no QTL.
+- `H0est` : A type of `EcmNestrv.Result` including parameter estimates under H0: no QTL.
 
 """
 function gene2Scan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::Union{Matrix{Float64},Vector{Float64}},

@@ -39,7 +39,7 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
               LODs[maridx]=lods
               H1par=[H1par;H1par1]
               if (H0_up)
-               est0 =[est0;est00] #high dimensional traits
+               est0 =[est0;Result(est00.B,est00.τ2*init.Kc,est00.Σ,est00.loglik)] #high dimensional traits
               else
                est0=[est0;Result(init.B,init.Kc,init.Σ,init.loglik)];
               end
@@ -59,9 +59,12 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
               LODs,H1par=marker1Scan(p,q,1,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,T0.Z,df_prior,T0.Ψ;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
       #   B = arrngB(H1par,size(Xnul,1),q,p,cross)
-        if (!H0_up) # keep null estimates from getKc
-           est0=Result(init.B,init.Kc,init.Σ,init.loglik)
-        end
+                if (H0_up)
+                    est0 = Result(est0.B,est0.τ2*init.Kc,est0.Σ,est0.loglik)
+                else
+                    est0= Result(init.B,init.Kc,init.Σ,init.loglik)
+                end
+        
   end
 
   # Output choice
@@ -117,7 +120,7 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
               LODs[maridx]=lods
               H1par=[H1par;H1par1]
               if (H0_up)
-               est0 =[est0;est00] #high dimensional traits
+               est0 =[est0;Result(est00.B,est00.τ2*init.Kc,est00.Σ,est00.loglik)] #high dimensional traits
               else
                est0=[est0;Result(init.B,init.Kc,init.Σ,init.loglik)];
               end
@@ -138,9 +141,12 @@ function geneScan(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::
               LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,df_prior,T0.Ψ;tol0=tol0,tol1=tol,ρ=ρ)
            # rearrange B into 3-d array
       #   B = arrngB(H1par,size(Xnul,1),q,p,cross)
-        if (!H0_up) # keep null estimates from getKc
-           est0=Result(init.B,init.Kc,init.Σ,init.loglik)
-        end
+                if (H0_up)
+                    est0 = Result(est0.B,est0.τ2*init.Kc,est0.Σ,est0.loglik)
+                else
+                    est0= Result(init.B,init.Kc,init.Σ,init.loglik)
+                end
+        
   end
 
   # Output choice
@@ -299,7 +305,7 @@ where `Kg` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`
 - `result` : A vector of LOD scores,`LODs` as default  or  ``- \\log_{10}{P}`` by [`lod2logP`](@ref) if `LogP = true`.
 - `B` : A 3-d array of `B` (fixed effects) matrices under H1: existence of QTL.  If sex covariates, e.g. size(C)=(1,n), are added to `Xnul` : `Xnul= [ones(1,size(Y,2)); C]` 
         in 4-way cross analysis, B[:,2,100], B[:,3:5,100] are effects for sex, the rest genotypes of the 100th QTL, respectively.
-- `H0est` : A type of `EcmNestrv.Result` including parameter estimates under H0: no QTL for both functions.  Returns `EcmNestrv.Approx` if `H0_up=true`.
+- `H0est` : A type of `EcmNestrv.Result` including parameter estimates under H0: no QTL for both functions.  
 """
 function gene1Scan(cross::Int64,Tg,Λg,Y::Array{Float64,2},XX::Markers,LOCO::Bool=false;penalize::Bool=false,m=size(Y,1),Z=diagm(ones(m)),H0_up::Bool=false,
           Xnul::Array{Float64,2}=ones(1,size(Y,2)),df_prior=m+1,Prior::Matrix{Float64}=cov(Y,dims=2)*3,

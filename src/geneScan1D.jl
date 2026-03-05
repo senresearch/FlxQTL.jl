@@ -198,7 +198,7 @@ function gene1Scan(Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::Union{Matrix
                 H1par=[H1par;H1par1]
 
                 if (H0_up)
-               est0 =[est0;est00] #high dimensional traits
+               est0 =[est0;Result(est00.B,est00.τ2*init.Kc,est00.Σ,est00.loglik)] #high dimensional traits
               else
                est0=[est0;Result(init.B,init.Kc,init.Σ,init.loglik)];
               end
@@ -215,6 +215,12 @@ function gene1Scan(Tg::Union{Array{Float64,3},Matrix{Float64}},Λg::Union{Matrix
 
                   est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Z,T0.Σ,H0_up;itol=itol,tol=tol,ρ=ρ)
                 LODs,H1par=marker1Scan(p,q,1,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1,T0.Z;tol0=tol0,tol1=tol,ρ=ρ)
+                
+                if (H0_up)
+                    est0 = Result(est0.B,est0.τ2*init.Kc,est0.Σ,est0.loglik)
+                else
+                    est0= Result(init.B,init.Kc,init.Σ,init.loglik)
+                end
         
     end
 
@@ -272,7 +278,7 @@ function geneScan1(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg:
                 H1par=[H1par;H1par1]
 
                 if (H0_up)
-               est0 =[est0;est00] #high dimensional traits
+               est0 =[est0;Result(est00.B,est00.τ2*init.Kc,est00.Σ,est00.loglik)] #high dimensional traits
               else
                est0=[est0;Result(init.B,init.Kc,init.Σ,init.loglik)];
               end
@@ -289,6 +295,12 @@ function geneScan1(cross::Int64,Tg::Union{Array{Float64,3},Matrix{Float64}},Λg:
 
                   est0=nulScan(init,1,Λg,λc,T0.Y,T0.Xnul,T0.Σ,H0_up;itol=itol,tol=tol,ρ=ρ)
                 LODs,H1par=marker1Scan(p,m,1,cross,est0,Λg,λc,T0.Y,T0.Xnul,X1;tol0=tol0,tol1=tol,ρ=ρ)
+                 
+                if (H0_up)
+                    est0 = Result(est0.B,est0.τ2*init.Kc,est0.Σ,est0.loglik)
+                else
+                    est0= Result(init.B,init.Kc,init.Σ,init.loglik)
+                end
         
     end
 
