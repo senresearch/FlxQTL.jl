@@ -1,6 +1,6 @@
 name = "FlxQTL"
 uuid = "ede81e08-c6d8-4fe3-94c2-f928d9d678ed"
-version = "4.0.0"
+version = "4.0.1"
 authors = ["Hyeonju Kim <hyeonjukm01@gmail.com>"]
 
 [deps]
