@@ -54,7 +54,7 @@ XX=FlxQTL.Markers(marname,chr,pos,geno')
 XX1=FlxQTL.Markers(marname,chr,pos,geno)
 
 #test data 
-fidx = genFinoidx(y1)
+fidx = getFinoidx(y1)
 @test length(findx)== 0
 
 h=Y_huber(y1)
