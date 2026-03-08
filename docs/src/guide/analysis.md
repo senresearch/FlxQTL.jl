@@ -91,7 +91,7 @@ K = shrinkg(kinshipMan,10,XX.X) # a matrix
 
 ## 1D genome scan
 
-FlxQTL has added a new functionality for higher dimensional traits, operated by penalized log-likelihood function using `Prior` with `df_prior` for an error term, ``\Sigma``, distributed by Inverse-Wishart distribution to remedy numerial stability.  Users can choose a penalization option in the keyword argument, `penalize =true` when scan or permutation fails convergence in the default setting (no penalization).  The default positive definite scale matrix is then a large scaled matrix (`Prior = cov(Y,dims=2)*3`).  We recommend controlling degrees of freedom (`df_prior`), i.e. ``m+1 (default) \le  df\_prior < 2m ``, or updating the null parameter estimates (`H0_up = true`) for numerical stability when analyzing higher dimenional trait data if any singularity error occurrs.   
+FlxQTL has added a new functionality for higher dimensional traits, operated by penalized log-likelihood function using `Prior` with `df_prior` for an error term, ``\Sigma``, distributed by Inverse-Wishart distribution to remedy numerial stability.  Users can choose a penalization option in the keyword argument, `penalize =true` when scan or permutation fails convergence in the default setting (no penalization).  The default positive definite scale matrix is then a large scaled matrix (`Prior = cov(Y,dims=2)*3`).  We recommend controlling degrees of freedom (`df_prior`), i.e. ``m+1 (default) \le df\_prior < 2m ``, or updating the null parameter estimates (`H0_up = true`) for numerical stability when analyzing higher dimenional traits with genotype probability data if any singularity error occurrs.   
 
 !!! Note 
 - The last resort of `df_prior = Int64(ceil(1.9m))` could be applied unless any of adjustments would work. Any tolerance (`itol`, `tol0`, `tol`) of base algorithms may be adjusted, but this is not needed in most cases.
@@ -151,8 +151,8 @@ lod,b1,Est00 = gene1Scan(T,λ,Ystd,1,XX); # MLMM
 ```
 
 The function `gene1Scan()` has three outputs: `LOD scores (LODs)`, `effects matrix under H1 (B)`, and `parameter estimates under H0 (est0)`, which 
-is an `Array{Any,1}`.  If you want to see null parameter esitmate in chromosome 1 for LOCO option, for instance, type `est0[1].B`, `est0[1].loglik`, `est0[1].τ2`, 
-`est0[1].Σ`, which is a struct of `Approx`, if `H0_up=true` for higher dimensional trait data (``m\ge 16\sim 18``) in the keyword argument.  The default (`false`) returns a struct of `Result` estimated by MLMM for lower dimensional traits.      
+is an `Array{Any,1}`.  If you want to see null parameter esitmate in chromosome 1 for LOCO option, for instance, type `est0[1].B`, `est0[1].loglik`, `est0[1].Vc`, 
+`est0[1].Σ`, which is a struct of `Result`.  When analyzing high-dimensional traits with genotype probability data, e.g. `m = 36` with `cross = 4` without no penalization, this may fail completing genome scan; it is recommended that setting `H0_up=true` and `penalize=true`, which updates the null variance component ``V_C`` by ``\tau^2`` under `H0`, i.e., ``\Omega \approx \tau^2V_C``, followed by the addtional update ``\tau^2`` for each marker. 
 In particular, you can extract values from each matrix in `B` (3D array of matrices) to generate an effects plot. To print an effect size matrix for the 
 third marker, type `B[:,:,3]`, where the last dimension is the order of a marker in the genotype (probability) data.
 

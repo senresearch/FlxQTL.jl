@@ -275,9 +275,8 @@ where `Kg` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`
 !!! Note
 - When some LOD scores return negative values, you may reduce tolerences for ECM to `tol0 = 1e-4`, or increase `df_prior`, where ``m+1 \\le`` `df_prior` ``< 2m``.
    The last resort could be `df_prior = Int64(ceil(1.9m))` to avoid sigularity errors unless any of them works.  
-    Adjusting `df_prior` works better than doing `'Prior`; we do not recommend this adjustment for lower dimensional traits (``m < 15 \\sim 20``), 
-     depending on the data since this may slow the performance.  For lower dimensional trait data, one can use the function of no penalization option.
-
+    Adjusting `df_prior` works better than doing `'Prior`; we do recommend this adjustment for higher dimensional traits with genotype probability data, depending on the data--we have tested no penalization option witout error up to ``m = 16`` with 
+   genotype probabilities or `m = 30` with genotypes.  Lower dimensional traits with penalization slow performance. 
 - This LOCO version of permutation test is desirable to be implemented by high-performance computers.
 
 

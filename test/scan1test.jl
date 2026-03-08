@@ -53,6 +53,17 @@ XX=FlxQTL.Markers(marname,chr,pos,geno')
 # for MLM setup
 XX1=FlxQTL.Markers(marname,chr,pos,geno)
 
+#test data 
+fidx = genFinoidx(y1)
+@test length(findx)== 0
+
+h=Y_huber(y1)
+@test size(h)==size(y1)
+
+a,b = size(y1)
+vec= mat2vec(y1)
+@test length(vec) == a*b
+
 #test shrinkgLoco with kinshipMan, shrinkg
  Kg=FlxQTL.shrinkgLoco(FlxQTL.GRM.kinshipMan,15,XX)
 for j=1:2
@@ -87,6 +98,11 @@ Z1=hcat(ones(m),vcat(-ones(2),ones(2)));
 #MLM:mle
 mlod, bm,mest0= FlxQTL.mlm1Scan(1,y1,XX1,Z)
 mlogp,bm,mest0=FlxQTL.mlm1Scan(1,y1,XX1,Z;LogP=true)
+mlnp = lod2logP(mlod)
+for j= eachindex(mlod)
+ print(@test isapprox(mlogp[j],mlnp[j];atol=0.0001) )
+end
+
 #Z=I
 mlodi, bmi,mest0i= FlxQTL.mlm1Scan(1,y1,XX1)
 mlogpi,bmi,mest0i=FlxQTL.mlm1Scan(1,y1,XX1;LogP=true)

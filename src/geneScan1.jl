@@ -296,8 +296,8 @@ where `Kg` is a genetic kinship, and ``\\Omega \\approx \\tau^2V_C``, ``\\Sigma`
 - If some LOD scores return negative values under penalization or no penalization, then you may reduce tolerences for ECM to e.g., `tol0 = 1e-4` (no penalization), 
   set `H0_up=true`, or (and) switch to penalization (`penalize=true`) followed by adjusting `df_prior`, such that 
    ``m+1 \\le`` `df_prior` ``< 2m`` to avoid singularity errors.  The last resort could be `df_prior = Int64(ceil(1.9m))` when any of them would not work.
-   Adjusting `df_prior` is more effective than doing `Prior`; we do not recommend this adjustment for lower dimensional traits, e.g.``m < 15 \\sim 20``, 
-   depending on the data since this may slow the performance.  
+   Adjusting `df_prior` is more effective than doing `Prior`; we do recommend this adjustment for higher dimensional traits with genotype probability data, depending on the data--we have tested no penalization option witout error up to ``m = 16`` with 
+   genotype probabilities or `m = 30` with genotypes.  Lower dimensional traits with penalization slow performance.  
 
 
 # Output
