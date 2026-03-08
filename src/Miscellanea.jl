@@ -236,7 +236,7 @@ end
 
 """
 
-    getFinoidx(phenoData::Array{Union{Missing,Float64},2})
+    getFinoidx(phenoData::Union{Array{Union{Missing,Float64},2},Matrix{Float64}})
 
 Attains indices of phenotype data without missing values.
 
@@ -245,9 +245,9 @@ Attains indices of phenotype data without missing values.
 - `phenoData` : A matrix of phenotype (or trait) data including missing values. size(phenoData) = (m,n) for `m` traits and `n` individuals.
 
 """
-function getFinoidx(phenoData::Array{Union{Missing,Float64},2})
+function getFinoidx(phenoData::Union{Array{Union{Missing,Float64},2},Matrix{Float64}})
 
-return getindex.(findall(ismissing.(sum(phenoData,dims=1)),2))
+return findall(ismissing.(phenoData))
 
 end
 
